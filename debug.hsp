@@ -1,0 +1,12 @@
+
+    #include "as.header.as"
+    #include "cfg.as"
+    #include "hspda.as"
+    #include "kernel32.as"
+    #include "resistor.as"
+
+    initRegister
+
+    vload "dump_res.bin"
+
+    stop

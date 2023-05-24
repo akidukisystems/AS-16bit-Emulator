@@ -1,0 +1,347 @@
+
+    if ( vbin_CPUmeirei_Main == 0x70 ) : { // HLT
+
+        repeat
+
+            if ( ( cnt \ CPU_CLOCK_CYCLE  ) == 0 ) : await CPU_CLOCK_WAIT
+
+            if ( ( vint_Interrupt ) and ( ( fetchResistorWe(rFL) && fIF ) == fIF ) ) {
+
+                break
+
+            }
+
+            if ( emu_vbin_needReboot ) : break
+                
+        loop
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x71 ) : { // INT
+
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        switch vbin_CPUmeirei_Prm.1
+        case 0x04 // 即値
+            vbin_CPUtmp.0 = vint_CPUparam.0
+        swbreak
+        swend
+
+        vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, vbin_CPUtmp.0 * 4 )         // オフセット
+        vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, vbin_CPUtmp.0 * 4 +2 )      // セグメント
+
+        vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.3)
+        writeResistorWg rSP, vbin_CPUtmp.3
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rFL)
+
+        vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.3)
+        writeResistorWg rSP, vbin_CPUtmp.3
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWs(rCS)
+        writeResistorWs rCS, vbin_CPUtmp.2
+
+        vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.3)
+        writeResistorWg rSP, vbin_CPUtmp.3
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rIP)
+        writeResistorWe rIP, vbin_CPUtmp.1
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x72 ) : { // INT3
+
+        vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, 3 * 4 )
+        vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, 3 * 4 +2 )
+
+        vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.3)
+        writeResistorWg rSP, vbin_CPUtmp.3
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rFL)
+
+        vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.3)
+        writeResistorWg rSP, vbin_CPUtmp.3
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWs(rCS)
+        writeResistorWs rCS, vbin_CPUtmp.2
+
+        vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.3)
+        writeResistorWg rSP, vbin_CPUtmp.3
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rIP)
+        writeResistorWe rIP, vbin_CPUtmp.1
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x73 ) : { // INTO
+
+        if ( TestFlag(fOF) != fOF ) : {
+
+                return
+            
+        }
+
+        vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, 4 * 4 )
+        vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, 4 * 4 +2 )
+
+        vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.3)
+        writeResistorWg rSP, vbin_CPUtmp.3
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rFL)
+
+        vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.3)
+        writeResistorWg rSP, vbin_CPUtmp.3
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWs(rCS)
+        writeResistorWs rCS, vbin_CPUtmp.2
+
+        vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.3)
+        writeResistorWg rSP, vbin_CPUtmp.3
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rIP)
+        writeResistorWe rIP, vbin_CPUtmp.1
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x7A ) : { // CALL
+
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+
+            }
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+        swbreak
+        case 0x04 // 即値
+            vbin_CPUtmp.0 = vint_CPUparam.0
+        swbreak
+        swend
+
+        vbin_CPUtmp.1 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.1)
+        writeResistorWg rSP, vbin_CPUtmp.1
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rIP)
+        writeResistorWe rIP, vbin_CPUtmp.0
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x7B ) : { // RET
+
+        writeResistorWe rIP, wpeek ( emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP) )
+        vbin_CPUtmp.0 = fetchResistorWg(rSP) +2
+        checkDataW(vbin_CPUtmp.0)
+        writeResistorWg rSP, vbin_CPUtmp.0
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x7C ) : { // CALLF
+
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+
+            }
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+        swbreak
+        case 0x04 // 即値
+            vbin_CPUtmp.0 = vint_CPUparam.0
+        swbreak
+        swend
+
+        vbin_CPUtmp.1 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.1)
+        writeResistorWg rSP, vbin_CPUtmp.1
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWs(rCS)
+
+        vbin_CPUtmp.1 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.1)
+        writeResistorWg rSP, vbin_CPUtmp.1
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rIP)
+
+        writeResistorWs rCS, vbin_CPUtmp.0
+        writeResistorWe rIP, 0
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x7D ) : { // FRET
+
+        writeResistorWe rIP, wpeek ( emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP) )
+        vbin_CPUtmp.0 = fetchResistorWg(rSP) +2
+        checkDataW(vbin_CPUtmp.0)
+        writeResistorWg rSP, vbin_CPUtmp.0
+
+        writeResistorWs rCS, wpeek ( emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP) )
+        vbin_CPUtmp.0 = fetchResistorWg(rSP) +2
+        checkDataW(vbin_CPUtmp.0)
+        writeResistorWg rSP, vbin_CPUtmp.0
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x7E ) : { // IRET
+
+        writeResistorWe rIP, wpeek ( emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP) )
+        vbin_CPUtmp.0 = fetchResistorWg(rSP) +2
+        checkDataW(vbin_CPUtmp.0)
+        writeResistorWg rSP, vbin_CPUtmp.0
+
+        writeResistorWs rCS, wpeek ( emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP) )
+        vbin_CPUtmp.0 = fetchResistorWg(rSP) +2
+        checkDataW(vbin_CPUtmp.0)
+        writeResistorWg rSP, vbin_CPUtmp.0
+
+        writeResistorWe rFL, wpeek ( emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP) )
+        vbin_CPUtmp.0 = fetchResistorWg(rSP) +2
+        checkDataW(vbin_CPUtmp.0)
+        writeResistorWg rSP, vbin_CPUtmp.0
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x7F ) : { // CCS
+
+        if ( ( fetchResistorWs(rCS) && 0xF000 ) != 0 ) : return
+
+        writeResistorWe rIP, fetchResistorWs(rCS) *0x10 + fetchResistorWe(rIP)
+        writeResistorWs rCS, 0
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0xFD ) : { // DBG
+
+        vbin_CPUtmp.0 = fetchResistorWe(rFL)
+
+        
+
+        vbin_CPUtmpS.0 = ""
+        repeat 16
+            
+            switch cnt
+            case 0
+                if ( vbin_CPUtmp && fCF ) : vbin_CPUtmpS.0 += "C" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 2
+                if ( vbin_CPUtmp && fPF ) : vbin_CPUtmpS.0 += "P" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 4
+                if ( vbin_CPUtmp && fAF ) : vbin_CPUtmpS.0 += "A" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 6
+                if ( vbin_CPUtmp && fZF ) : vbin_CPUtmpS.0 += "Z" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 7
+                if ( vbin_CPUtmp && fSF ) : vbin_CPUtmpS.0 += "S" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 8
+                if ( vbin_CPUtmp && fTF ) : vbin_CPUtmpS.0 += "T" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 9
+                if ( vbin_CPUtmp && fIF ) : vbin_CPUtmpS.0 += "I" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 10
+                if ( vbin_CPUtmp && fDF ) : vbin_CPUtmpS.0 += "D" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 11
+                if ( vbin_CPUtmp && fOF ) : vbin_CPUtmpS.0 += "O" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            swend
+
+        loop
+
+        mes "AX="+ strf("%04X", fetchResistorWg(rAX)) +" BX="+ strf("%04X", fetchResistorWg(rBX)) +" CX="+ strf("%04X", fetchResistorWg(rCX)) +" DX="+ strf("%04X", fetchResistorWg(rDX)) +" SI="+ strf("%04X", fetchResistorWg(rSI)) +" DI="+ strf("%04X", fetchResistorWg(rDI)) +" BP="+ strf("%04X", fetchResistorWg(rBP)) +" SP="+ strf("%04X", fetchResistorWg(rSP)) +""
+        mes "CS="+ strf("%04X", fetchResistorWs(rCS)) +" DS="+ strf("%04X", fetchResistorWs(rDS)) +" ES="+ strf("%04X", fetchResistorWs(rES)) +" SS="+ strf("%04X", fetchResistorWs(rSS)) +" IP="+ strf("%04X", fetchResistorWe(rIP)) +" "+ vbin_CPUtmpS.0 +""
+        mes "TIME="+ gettick(0) +" ms"
+        mes "TICK="+ emu_vint_executedCmd +"\n"
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0xFE ) : { // UD2
+
+        vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, 6 * 4 )
+        vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, 6 * 4 +2 )
+
+        vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.3)
+        writeResistorWg rSP, vbin_CPUtmp.3
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rFL)
+
+        vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.3)
+        writeResistorWg rSP, vbin_CPUtmp.3
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWs(rCS)
+        writeResistorWs rCS, vbin_CPUtmp.2
+
+        vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.3)
+        writeResistorWg rSP, vbin_CPUtmp.3
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rIP)
+        writeResistorWe rIP, vbin_CPUtmp.1
+
+        return
+
+    }

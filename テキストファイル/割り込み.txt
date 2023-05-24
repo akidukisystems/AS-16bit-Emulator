@@ -1,0 +1,28 @@
+割り込み機能の実装予定表
+
+0x00:ゼロ除算
+0x01:シングルステップ割り込み
+0x02:マスク不可（異常動作）
+0x03:ブレークポイント割り込み
+0x04:INTO オーバーフロー(INTO命令で、OFフラグが立ってる時に呼出)
+
+BIOS
+0x10    video
+0x11    system info
+0x12    low ram size get
+0x13    disk i/o
+0x14    serial port
+0x15    general system services
+0x16    keyboard
+0x17    parallel port
+0x18    call boot fault routine
+0x19    call boot strap routine
+0x1A    time/date
+0x1B    control-break signal
+0x1C    user timer interrupt
+0x1D    video prm table
+0x1E    floppy disk prm table
+0x1F    video graphic character table
+0x41/0x46 used
+0x4A    real time clock interrupt
+0x4F    vbe func

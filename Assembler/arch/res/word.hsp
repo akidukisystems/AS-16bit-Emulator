@@ -1,0 +1,17 @@
+
+    sdim vtable_res_WordTable, 64, 32
+
+    vtable_res_WordTable.0x00 = "AX"
+    vtable_res_WordTable.0x01 = "BX"
+    vtable_res_WordTable.0x02 = "CX"
+    vtable_res_WordTable.0x03 = "DX"
+    vtable_res_WordTable.0x04 = "SI"
+    vtable_res_WordTable.0x05 = "DI"
+    vtable_res_WordTable.0x06 = "BP"
+    vtable_res_WordTable.0x07 = "SP"
+    vtable_res_WordTable.0x10 = "CS"
+    vtable_res_WordTable.0x11 = "DS"
+    vtable_res_WordTable.0x12 = "ES"
+    vtable_res_WordTable.0x13 = "SS"
+    vtable_res_WordTable.0x20 = "IP"
+    vtable_res_WordTable.0x21 = "FL"

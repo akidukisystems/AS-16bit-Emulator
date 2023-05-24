@@ -1,0 +1,1059 @@
+
+    if ( vbin_CPUmeirei_Main == 0x20 ) : { // INC(B)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        vbin_CPUmeirei_Prm.2 = ( vbin_CPUmeirei_Prm.0 && 0x0F )
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+            vbin_CPUtmp.0 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+        swbreak
+        swend
+
+        vbin_CPUtmp.0 ++
+        
+        checkFlagB vbin_CPUtmp.0, ( fOF || fSF || fZF || fPF )
+        checkDataB vbin_CPUtmp.0
+
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                writeResistorBgh vint_CPUparam.0 -0x30, vbin_CPUtmp.0
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                writeResistorBgl vint_CPUparam.0 -0x40, vbin_CPUtmp.0
+
+            }
+        swbreak
+        case 0x02
+            poke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vint_CPUparam.0, vbin_CPUtmp.0
+        swbreak
+        case 0x03
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+            poke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vbin_CPUtmp.1, vbin_CPUtmp.0
+        swbreak
+        swend
+
+
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x21 ) : { // INC(W)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        vbin_CPUmeirei_Prm.2 = ( vbin_CPUmeirei_Prm.0 && 0x0F )
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : {
+
+                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : {
+
+                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+
+            }
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+        swbreak
+        swend
+
+        vbin_CPUtmp.0 ++
+        
+        checkFlagW vbin_CPUtmp.0, ( fOF || fSF || fZF || fPF )
+        checkDataW vbin_CPUtmp.0
+
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                writeResistorWg vint_CPUparam.0, vbin_CPUtmp.0
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                writeResistorWs vint_CPUparam.0 -0x10, vbin_CPUtmp.0
+
+            }
+        swbreak
+        case 0x02
+            wpoke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vint_CPUparam.0, vbin_CPUtmp.0
+        swbreak
+        case 0x03
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+
+            }
+            wpoke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vbin_CPUtmp.1, vbin_CPUtmp.0
+        swbreak
+        swend
+
+        return
+
+    }
+
+
+    
+    if ( vbin_CPUmeirei_Main == 0x22 ) : { // DEC(B)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        vbin_CPUmeirei_Prm.2 = ( vbin_CPUmeirei_Prm.0 && 0x0F )
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+            vbin_CPUtmp.0 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+        swbreak
+        swend
+
+        vbin_CPUtmp.0 --
+        
+        checkFlagB vbin_CPUtmp.0, ( fOF || fSF || fZF || fPF )
+        checkDataB vbin_CPUtmp.0
+
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                writeResistorBgh vint_CPUparam.0 -0x30, vbin_CPUtmp.0
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                writeResistorBgl vint_CPUparam.0 -0x40, vbin_CPUtmp.0
+
+            }
+        swbreak
+        case 0x02
+            poke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vint_CPUparam.0, vbin_CPUtmp.0
+        swbreak
+        case 0x03
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+            poke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vbin_CPUtmp.1, vbin_CPUtmp.0
+        swbreak
+        swend
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x23 ) : { // DEC(W)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        vbin_CPUmeirei_Prm.2 = ( vbin_CPUmeirei_Prm.0 && 0x0F )
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : {
+
+                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : {
+
+                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+
+            }
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+        swbreak
+        swend
+
+        vbin_CPUtmp.0 --
+        
+        checkFlagW vbin_CPUtmp.0, ( fOF || fSF || fZF || fPF )
+        checkDataW vbin_CPUtmp.0
+
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                writeResistorWg vint_CPUparam.0, vbin_CPUtmp.0
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                writeResistorWs vint_CPUparam.0 -0x10, vbin_CPUtmp.0
+
+            }
+        swbreak
+        case 0x02
+            wpoke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vint_CPUparam.0, vbin_CPUtmp.0
+        swbreak
+        case 0x03
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+
+            }
+            wpoke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vbin_CPUtmp.1, vbin_CPUtmp.0
+        swbreak
+        swend
+
+        return
+
+    }
+
+
+
+    if ( vbin_CPUmeirei_Main == 0x24 ) : { // ADD (B)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        vbin_CPUmeirei_Prm.2 = ( vbin_CPUmeirei_Prm.0 && 0x0F )
+
+        switch vbin_CPUmeirei_Prm.2
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgh( vint_CPUparam.1 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgl( vint_CPUparam.1 -0x40 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.1 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.1 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorBgh( vint_CPUparam.1 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorBgl( vint_CPUparam.1 -0x40 )
+
+            }
+            vbin_CPUtmp.1 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.2 )
+        swbreak
+        case 0x04 // 即値
+            vbin_CPUtmp.1 = vint_CPUparam.1
+        swbreak
+        swend
+
+
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+            vbin_CPUtmp.0 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.2 )
+        swbreak
+        swend
+
+
+        vbin_CPUtmp.0 += vbin_CPUtmp.1
+        checkFlagB vbin_CPUtmp.0, ( fOF || fSF || fZF || fAF || fPF || fCF )
+        checkDataB vbin_CPUtmp.0
+
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                writeResistorBgh vint_CPUparam.0 -0x30, vbin_CPUtmp.0
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                writeResistorBgl vint_CPUparam.0 -0x40, vbin_CPUtmp.0
+
+            }
+        swbreak
+        case 0x02
+            poke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vint_CPUparam.0, vbin_CPUtmp.0
+        swbreak
+        case 0x03
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+            poke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vbin_CPUtmp.1, vbin_CPUtmp.0
+        swbreak
+        swend
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x25 ) : { // ADD (W)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        vbin_CPUmeirei_Prm.2 = ( vbin_CPUmeirei_Prm.0 && 0x0F )
+
+        switch vbin_CPUmeirei_Prm.2
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.1 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.1 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorWg( vint_CPUparam.1 )
+
+            }
+            vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.2 )
+        swbreak
+        case 0x04 // 即値
+            vbin_CPUtmp.1 = vint_CPUparam.1
+        swbreak
+        swend
+
+
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.2 )
+        swbreak
+        swend
+
+        vbin_CPUtmp.0 += vbin_CPUtmp.1
+        checkFlagW vbin_CPUtmp.0, ( fOF || fSF || fZF || fAF || fPF || fCF )
+        checkDataW vbin_CPUtmp.0
+
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                writeResistorWg vint_CPUparam.0, vbin_CPUtmp.0
+
+            }
+        swbreak
+        case 0x02
+            wpoke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vint_CPUparam.0, vbin_CPUtmp.0
+        swbreak
+        case 0x03
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            wpoke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vbin_CPUtmp.1, vbin_CPUtmp.0
+        swbreak
+        swend
+
+        return
+
+    }
+
+
+
+    if ( vbin_CPUmeirei_Main == 0x26 ) : { // SUB (B)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        vbin_CPUmeirei_Prm.2 = ( vbin_CPUmeirei_Prm.0 && 0x0F )
+
+        switch vbin_CPUmeirei_Prm.2
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgh( vint_CPUparam.1 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgl( vint_CPUparam.1 -0x40 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.1 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.1 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorBgh( vint_CPUparam.1 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorBgl( vint_CPUparam.1 -0x40 )
+
+            }
+            vbin_CPUtmp.1 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.2 )
+        swbreak
+        case 0x04 // 即値
+            vbin_CPUtmp.1 = vint_CPUparam.1
+        swbreak
+        swend
+
+
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+            vbin_CPUtmp.0 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.2 )
+        swbreak
+        swend
+
+        vbin_CPUtmp.0 -= vbin_CPUtmp.1
+        checkFlagB vbin_CPUtmp.0, ( fOF || fSF || fZF || fAF || fPF || fCF )
+        checkDataB vbin_CPUtmp.0
+
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                writeResistorBgh vint_CPUparam.0 -0x30, vbin_CPUtmp.0
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                writeResistorBgl vint_CPUparam.0 -0x40, vbin_CPUtmp.0
+
+            }
+        swbreak
+        case 0x02
+            poke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vint_CPUparam.0, vbin_CPUtmp.0
+        swbreak
+        case 0x03
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+            poke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vbin_CPUtmp.1, vbin_CPUtmp.0
+        swbreak
+        swend
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x27 ) : { // SUB (W)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        vbin_CPUmeirei_Prm.2 = ( vbin_CPUmeirei_Prm.0 && 0x0F )
+
+        switch vbin_CPUmeirei_Prm.2
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.1 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.1 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorWg( vint_CPUparam.1 )
+
+            }
+            vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.2 )
+        swbreak
+        case 0x04 // 即値
+            vbin_CPUtmp.1 = vint_CPUparam.1
+        swbreak
+        swend
+
+
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.2 )
+        swbreak
+        swend
+
+        vbin_CPUtmp.0 -= vbin_CPUtmp.1
+        checkFlagW vbin_CPUtmp.0, ( fOF || fSF || fZF || fAF || fPF || fCF )
+        checkDataW vbin_CPUtmp.0
+
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                writeResistorWg vint_CPUparam.0, vbin_CPUtmp.0
+
+            }
+        swbreak
+        case 0x02
+            wpoke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vint_CPUparam.0, vbin_CPUtmp.0
+        swbreak
+        case 0x03
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            wpoke emu_vbin_Memory, fetchResistorWs(rDS) *0x10 +vbin_CPUtmp.1, vbin_CPUtmp.0
+        swbreak
+        swend
+
+        return
+
+    }
+
+
+
+    if ( vbin_CPUmeirei_Main == 0x28 ) : { // MUL (B)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+            vbin_CPUtmp.0 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+        swbreak
+        swend
+        
+        vbin_CPUtmp.0 *= fetchResistorBgl(rAL)
+        checkFlagW vbin_CPUtmp.0, ( fOF || fCF )
+        checkDataW vbin_CPUtmp.0
+        writeResistorWg rAX, vbin_CPUtmp.0
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x29 ) : { // MUL (W)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+        swbreak
+        swend
+
+        
+        
+        vbin_CPUtmp.0 *= fetchResistorWg(rAX)
+        checkFlagD vbin_CPUtmp.0, ( fOF )
+        checkDataD vbin_CPUtmp.0
+        writeResistorWg rAX, ( vbin_CPUtmp.0 && 0x0000FFFF )
+        writeResistorWg rDX, RBS ( vbin_CPUtmp.0 && 0xFFFF0000, 16 )
+
+        return
+
+    }
+
+
+
+    if ( vbin_CPUmeirei_Main == 0x2A ) : { // DIV (B)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+            vbin_CPUtmp.0 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+        swbreak
+        swend
+
+        if ( vbin_CPUtmp.0 == ZERO ) : {
+
+            // #DE 除算エラー 例外
+            mes "#DE"
+            stop
+
+        }
+        
+        vbin_CPUtmp.1 = fetchResistorWg(rAX) / vbin_CPUtmp.0
+        vbin_CPUtmp.2 = fetchResistorWg(rAX) \ vbin_CPUtmp.0
+
+        if ( vbin_CPUtmp.2 > MAX8B ) : {
+
+            // #DE 除算エラー 例外
+            mes "#DE"
+            stop
+
+        }
+
+        writeResistorBgh rAH, vbin_CPUtmp.2 ;余り   
+        writeResistorBgl rAL, vbin_CPUtmp.1 ;商
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x2B ) : { // DIV (W)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+        swbreak
+        swend
+
+        vbin_CPUtmp.1 = fetchResistorWg(rDX) << 16
+        vbin_CPUtmp.1 += fetchResistorWg(rAX)
+
+        if ( vbin_CPUtmp.0 == ZERO ) : {
+
+            // #DE 除算エラー 例外
+            mes "#DE"
+            stop
+
+        }
+
+        vbin_CPUtmp.2 = vbin_CPUtmp.1 / vbin_CPUtmp.0
+        vbin_CPUtmp.3 = vbin_CPUtmp.1 \ vbin_CPUtmp.0
+
+        if ( vbin_CPUtmp.2 > MAX16B ) : {
+
+            // #DE 除算エラー 例外
+            mes "#DE"
+            stop
+
+        }
+
+        writeResistorWg rDX, vbin_CPUtmp.3  ;余り
+        writeResistorWg rAX, vbin_CPUtmp.2  ;商
+
+        return
+
+    }
+
+
+
+    if ( vbin_CPUmeirei_Main == 0x50 ) : { // CMP (B)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        vbin_CPUmeirei_Prm.2 = ( vbin_CPUmeirei_Prm.0 && 0x0F )
+
+        switch vbin_CPUmeirei_Prm.2
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgh( vint_CPUparam.1 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorBgl( vint_CPUparam.1 -0x40 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.1 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.1 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorBgh( vint_CPUparam.1 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorBgl( vint_CPUparam.1 -0x40 )
+
+            }
+            vbin_CPUtmp.1 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.2 )
+        swbreak
+        case 0x04 // 即値
+            vbin_CPUtmp.1 = vint_CPUparam.1
+        swbreak
+        swend
+
+
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x30 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorBgh( vint_CPUparam.0 -0x30 )
+
+            }
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x40 ) : { // パラメータ1の上位4bitが0x04の場合（汎用BYTE_LOW レジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorBgl( vint_CPUparam.0 -0x40 )
+
+            }
+            vbin_CPUtmp.0 = peek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.2 )
+        swbreak
+        swend
+
+        vbin_CPUtmp.0 -= vbin_CPUtmp.1
+        checkFlagBcmp vbin_CPUtmp.0, ( fOF || fSF || fZF || fAF || fPF || fCF )
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x51 ) : { // CMP (W)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        vbin_CPUmeirei_Prm.2 = ( vbin_CPUmeirei_Prm.0 && 0x0F )
+
+        switch vbin_CPUmeirei_Prm.2
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.1 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.1 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorWg( vint_CPUparam.1 )
+
+            }
+            vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.2 )
+        swbreak
+        case 0x04 // 即値
+            vbin_CPUtmp.1 = vint_CPUparam.1
+        swbreak
+        swend
+
+
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+        swbreak
+        case 0x02 // メモリ
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+        swbreak
+        case 0x03 // レジスタp
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+                vbin_CPUtmp.2 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.2 )
+        swbreak
+        swend
+
+        vbin_CPUtmp.0 -= vbin_CPUtmp.1
+        checkFlagWcmp vbin_CPUtmp.0, ( fOF || fSF || fZF || fAF || fPF || fCF )
+
+        return
+
+    }

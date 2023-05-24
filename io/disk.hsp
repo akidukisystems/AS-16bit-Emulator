@@ -1,0 +1,193 @@
+
+    switch vint_CPUio_PortNumber
+
+        case 0x20
+
+            if ( vint_CPUioTypeIsIN == 1 ) {
+
+                vint_CPUio_Result = vint_CPUio_disk_statval
+
+            }
+
+            return
+
+        swbreak
+
+        case 0x21
+
+            if ( vint_CPUioTypeIsIN == 1 ) {
+
+                vint_CPUio_Result = vint_CPUio_disk_errcode
+
+            }
+
+            return
+
+        swbreak
+
+        case 0x22
+
+            if ( vint_CPUioTypeIsIN == 0 ) {
+
+                vint_CPUio_disk_DataOffset = vint_CPUio_PortOutPut
+
+            }
+
+            return
+
+        swbreak
+
+        case 0x23
+
+            if ( vint_CPUioTypeIsIN == 0 ) {
+
+                vint_CPUio_disk_DataSegment = vint_CPUio_PortOutPut
+
+            }
+
+            return
+
+        swbreak
+
+        case 0x24
+
+            if ( vint_CPUioTypeIsIN == 0 ) {
+
+                vint_CPUio_tmp = vint_CPUio_PortOutPut
+                if ( vint_CPUio_tmp > 0xFFFF ) : return
+                vint_CPUio_disk_TruckNum = vint_CPUio_disk_TruckNum || %0011111111
+                vint_CPUio_tmp = vint_CPUio_tmp || %1100000000
+                vint_CPUio_disk_TruckNum = vint_CPUio_disk_TruckNum && vint_CPUio_tmp
+
+            }
+
+            return
+
+        swbreak
+
+        case 0x25
+
+            if ( vint_CPUioTypeIsIN == 0 ) {
+
+                vint_CPUio_tmp = vint_CPUio_PortOutPut
+                vint_CPUio_disk_TruckNum = vint_CPUio_disk_TruckNum || %1100000000
+                vint_CPUio_tmp = vint_CPUio_tmp << 2
+                vint_CPUio_tmp = vint_CPUio_tmp || %0011111111
+                vint_CPUio_disk_TruckNum = vint_CPUio_disk_TruckNum && vint_CPUio_tmp
+
+                vint_CPUio_tmp = vint_CPUio_PortOutPut
+                vint_CPUio_disk_SectorNum = vint_CPUio_tmp && %00111111
+
+            }
+
+            return
+
+        swbreak
+
+        case 0x26
+
+            if ( vint_CPUioTypeIsIN == 0 ) {
+
+                vint_CPUio_disk_HeadNum = vint_CPUio_PortOutPut
+
+            }
+
+            return
+
+        swbreak
+
+        case 0x27
+
+            if ( vint_CPUioTypeIsIN == 0 ) {
+
+                vint_CPUio_disk_DiskNum = vint_CPUio_PortOutPut
+
+            }
+
+            return
+
+        swbreak
+
+        case 0x28
+
+            if ( vint_CPUioTypeIsIN == 0 ) {
+
+                if ( vint_CPUio_PortOutPut == 0x00 ) : vint_CPUio_disk_statval = 1
+
+                if ( vint_CPUio_PortOutPut == 0x01 ) {
+
+                    vbin_CPUio_disk_buffer = ""
+                    vint_CPUio_disk_buffersize = 0
+                    
+                    vint_CPUio_disk_statval = 0
+                    vint_CPUio_disk_errcode = 0
+                    vbin_CPUio_disk_TruckNum = 0
+                    vint_CPUio_disk_SectorNum = 0
+                    vint_CPUio_disk_HeadNum = 0
+                    vint_CPUio_disk_DiskNum = 0
+
+                    vint_CPUio_disk_DiskSectorSize = 0
+                    vint_CPUio_disk_DiskTruckSize = 0
+                    vint_CPUio_disk_DiskCilSize = 0
+                    vint_CPUio_disk_DiskHeadCnt = 0
+
+                    vint_CPUio_disk_DataOffset = 0
+                    vint_CPUio_disk_DataSegment = 0
+
+                    vint_CPUio_disk_statval = 0
+
+                }
+
+                if ( vint_CPUio_PortOutPut == 0x02 ) {
+
+                    vint_CPUio_disk_statval = 0
+
+                }
+
+                if ( vint_CPUio_PortOutPut == 0x03 ) {
+
+                    logmes strf( "%04X", vint_CPUio_disk_DataSegment *0x10 + vint_CPUio_disk_DataOffset )
+                    logmes "head:"+ vint_CPUio_disk_HeadNum +" truck:"+ vint_CPUio_disk_TruckNum +" sector:"+ vint_CPUio_disk_SectorNum
+
+                    if ( ( vint_CPUio_disk_HeadNum*vint_CPUio_disk_DiskCilSize*vint_CPUio_disk_DiskTruckSize + vint_CPUio_disk_TruckNum*vint_CPUio_disk_DiskTruckSize + vint_CPUio_disk_SectorNum ) *vint_CPUio_disk_DiskSectorSize > vint_CPUio_disk_buffersize ) {
+
+                        vint_CPUio_disk_statval = 0xFF
+                        vint_CPUio_disk_errcode = 0x04
+                        return
+
+                    }
+
+                    memcpy emu_vbin_Memory, vbin_CPUio_disk_buffer, 512, vint_CPUio_disk_DataSegment *0x10 + vint_CPUio_disk_DataOffset, ( vint_CPUio_disk_HeadNum*vint_CPUio_disk_DiskCilSize*vint_CPUio_disk_DiskTruckSize + vint_CPUio_disk_TruckNum*vint_CPUio_disk_DiskTruckSize + ( vint_CPUio_disk_SectorNum -1 ) ) *vint_CPUio_disk_DiskSectorSize
+
+                    logmes ( vint_CPUio_disk_HeadNum*vint_CPUio_disk_DiskCilSize*vint_CPUio_disk_DiskTruckSize + vint_CPUio_disk_TruckNum*vint_CPUio_disk_DiskTruckSize + ( vint_CPUio_disk_SectorNum -1 ) ) *vint_CPUio_disk_DiskSectorSize
+                }
+
+                if ( vint_CPUio_PortOutPut == 0x05 ) {
+
+                    exist strf( "fdisk%d.img", vint_CPUio_disk_DiskNum )
+                    vint_CPUio_disk_buffersize = strsize
+                    if ( vint_CPUio_disk_buffersize == -1 ) {
+
+                        vint_CPUio_disk_statval = 0xFF
+                        vint_CPUio_disk_errcode = 0x05
+                        return
+
+                    }
+
+                    sdim vbin_CPUio_disk_buffer, vint_CPUio_disk_buffersize
+                    bload strf( "fdisk%d.img", vint_CPUio_disk_DiskNum ), vbin_CPUio_disk_buffer, vint_CPUio_disk_buffersize
+
+                    vint_CPUio_disk_DiskSectorSize = wpeek( vbin_CPUio_disk_buffer, 0x0E )
+                    vint_CPUio_disk_DiskTruckSize = wpeek( vbin_CPUio_disk_buffer, 0x10 )
+                    vint_CPUio_disk_DiskCilSize = wpeek( vbin_CPUio_disk_buffer, 0x12 )
+                    vint_CPUio_disk_DiskHeadCnt = peek( vbin_CPUio_disk_buffer, 0x14 )
+
+                }
+
+            }
+
+            return
+
+        swbreak
+
+    swend

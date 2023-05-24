@@ -1,0 +1,17 @@
+?sector=512
+?truck=18
+?cyls=80
+?head=2
+?clst=2
+?fat-cnt=2
+?fat-pos=1
+?fat-size=1
+?init
+!boot.bin
++system.sys
++version.txt
++exit.com
++test.com
++dir.com
++cls.com
+=fdisk0.img

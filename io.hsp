@@ -1,0 +1,38 @@
+
+    ;logmes strf("I/O port number equal 0x%04X", vint_CPUio_PortNumber)
+
+    if ( ( vint_CPUio_PortNumber && 0xF0 ) == 0x20 ) : {
+
+        #addition "io/disk.hsp"
+
+    }
+
+    if ( ( vint_CPUio_PortNumber && 0xF0 ) == 0x60 ) : {
+
+        #addition "io/sound.hsp"
+
+    }
+
+    if ( ( vint_CPUio_PortNumber && 0xF0 ) == 0x80 ) : {
+
+        #addition "io/keybd.hsp"
+
+    }
+
+    if ( ( vint_CPUio_PortNumber && 0xF0 ) == 0xF0 ) : {
+
+        #addition "io/intcont.hsp"
+
+    }
+
+    return
+
+*l_CPUio_KeyBuffer
+
+    vint_CPUio_KeyBuffer_wparam = wparam
+    vint_CPUio_KeyBuffer_lparam = lparam
+    vint_CPUio_KeyBuffer_iparam = iparam
+
+    vint_CPUio_KeyBuffer_LT = 64
+
+    return

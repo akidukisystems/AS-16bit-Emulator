@@ -1,0 +1,7 @@
+
+    sdim vtable_res_byteLowTable, 64, 32
+
+    vtable_res_byteLowTable.0x40 = "AL"
+    vtable_res_byteLowTable.0x41 = "BL"
+    vtable_res_byteLowTable.0x42 = "CL"
+    vtable_res_byteLowTable.0x43 = "DL"

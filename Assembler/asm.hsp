@@ -1,0 +1,1494 @@
+
+    #packopt name "asm"
+    #packopt version "version.txt"
+
+    sysfont 11
+    #module
+
+    // convert hex to dec
+    #defcfunc intdh str intdh_p1
+
+        vstr_temp.0 = intdh_p1
+    
+        if ( instr( vstr_temp.0, 0, "0x" ) == 0 ) {
+
+            return int( "$"+ strmid( vstr_temp.0, 2, strlen( vstr_temp.0 ) -2 ) )
+
+        }
+        if ( instr( vstr_temp.0, 0, "h" ) == strlen( vstr_temp.0 ) -1 ) {
+
+            return int( "$"+ strmid( vstr_temp.0, 0, strlen( vstr_temp.0 ) -1 ) )
+
+        }
+
+    return int ( intdh_p1 )
+
+    #global
+
+    #include "as.header.as"
+    #include "cfg.as"
+
+    title "Assembler"
+
+    #enum SIZE_NONE = 1
+    #enum SIZE_WORD
+    #enum SIZE_BYTE
+
+    #enum PRM_NULL = 0
+    #enum PRM_RESISTOR
+    #enum PRM_MEMORY
+    #enum PRM_POINTER
+    #enum PRM_VALUE
+
+    #define WAITMS 2
+
+    cfgAS_init "asm_conf.ascfg"
+    vstr_inputfileName = ""
+
+    pos 0, 0 : objsize 128, 24, 0
+    button goto "Open...", *l_oaa
+    pos 128, 0 : button goto "Assemble", *l_run
+
+    vstr_message = "Ready...\n"
+
+    pos 0, 24
+    mesbox vstr_message, 640, 400, 0, 0
+
+    stop
+
+*l_oaa
+
+    dialog "asm|*", 16, "Assembly file|All"
+    if ( stat ) {
+
+        vstr_inputfileName = refstr
+        vstr_message += "Loaded ASM file. (\""+ refstr +"\")\n"
+        objprm 2, vstr_message
+
+    }
+
+    stop
+
+*l_run
+
+    // initiation
+
+    vstr_inputfileData = ""
+    vstr_loadline = ""
+    vstr_fixedData = ""
+
+    vstr_resistorWordTable      = "AX", "BX", "CX", "DX", "SI", "DI", "BP", "SP", "CS", "DS", "ES", "SS", "IP", "FL"
+    vstr_resistorByteHighTable  = "AH", "BH", "CH", "DH"
+    vstr_resistorByteLowTable   = "AL", "BL", "CL", "DL"
+
+    vtable_com_wordTable = ""
+    #addition "arch\\com\\wordtable.hsp"
+
+    vtable_com_byteTable = ""
+    #addition "arch\\com\\bytetable.hsp"
+
+    vtable_com_noneTable = ""
+    #addition "arch\\com\\nonetable.hsp"
+
+    vtable_res_WordTable = ""
+    #addition "arch\\res\\word.hsp"
+
+    vtable_res_ByteHighTable = ""
+    #addition "arch\\res\\byteh.hsp"
+
+    vtable_res_ByteLowTable = ""
+    #addition "arch\\res\\bytel.hsp"
+
+    vtable_com_transform = ""
+    #addition "arch\\com\\transform.hsp"
+
+    notesel vstr_inputfileData
+    exist vstr_inputfileName
+    if ( strsize == -1 ) : stop
+    noteload vstr_inputfileName
+
+
+
+    vstr_message += "Assembler: Cleaning Code...\n"
+    objprm 2, vstr_message
+
+    // code cleaning.
+    repeat notemax
+
+        noteget vstr_loadline, cnt
+        vint_noteindex = cnt
+
+        // delete indent
+
+        repeat
+
+            if ( ( instr( vstr_loadline, 0, " " ) == 0 ) or ( instr( vstr_loadline, 0, "\t" ) == 0 ) ) {
+
+                vstr_loadline = strmid( vstr_loadline, 1, strlen(vstr_loadline) )
+                
+            } else {
+
+                break
+                
+            }
+
+        loop
+
+        // next line
+
+        if ( vstr_loadline == "" ) {
+            
+            continue cnt+1
+
+        }
+
+
+        sdim vstr_code, 64, 32
+        vint_codeindex = 0
+        vint_DoNotSplitFlag = 0
+
+        // convert fixed string
+
+        repeat
+
+            vstr_getstr = strmid( vstr_loadline, 0, 1 )                         ; this char
+            vstr_loadline = strmid( vstr_loadline, 1, strlen(vstr_loadline)-1 ) ; unconverted chars
+
+            // if "string", then do not convert
+            if ( vstr_getstr == "\"" ) {
+
+                if ( vint_DoNotSplitFlag ) {
+                
+                    vint_DoNotSplitFlag = 0
+
+                } else {
+
+                    vint_DoNotSplitFlag = 1
+
+                }
+
+            }
+
+            // if got char isnt split char, then put char, else change chars pointer
+            if ( ( vstr_getstr != " " ) and ( vstr_getstr != "\t" ) and ( vstr_getstr != "," ) ) {
+
+                vstr_code.vint_codeindex += vstr_getstr
+
+            } else {
+
+                if ( vstr_code.vint_codeindex == "" ) : continue cnt+1  ; if finish this string convert, then go to next string
+                if ( vint_DoNotSplitFlag == 1 ) {                       ; if "string", then its ignore
+                    
+                    vstr_code.vint_codeindex += vstr_getstr
+
+                } else {
+
+                    // next chars pointer
+                    vstr_fixedData += ","+ vstr_code.vint_codeindex +""
+                    vint_codeindex ++
+
+                }
+
+            }
+
+            // if finished, then go to next line
+            if ( strlen(vstr_loadline) == 0 ) { 
+                
+                if ( vstr_code.vint_codeindex == "" ) {
+                    
+                    vstr_fixedData += "\n"
+                    break
+
+                }
+
+                vstr_fixedData += ","+ vstr_code.vint_codeindex +"\n"
+                break
+
+            }
+
+        loop
+
+        await WAITMS
+
+    loop
+
+
+
+    // PreProcess
+
+    sdim vstr_code, 64, 8
+    vint_codeindex = 0
+
+    sdim vtable_enum, 64, 2, 256
+    vint_enumIndex = 0
+
+    sdim vtable_label, 64, 2, 256
+    vint_labelIndex = 0
+
+    sdim vbin_assembledData, 512
+    vint_assembledDataNextIndex = 0
+
+    vint_originaddr = 0
+    vint_originaddr_tmp = 0
+
+    vstr_filename = ""
+
+    notesel vstr_fixedData
+
+    vstr_message += "Assembler: Preprocessing...\n"
+    objprm 2, vstr_message
+
+    repeat notemax
+
+        noteget vstr_loadline, cnt
+
+        sdim vstr_code, 64, 8
+        split vstr_loadline, ",", vstr_code
+
+        if ( instr( vstr_code.1, 0, "#" ) == 0 ) {
+
+            switch vstr_code.1
+            case "#config"
+            
+                if ( vstr_code.2 == "codesize" ) {
+
+                    sdim vbin_assembledData, intdh( vstr_code.3 )
+                    vstr_message += "Assembler: Codesize:"+ intdh( vstr_code.3 ) +" Bytes\n"
+                    objprm 2, vstr_message
+
+                }
+
+                if ( vstr_code.2 == "filename" ) {
+
+                    vstr_filename = strtrim( vstr_code.3, 0, '"' )
+                    vstr_message += "Assembler: filename:\""+ vstr_filename +"\"\n"
+                    objprm 2, vstr_message
+
+                }
+
+            swbreak
+            case "#enum"
+
+                vtable_enum.0.vint_enumIndex = vstr_code.2
+                vtable_enum.1.vint_enumIndex = str( intdh( vstr_code.3 ) )
+                vint_enumIndex ++
+
+                vstr_message += "Assembler: Defined value. (Name:"+ vstr_code.2 +" Value:"+ strf( "%04Xh", intdh( vstr_code.3 ) ) +")\n"
+                objprm 2, vstr_message
+
+            swbreak
+            case "#origin"
+
+                if ( vstr_code.2 == "addr" ) {
+
+                    vint_originaddr = intdh( vstr_code.3 )
+
+                }
+
+            swbreak
+            swend
+
+        }
+
+        await WAITMS
+        
+    loop
+
+    //1st
+
+    
+
+    notesel vstr_fixedData
+
+    dim vtable_type, 4, notemax
+    vint_currentaddress = 0
+
+    sdim vtable_labeluse, 64, 2, 256
+    vint_labeluseIndex = 0
+
+
+    /*
+
+        vtable_type.0 = 命令サイズ {
+            int 0 = NULL
+                1 = NONE
+                2 = WORD
+                3 = BYTE
+        }
+
+        vtable_type.1 = パラメータ1の種類 {
+            int 0 = NULL
+                1 = RESISTOR
+                2 = MEMORY
+                3 = POINTER
+                4 = VALUE
+        }
+
+        vtable_type.2 = パラメータ2の種類 {
+            int 0 = NULL
+                1 = RESISTOR
+                2 = MEMORY
+                3 = POINTER
+                4 = VALUE
+        }
+
+        vtable_type.3 = 命令のあるアドレス
+
+    */
+    
+    vstr_message += "Assembler: 1st passing...\n"
+    objprm 2, vstr_message
+
+    repeat notemax
+
+        vint_thisNoteIndex = cnt
+
+        noteget vstr_loadline, cnt
+        sdim vstr_code, 64, 8
+
+        split vstr_loadline, ",", vstr_code
+
+        // prepocessor command
+        if ( instr( vstr_code.1, 0, "#" ) == 0  ) {
+
+            if ( ( vstr_code.1 == "#origin" ) ) {
+
+                if ( ( vstr_code.2 == "offset" ) ) {
+
+                    vint_originaddr_tmp = vint_originaddr
+                    vint_originaddr = intdh( vstr_code.3 ) 
+
+                    if ( instr( vstr_code.3, 0, "-" ) == 0 ) : vint_originaddr *= -1
+
+                }
+
+                if ( ( vstr_code.2 == "end" ) ) {
+                
+                    vint_originaddr = vint_originaddr_tmp
+
+                }
+
+            }
+
+            continue cnt+1
+
+        }
+
+        // internal command
+        if ( ( instr( vstr_code.1, 0, "&" ) == 0 ) ) {
+
+            if ( vstr_code.1 == "&RESB" ) {
+
+                vint_currentaddress += intdh( vstr_code.2 )
+                vint_assembledDataNextIndex += intdh( vstr_code.2 )
+
+                continue cnt+1
+
+            }
+
+            if ( vstr_code.1 == "&RESBSF" ) {
+
+                if ( ( intdh( vstr_code.2 ) - vint_currentaddress ) < 0 ) {
+                
+                    vstr_message += ""+ strf( "%04Xh", vstr_code.2 ) +" is vaild value.\n"
+                    objprm 2, vstr_message
+                    stop
+
+                }
+
+                vint_currentaddress += intdh( vstr_code.2 ) - vint_currentaddress
+                vint_assembledDataNextIndex += intdh( vstr_code.2 ) - vint_assembledDataNextIndex
+
+                continue cnt+1
+
+            }
+
+            if ( vstr_code.1 == "&DB" ) {
+
+                repeat -1, 2
+
+                    if ( vstr_code.cnt == "" ) : break
+                    if ( instr( vstr_code.cnt, 0, ";" ) == 0 ) : break
+
+                    if ( instr( vstr_code.cnt, 0, "@" ) == 0 ) {
+
+                        vint_temp = cnt
+
+                        repeat length2( vtable_enum )
+
+                            if ( vtable_enum.0.cnt == vstr_code.vint_temp ) {
+
+                                if ( int( vtable_enum.1.cnt ) > 0xFF ) {
+
+                                    vstr_message += "Error: invaild value.\n"
+                                    objprm 2, vstr_message
+                                    stop
+
+                                }
+
+                                poke vbin_assembledData, vint_assembledDataNextIndex, int( vtable_enum.1.cnt )
+                                break
+
+                            }
+
+                        loop
+
+                        vint_assembledDataNextIndex ++
+                        vint_currentaddress ++
+                        continue cnt+1
+
+                    }
+
+                    if ( instr( vstr_code.cnt, 0, "\"" ) == 0 ) {
+
+                        poke vbin_assembledData, vint_assembledDataNextIndex, strtrim( vstr_code.cnt, 0, '\"' )
+                        vint_assembledDataNextIndex += strsize
+                        vint_currentaddress += strsize
+                        continue cnt+1
+
+                    } else {
+
+                        vint_temp = intdh( vstr_code.cnt )
+
+                        if ( vint_temp > 0xFF ) {
+
+                            vstr_message += "Error: invaild value.\n"
+                            objprm 2, vstr_message
+                            stop
+
+                        }
+
+                        poke vbin_assembledData, vint_assembledDataNextIndex, vint_temp
+                        vint_assembledDataNextIndex ++
+                        vint_currentaddress ++
+                        continue cnt+1
+
+                    }
+
+                loop
+
+                continue cnt+1
+
+            }
+
+            if ( vstr_code.1 == "&DW" ) {
+
+                repeat -1, 2
+
+                    if ( vstr_code.cnt == "" ) : break
+                    if ( instr( vstr_code.cnt, 0, ";" ) == 0 ) : break
+
+                    if ( instr( vstr_code.cnt, 0, "@" ) == 0 ) {
+
+                        vint_temp = cnt
+
+                        repeat length2( vtable_enum )
+
+                            if ( vtable_enum.0.cnt == vstr_code.vint_temp ) {
+
+                                wpoke vbin_assembledData, vint_assembledDataNextIndex, int( vtable_enum.1.cnt )
+                                break
+
+                            }
+
+                        loop
+
+                        vint_assembledDataNextIndex += 2
+                        vint_currentaddress += 2
+                        continue cnt+1
+
+                    }
+
+                    if ( instr( vstr_code.cnt, 0, "\"" ) == 0 ) {
+
+                        wpoke vbin_assembledData, vint_assembledDataNextIndex, strtrim( vstr_code.cnt, 0, '\"' )
+                        vint_assembledDataNextIndex += strsize
+                        vint_currentaddress += strsize
+                        continue cnt+1
+
+                    } else {
+
+                        vint_temp = intdh( vstr_code.cnt )
+
+                        if ( vint_temp > 0xFFFF ) {
+
+                            vstr_message += "Error: invaild value.\n"
+                            objprm 2, vstr_message
+                            stop
+
+                        }
+
+                        wpoke vbin_assembledData, vint_assembledDataNextIndex, vint_temp
+                        vint_assembledDataNextIndex += 2
+                        vint_currentaddress += 2
+                        continue cnt+1
+
+                    }
+
+                loop
+
+                continue cnt+1
+
+            }
+
+        }
+
+        // set label
+        if ( ( instr( vstr_code.1, 0, ":" ) == strlen( vstr_code.1 ) -1 ) ) {
+
+            vtable_label.0.vint_labelIndex = vstr_code.1
+            vtable_label.1.vint_labelIndex = str( vint_currentaddress + vint_originaddr )
+            vint_labelIndex ++
+
+            continue cnt+1
+
+        }
+
+        // comment out
+        if ( ( instr( vstr_code.1, 0, ";" ) == 0 ) ) {
+
+            continue cnt+1
+
+        }
+
+        // define parameter cnt and command size
+
+        vtable_type.0.cnt = SIZE_BYTE
+        vtable_type.1.cnt = PRM_VALUE
+        vtable_type.2.cnt = PRM_VALUE
+        vint_this2ndprmIsByte = 0
+
+        // no parameter
+        if ( ( vstr_code.2 == "" ) or ( vstr_code.2 == ";" ) ) {
+            
+            vtable_type.0.cnt = SIZE_NONE
+            vtable_type.1.cnt = PRM_NULL
+            vtable_type.2.cnt = PRM_NULL
+
+            vtable_type.3.cnt = vint_currentaddress
+            vint_currentaddress += 2
+
+            switch vtable_type.0.cnt
+            case SIZE_NONE
+    
+                foreach vtable_com_nonetable
+    
+                    if ( vstr_code.1 == vtable_com_nonetable.cnt ) {
+    
+                        poke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                        vint_assembledDataNextIndex ++
+    
+                        vint_temp.0 = 0
+                        vint_temp.0 += vtable_type.1.vint_thisNoteIndex << 4
+                        vint_temp.0 += vtable_type.2.vint_thisNoteIndex
+    
+                        poke vbin_assembledData, vint_assembledDataNextIndex, vint_temp.0
+                        vint_assembledDataNextIndex ++
+    
+                    }
+    
+                loop
+            
+            swbreak
+            swend
+
+            continue cnt+1
+
+        }
+
+        //value
+
+
+        // memory
+
+        if ( instr( vstr_code.2, 0, "WORD[" ) == 0 ) {
+
+            vtable_type.0.cnt = SIZE_WORD
+            vtable_type.1.cnt = PRM_MEMORY
+
+        }
+
+        if ( instr( vstr_code.3, 0, "WORD[" ) == 0 ) {
+
+            vtable_type.0.cnt = SIZE_WORD
+            vtable_type.2.cnt = PRM_MEMORY
+
+        }
+
+        if ( instr( vstr_code.2, 0, "BYTE[" ) == 0 ) {
+
+            if ( vtable_type.0.cnt != SIZE_WORD ) : vtable_type.0.cnt = SIZE_BYTE
+            vtable_type.1.cnt = PRM_MEMORY
+
+        }
+
+        if ( instr( vstr_code.3, 0, "BYTE[" ) == 0 ) {
+
+            if ( vtable_type.0.cnt != SIZE_WORD ) : vtable_type.0.cnt = SIZE_BYTE
+            vtable_type.2.cnt = PRM_MEMORY
+
+        }
+
+        //pointer
+
+        foreach vstr_resistorWordTable
+
+            if ( vstr_code.2 == "["+ vstr_resistorWordTable.cnt +"]" ) {
+
+                vtable_type.0.vint_thisNoteIndex = SIZE_WORD
+                vtable_type.1.vint_thisNoteIndex = PRM_POINTER
+
+            }
+
+            if ( vstr_code.3 == "["+ vstr_resistorWordTable.cnt +"]" ) {
+
+                vtable_type.0.vint_thisNoteIndex = SIZE_WORD
+                vtable_type.2.vint_thisNoteIndex = PRM_POINTER
+
+            }
+
+        loop
+
+        foreach vstr_resistorByteHighTable
+
+            if ( vstr_code.2 == "["+ vstr_resistorByteHighTable.cnt +"]" ) {
+
+                if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
+                vtable_type.1.vint_thisNoteIndex = PRM_POINTER
+
+            }
+
+            if ( vstr_code.3 == "["+ vstr_resistorByteHighTable.cnt +"]" ) {
+
+                if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
+                vtable_type.2.vint_thisNoteIndex = PRM_POINTER
+                vint_this2ndprmIsByte = SIZE_BYTE
+
+            }
+
+        loop
+
+        foreach vstr_resistorByteLowTable
+
+            if ( vstr_code.2 == "["+ vstr_resistorByteLowTable.cnt +"]" ) {
+
+                if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
+                vtable_type.1.vint_thisNoteIndex = PRM_POINTER
+
+            }
+
+            if ( vstr_code.3 == "["+ vstr_resistorByteLowTable.cnt +"]" ) {
+
+                if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
+                vtable_type.2.vint_thisNoteIndex = PRM_POINTER
+                vint_this2ndprmIsByte = SIZE_BYTE
+
+            }
+
+
+        loop
+
+        //resistor
+
+        foreach vstr_resistorWordTable
+
+            if ( vstr_code.2 == vstr_resistorWordTable.cnt ) {
+
+                vtable_type.0.vint_thisNoteIndex = SIZE_WORD
+                vtable_type.1.vint_thisNoteIndex = PRM_RESISTOR
+
+            }
+
+            if ( vstr_code.3 == vstr_resistorWordTable.cnt ) {
+
+                vtable_type.0.vint_thisNoteIndex = SIZE_WORD
+                vtable_type.2.vint_thisNoteIndex = PRM_RESISTOR
+
+            }
+
+        loop
+
+        foreach vstr_resistorByteHighTable
+
+            if ( vstr_code.2 == vstr_resistorByteHighTable.cnt ) {
+
+                if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
+                vtable_type.1.vint_thisNoteIndex = PRM_RESISTOR
+
+            }
+
+            if ( vstr_code.3 == vstr_resistorByteHighTable.cnt ) {
+
+                if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
+                vtable_type.2.vint_thisNoteIndex = PRM_RESISTOR
+                vint_this2ndprmIsByte = SIZE_BYTE
+
+            }
+
+        loop
+
+        foreach vstr_resistorByteLowTable
+
+            if ( vstr_code.2 == vstr_resistorByteLowTable.cnt ) {
+
+                if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
+                vtable_type.1.vint_thisNoteIndex = PRM_RESISTOR
+
+            }
+
+            if ( vstr_code.3 == vstr_resistorByteLowTable.cnt ) {
+
+                if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
+                vtable_type.2.vint_thisNoteIndex = PRM_RESISTOR
+                vint_this2ndprmIsByte = SIZE_BYTE
+
+            }
+
+        loop
+
+        // one param
+        if ( ( vstr_code.3 == "" ) or ( vstr_code.3 == ";" ) ) {
+
+            if ( ( vtable_type.0.cnt == SIZE_BYTE ) and ( vtable_type.1.cnt == PRM_VALUE ) ) {
+
+                vtable_type.0.cnt == SIZE_WORD
+
+            }
+
+            vtable_type.2.cnt = PRM_NULL
+            vtable_type.3.cnt = vint_currentaddress
+            vint_currentaddress += 4
+
+        } else {
+
+            vtable_type.3.cnt = vint_currentaddress
+            vint_currentaddress += 6
+
+        }
+
+        // replace commnad
+        repeat length2( vtable_com_transform )
+
+            if ( vstr_code.1 == vtable_com_transform.0.cnt ) {
+
+                vstr_code.1 == vtable_com_transform.1.cnt
+                break
+
+            }
+
+        loop
+
+        // convert mnemonic to binary opecode
+
+        switch vtable_type.0.cnt
+        case SIZE_NONE
+
+            foreach vtable_com_nonetable
+
+                if ( vstr_code.1 == vtable_com_nonetable.cnt ) {
+
+                    poke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                    vint_assembledDataNextIndex ++
+
+                    vint_temp.0 = 0
+                    vint_temp.0 += vtable_type.1.vint_thisNoteIndex << 4
+                    vint_temp.0 += vtable_type.2.vint_thisNoteIndex
+
+                    poke vbin_assembledData, vint_assembledDataNextIndex, vint_temp.0
+                    vint_assembledDataNextIndex ++
+
+                    break
+
+                }
+
+            loop
+        
+        swbreak
+        case SIZE_WORD
+
+            foreach vtable_com_wordtable
+
+                if ( vstr_code.1 == vtable_com_wordtable.cnt ) {
+
+                    //code
+                    poke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                    vint_assembledDataNextIndex ++
+
+                    vint_temp.0 = 0
+                    vint_temp.0 += vtable_type.1.vint_thisNoteIndex << 4
+                    vint_temp.0 += vtable_type.2.vint_thisNoteIndex
+
+                    //prmdata
+                    poke vbin_assembledData, vint_assembledDataNextIndex, vint_temp.0
+                    vint_assembledDataNextIndex ++
+
+                    //prm1
+                    if ( vtable_type.1.vint_thisNoteIndex == PRM_RESISTOR ) {
+
+                        foreach vtable_res_WordTable
+
+                            if ( vstr_code.2 == vtable_res_WordTable.cnt ) {
+
+                                wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                vint_assembledDataNextIndex += 2
+
+                                break
+
+                            }
+
+                        loop
+
+                    }
+
+                    if ( vtable_type.1.vint_thisNoteIndex == PRM_POINTER ) {
+
+                        foreach vtable_res_WordTable
+
+                            if ( vstr_code.2 == "["+ vtable_res_WordTable.cnt +"]" ) {
+
+                                wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                vint_assembledDataNextIndex += 2
+
+                                break
+
+                            }
+
+                        loop
+
+                    }
+
+                    if ( vtable_type.1.vint_thisNoteIndex == PRM_MEMORY ) {
+
+                        vint_prmfinished = 0
+
+                        if ( instr( vstr_code.2, 0, ":" ) == strlen( vstr_code.2 ) -1 ) {
+
+                            vtable_labeluse.0.vint_labeluseIndex = strmid( vstr_code.2, 5, strlen(vstr_code.2) -6 )
+                            vtable_labeluse.1.vint_labeluseIndex = str( vint_assembledDataNextIndex )
+                            vint_labeluseIndex ++
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( instr( vstr_code.2, 0, "@" ) == 0 ) {
+
+                            repeat length2( vtable_enum )
+
+                                if ( vtable_enum.0.cnt == strmid( vstr_code.2, 5, strlen(vstr_code.2) -6 ) ) {
+
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, vtable_enum.1.cnt
+                                    break
+
+                                }
+
+                            loop
+
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( vint_prmfinished == 0 ) {
+
+                            wpoke vbin_assembledData, vint_assembledDataNextIndex, intdh( strmid( vstr_code.2, 5, strlen(vstr_code.2) -6 ) )
+                            vint_assembledDataNextIndex += 2
+
+                        }
+
+                    }
+
+                    if ( vtable_type.1.vint_thisNoteIndex == PRM_VALUE ) {
+
+                        vint_prmfinished = 0
+
+                        if ( instr( vstr_code.2, 0, ":" ) == strlen( vstr_code.2 ) -1 ) {
+
+                            vtable_labeluse.0.vint_labeluseIndex = vstr_code.2
+                            vtable_labeluse.1.vint_labeluseIndex = str( vint_assembledDataNextIndex )
+                            vint_labeluseIndex ++
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( instr( vstr_code.2, 0, "@" ) == 0 ) {
+
+                            repeat length2( vtable_enum )
+
+                                if ( vtable_enum.0.cnt == vstr_code.2 ) {
+
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, int( vtable_enum.1.cnt )
+                                    break
+
+                                }
+
+                            loop
+
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( vint_prmfinished == 0 ) {
+
+                            wpoke vbin_assembledData, vint_assembledDataNextIndex, intdh( vstr_code.2 )
+                            vint_assembledDataNextIndex += 2
+
+                        }
+
+                    }
+
+                    //prm2
+                    if ( vtable_type.2.vint_thisNoteIndex == PRM_NULL ) {
+
+                    }
+
+                    if ( vtable_type.2.vint_thisNoteIndex == PRM_RESISTOR ) {
+
+                        if ( vint_this2ndprmIsByte == SIZE_BYTE ) {
+
+                            foreach vtable_res_ByteHighTable
+
+                                if ( vstr_code.3 == vtable_res_ByteHighTable.cnt ) {
+
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                    vint_assembledDataNextIndex += 2
+                                    break
+
+                                }
+
+                            loop
+
+                            foreach vtable_res_ByteLowTable
+
+                                if ( vstr_code.3 == vtable_res_ByteLowTable.cnt ) {
+
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                    vint_assembledDataNextIndex += 2
+                                    break
+
+                                }
+
+                            loop   
+
+                        } else {
+
+                            foreach vtable_res_WordTable
+
+                                if ( vstr_code.3 == vtable_res_WordTable.cnt ) {
+
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                    vint_assembledDataNextIndex += 2
+
+                                    break
+
+                                }
+
+                            loop
+
+                        }
+
+                    }
+
+                    if ( vtable_type.2.vint_thisNoteIndex == PRM_POINTER ) {
+
+                        if ( vint_this2ndprmIsByte == SIZE_BYTE ) {
+
+                            foreach vtable_res_ByteHighTable
+
+                                if ( vstr_code.3 == "["+ vtable_res_ByteHighTable.cnt +"]" ) {
+
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                    vint_assembledDataNextIndex += 2
+
+                                    break
+
+                                }
+
+                            loop
+
+                            foreach vtable_res_ByteLowTable
+
+                                if ( vstr_code.3 == "["+ vtable_res_ByteLowTable.cnt +"]" ) {
+
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                    vint_assembledDataNextIndex += 2
+
+                                    break
+
+                                }
+
+                            loop
+                            
+                        } else {
+
+                            foreach vtable_res_WordTable
+
+                                if ( vstr_code.3 == "["+ vtable_res_WordTable.cnt +"]" ) {
+
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                    vint_assembledDataNextIndex += 2
+
+                                    break
+
+                                }
+
+                            loop
+
+                        }
+
+                    }
+
+                    if ( vtable_type.2.vint_thisNoteIndex == PRM_MEMORY ) {
+
+                        vint_prmfinished = 0
+
+                        if ( instr( vstr_code.3, 0, ":" ) == strlen( vstr_code.3 ) -1 ) {
+
+                            vtable_labeluse.0.vint_labeluseIndex = strmid( vstr_code.3, 5, strlen(vstr_code.3) -6 )
+                            vtable_labeluse.1.vint_labeluseIndex = str( vint_assembledDataNextIndex )
+                            vint_labeluseIndex ++
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( instr( vstr_code.3, 0, "@" ) == 0 ) {
+
+                            repeat length2( vtable_enum )
+
+                                if ( vtable_enum.0.cnt == strmid( vstr_code.3, 5, strlen(vstr_code.3) -6 ) ) {
+
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, int( vtable_enum.1.cnt )
+                                    break
+
+                                }
+
+                            loop
+
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( vint_prmfinished == 0 ) {
+
+                            wpoke vbin_assembledData, vint_assembledDataNextIndex, intdh( strmid( vstr_code.3, 5, strlen(vstr_code.3) -6 ) )
+                            vint_assembledDataNextIndex += 2
+
+                        }
+
+                    }
+
+                    if ( vtable_type.2.vint_thisNoteIndex == PRM_VALUE ) {
+
+                        vint_prmfinished = 0
+
+                        if ( instr( vstr_code.3, 0, ":" ) == strlen( vstr_code.3 ) -1 ) {
+
+                            vtable_labeluse.0.vint_labeluseIndex = vstr_code.3
+                            vtable_labeluse.1.vint_labeluseIndex = str( vint_assembledDataNextIndex )
+                            vint_labeluseIndex ++
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( instr( vstr_code.3, 0, "@" ) == 0 ) {
+
+                            repeat length2( vtable_enum )
+
+                                if ( vtable_enum.0.cnt == vstr_code.3 ) {
+
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, int( vtable_enum.1.cnt )
+                                    break
+
+                                }
+
+                            loop
+
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( vint_prmfinished == 0 ) {
+
+                            wpoke vbin_assembledData, vint_assembledDataNextIndex, intdh( vstr_code.3 )
+                            vint_assembledDataNextIndex += 2
+
+                        }
+
+                    }
+
+                    break
+
+                }
+
+            loop
+
+        swbreak
+        case SIZE_BYTE
+
+            foreach vtable_com_byteTable
+
+                if ( vstr_code.1 == vtable_com_byteTable.cnt ) {
+
+                    //code
+                    poke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                    vint_assembledDataNextIndex ++
+
+                    vint_temp.0 = 0
+                    vint_temp.0 += vtable_type.1.vint_thisNoteIndex << 4
+                    vint_temp.0 += vtable_type.2.vint_thisNoteIndex
+
+                    //prmdata
+                    poke vbin_assembledData, vint_assembledDataNextIndex, vint_temp.0
+                    vint_assembledDataNextIndex ++
+
+                    //prm1
+                    if ( vtable_type.1.vint_thisNoteIndex == PRM_RESISTOR ) {
+
+                        foreach vtable_res_byteHighTable
+
+                            if ( vstr_code.2 == vtable_res_byteHighTable.cnt ) {
+
+                                wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                vint_assembledDataNextIndex += 2
+                                break
+
+                            }
+
+                        loop
+
+                        foreach vtable_res_ByteLowTable
+
+                            if ( vstr_code.2 == vtable_res_ByteLowTable.cnt ) {
+
+                                wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                vint_assembledDataNextIndex += 2
+
+                                break
+
+                            }
+
+                        loop
+
+                    }
+
+                    if ( vtable_type.1.vint_thisNoteIndex == PRM_POINTER ) {
+
+                        foreach vtable_res_ByteHighTable
+
+                            if ( vstr_code.2 == "["+ vtable_res_ByteHighTable.cnt +"]" ) {
+
+                                wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                vint_assembledDataNextIndex += 2
+
+                                break
+
+                            }
+
+                        loop
+
+                        foreach vtable_res_ByteLowTable
+
+                            if ( vstr_code.2 == "["+ vtable_res_ByteLowTable.cnt +"]" ) {
+
+                                wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                vint_assembledDataNextIndex += 2
+
+                                break
+
+                            }
+
+                        loop
+
+                    }
+
+                    if ( vtable_type.1.vint_thisNoteIndex == PRM_MEMORY ) {
+
+                        vint_prmfinished = 0
+
+                        if ( instr( vstr_code.2, 0, ":" ) == strlen( vstr_code.2 ) -1 ) {
+
+                            vtable_labeluse.0.vint_labeluseIndex = strmid( vstr_code.2, 5, strlen(vstr_code.2) -6 )
+                            vtable_labeluse.1.vint_labeluseIndex = str( vint_assembledDataNextIndex )
+                            vint_labeluseIndex ++
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( instr( vstr_code.2, 0, "@" ) == 0 ) {
+
+                            repeat length2( vtable_enum )
+
+                                if ( vtable_enum.0.cnt == strmid( vstr_code.2, 5, strlen(vstr_code.2) -6 ) ) {
+
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, vtable_enum.1.cnt
+                                    break
+
+                                }
+
+                            loop
+
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( vint_prmfinished == 0 ) {
+
+                            wpoke vbin_assembledData, vint_assembledDataNextIndex, intdh( strmid( vstr_code.2, 5, strlen(vstr_code.2) -6 ) )
+                            vint_assembledDataNextIndex += 2
+
+                        }
+
+                    }
+
+                    if ( vtable_type.1.vint_thisNoteIndex == PRM_VALUE ) {
+
+                        vint_prmfinished = 0
+
+                        if ( instr( vstr_code.2, 0, ":" ) == strlen( vstr_code.2 ) -1 ) {
+
+                            vtable_labeluse.0.vint_labeluseIndex = vstr_code.2
+                            vtable_labeluse.1.vint_labeluseIndex = str( vint_assembledDataNextIndex )
+                            vint_labeluseIndex ++
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( instr( vstr_code.2, 0, "@" ) == 0 ) {
+
+                            repeat length2( vtable_enum )
+
+                                if ( vtable_enum.0.cnt == vstr_code.2 ) {
+
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, int( vtable_enum.1.cnt )
+                                    break
+
+                                }
+
+                            loop
+
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( vint_prmfinished == 0 ) {
+
+                            wpoke vbin_assembledData, vint_assembledDataNextIndex, intdh( vstr_code.2 )
+                            vint_assembledDataNextIndex += 2
+
+                        }
+
+                    }
+
+                    //prm2
+                    if ( vtable_type.2.vint_thisNoteIndex == PRM_NULL ) {
+
+                        
+
+                    }
+
+                    if ( vtable_type.2.vint_thisNoteIndex == PRM_RESISTOR ) {
+
+                        foreach vtable_res_ByteHighTable
+
+                            if ( vstr_code.3 == vtable_res_ByteHighTable.cnt ) {
+
+                                wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                vint_assembledDataNextIndex += 2
+                                break
+
+                            }
+
+                        loop
+
+                        foreach vtable_res_ByteLowTable
+
+                            if ( vstr_code.3 == vtable_res_ByteLowTable.cnt ) {
+
+                                wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                vint_assembledDataNextIndex += 2
+                                break
+
+                            }
+
+                        loop
+
+                    }
+
+                    if ( vtable_type.2.vint_thisNoteIndex == PRM_POINTER ) {
+
+                        foreach vtable_res_ByteHighTable
+
+                            if ( vstr_code.3 == "["+ vtable_res_ByteHighTable.cnt +"]" ) {
+
+                                wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                vint_assembledDataNextIndex += 2
+
+                                break
+
+                            }
+
+                        loop
+
+                        foreach vtable_res_ByteLowTable
+
+                            if ( vstr_code.3 == "["+ vtable_res_ByteLowTable.cnt +"]" ) {
+
+                                wpoke vbin_assembledData, vint_assembledDataNextIndex, cnt
+                                vint_assembledDataNextIndex += 2
+
+                                break
+
+                            }
+
+                        loop
+
+                    }
+
+                    if ( vtable_type.2.vint_thisNoteIndex == PRM_MEMORY ) {
+
+                        vint_prmfinished = 0
+
+                        if ( instr( vstr_code.3, 0, ":" ) == strlen( vstr_code.3 ) -1 ) {
+
+                            vtable_labeluse.0.vint_labeluseIndex = strmid( vstr_code.3, 5, strlen(vstr_code.3) -6 )
+                            vtable_labeluse.1.vint_labeluseIndex = str( vint_assembledDataNextIndex )
+                            vint_labeluseIndex ++
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( instr( vstr_code.3, 0, "@" ) == 0 ) {
+
+                            repeat length2( vtable_enum )
+
+                                if ( vtable_enum.0.cnt == strmid( vstr_code.3, 5, strlen(vstr_code.3) -6 ) ) {
+
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, int( vtable_enum.1.cnt )
+                                    break
+
+                                }
+
+                            loop
+
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( vint_prmfinished == 0 ) {
+
+                            wpoke vbin_assembledData, vint_assembledDataNextIndex, intdh( strmid( vstr_code.3, 5, strlen(vstr_code.3) -6 ) )
+                            vint_assembledDataNextIndex += 2
+
+                        }
+
+                    }
+
+                    if ( vtable_type.2.vint_thisNoteIndex == PRM_VALUE ) {
+
+                        vint_prmfinished = 0
+
+                        if ( instr( vstr_code.3, 0, ":" ) == strlen( vstr_code.3 ) -1 ) {
+
+                            vtable_labeluse.0.vint_labeluseIndex = vstr_code.3
+                            vtable_labeluse.1.vint_labeluseIndex = str( vint_assembledDataNextIndex )
+                            vint_labeluseIndex ++
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( instr( vstr_code.3, 0, "@" ) == 0 ) {
+
+                            repeat length2( vtable_enum )
+
+                                if ( vtable_enum.0.cnt == vstr_code.3 ) {
+
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, int( vtable_enum.1.cnt )
+                                    break
+
+                                }
+
+                            loop
+
+                            vint_assembledDataNextIndex += 2
+                            vint_prmfinished = 1
+
+                        }
+
+                        if ( vint_prmfinished == 0 ) {
+
+                            wpoke vbin_assembledData, vint_assembledDataNextIndex, intdh( vstr_code.3 )
+                            vint_assembledDataNextIndex += 2
+
+                        }
+
+                    }
+
+                    break
+
+                }
+
+            loop
+
+        swbreak
+        swend
+
+        await WAITMS
+
+    loop
+
+    // 2nd pass
+
+    vstr_message += "Assembler: 2nd passing...\n"
+    objprm 2, vstr_message
+
+    // convert label to binary address
+    repeat length2( vtable_labeluse )
+
+        if ( vtable_labeluse.0.cnt == "" ) : break
+        vint_thisNoteIndex = cnt
+
+        repeat length2( vtable_label )
+
+            if ( vtable_label.0.cnt == "" ) {
+
+                vstr_message += "Assembler: This label is undefined. (Name:"+ vtable_labeluse.0.vint_thisNoteIndex +")\n"
+                objprm 2, vstr_message
+                stop
+
+            }
+            if ( vtable_labeluse.0.vint_thisNoteIndex == vtable_label.0.cnt ) {
+
+                wpoke vbin_assembledData, int( vtable_labeluse.1.vint_thisNoteIndex ), int( vtable_label.1.cnt )
+                vstr_message += "Assembler: Over writed address. (Name:"+ vtable_label.0.cnt +" Value:"+ strf( "%04Xh", vtable_label.1.cnt ) +" at:"+ strf( "%04Xh", vtable_labeluse.1.vint_thisNoteIndex ) +")\n"
+                objprm 2, vstr_message
+
+                break
+
+            }
+
+        loop
+
+        await WAITMS
+
+    loop
+
+    // finish
+    vstr_message += "Assemble has competed. Saved binary file at \""+ vstr_filename +"\".\n"
+    objprm 2, vstr_message
+
+    bsave vstr_filename, vbin_assembledData
+
+    stop

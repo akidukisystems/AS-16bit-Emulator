@@ -1,0 +1,8 @@
+_FILEVERSION=0.9.0
+_PRODUCTVERSION=0.9.0
+CompanyName=AkidukiSystems
+FileDescription=AS 16bit-Emulator
+FileVersion=0.9.0
+OriginalFilename=emulator.exe
+ProductName=AS 16bit-Emulator
+ProductVersion=0.9.0

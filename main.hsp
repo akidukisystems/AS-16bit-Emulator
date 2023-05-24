@@ -1,0 +1,407 @@
+
+    /* AS 16BIT EMULATOR    Launcher */
+
+    #cmpopt varname 1
+
+    #packopt name "emulator"
+    #packopt version "version.txt"
+
+    #include "as.header.as"
+    #include "cfg.as"
+    #include "hspda.as"
+    #include "kernel32.as"
+
+    #uselib "user32.dll"
+    #func SetTimer  "SetTimer"  int, int, int, int
+    #func KillTimer "KillTimer" int, int
+    #define WM_TIMER        0x0113
+
+    #define StartAddr   0
+    #define EndAddr     1
+    #define SizeAddr    2
+
+    CPU_CLOCK_CYCLE = 256
+    CPU_CLOCK_WAIT = 1
+    DISPLAY_REFRESH_TIME = 5
+    CPU_PIN_REFRESH = 2
+
+    #enum SCREEN_DEBUGLOG_ID = 0
+    #enum SCREEN_DISPLAY_ID
+    #enum SCREEN_CONTROL_ID
+    #enum SCREEN_SIZE_X = 640
+    #enum SCREEN_SIZE_Y = 480
+
+
+    #module
+
+        #uselib "kernel32.dll"
+        #cfunc GetTickCount "GetTickCount"
+
+        #enum global SCRhide = -1
+        #enum global SCRnone = 0
+        #enum global SCRactive = 1
+
+        #deffunc winsel int winsel_winID, int winsel_prm
+            gsel winsel_winID, winsel_prm
+        return
+
+        #deffunc settick int tickID
+            SetTick_int.tickID = GetTickCount()
+        return
+
+        #defcfunc gettick int tickID
+        return GetTickCount() - SetTick_int.tickID
+
+        #define useCustomFont 1
+
+        #uselib "gdi32.dll"
+        #func AddFontResourceA "AddFontResourceA" var
+        #func RemoveFontResourceA "RemoveFontResourceA" var
+
+        #define QFR_DESCRIPTION 1
+        #define QFR_LOGFONT 2
+
+        #deffunc setupFont
+            sdim Var_Temp_StrArray, , 8
+            sdim Var_ApplyFontsLists
+            Var_ApplyFontsLists_index = 0
+        return
+    
+        #deffunc addFont str fontFileName
+            if ( useCustomFont ) : {
+                Var_Temp_StrArray = ""+ dir_cur +"\\"+ fontfilename +""
+                exist Var_Temp_StrArray
+                if ( strsize != -1 ) : {
+                    AddFontResourceA Var_Temp_StrArray
+                    Var_ApplyFontsLists.Var_ApplyFontsLists_index = Var_Temp_StrArray
+                    Var_ApplyFontsLists_index ++
+                }
+            }
+        return
+    
+        #deffunc removeFont onexit
+            if ( useCustomFont ) : {
+                foreach Var_ApplyFontsLists
+                    RemoveFontResourceA Var_ApplyFontsLists.cnt
+                loop
+            }
+        return
+    
+        #deffunc removeFontSelf
+            if ( useCustomFont ) : {
+                foreach Var_ApplyFontsLists
+                    RemoveFontResourceA Var_ApplyFontsLists.cnt
+                loop
+            }
+        return
+
+        #deffunc saveError str saverr_type
+
+            vstr_temp = ""
+            notesel vstr_temp
+            noteadd "==Emulator Error Dump=="
+            noteadd "Emulator compile date: "+ __date__ +" "+ __time__ +""
+            noteadd "Compiler version: "+ __hspver__ +""
+            noteadd strf("Error occured date: %04d/%02d/%02d %02d:%02d:%02d.%03d", gettime(0), gettime(1), gettime(3), gettime(4), gettime(5), gettime(6), gettime(7) )
+            noteadd "Type: "+ saverr_type
+            noteadd "+Resistor"
+
+            vbin_CPUtmp = fetchResistorWe(rFL)
+            vbin_CPUtmpS = ""
+            repeat 16
+                
+                switch cnt
+                case 0
+                    if ( vbin_CPUtmp && fCF ) : vbin_CPUtmpS.0 += "C" : else : vbin_CPUtmpS.0 += "-"
+                swbreak
+                case 2
+                    if ( vbin_CPUtmp && fPF ) : vbin_CPUtmpS.0 += "P" : else : vbin_CPUtmpS.0 += "-"
+                swbreak
+                case 4
+                    if ( vbin_CPUtmp && fAF ) : vbin_CPUtmpS.0 += "A" : else : vbin_CPUtmpS.0 += "-"
+                swbreak
+                case 6
+                    if ( vbin_CPUtmp && fZF ) : vbin_CPUtmpS.0 += "Z" : else : vbin_CPUtmpS.0 += "-"
+                swbreak
+                case 7
+                    if ( vbin_CPUtmp && fSF ) : vbin_CPUtmpS.0 += "S" : else : vbin_CPUtmpS.0 += "-"
+                swbreak
+                case 8
+                    if ( vbin_CPUtmp && fTF ) : vbin_CPUtmpS.0 += "T" : else : vbin_CPUtmpS.0 += "-"
+                swbreak
+                case 9
+                    if ( vbin_CPUtmp && fIF ) : vbin_CPUtmpS.0 += "I" : else : vbin_CPUtmpS.0 += "-"
+                swbreak
+                case 10
+                    if ( vbin_CPUtmp && fDF ) : vbin_CPUtmpS.0 += "D" : else : vbin_CPUtmpS.0 += "-"
+                swbreak
+                case 11
+                    if ( vbin_CPUtmp && fOF ) : vbin_CPUtmpS.0 += "O" : else : vbin_CPUtmpS.0 += "-"
+                swbreak
+                swend
+
+            loop
+
+            noteadd "AX="+ strf("%04X", fetchResistorWg(rAX)) +" BX="+ strf("%04X", fetchResistorWg(rBX)) +" CX="+ strf("%04X", fetchResistorWg(rCX)) +" DX="+ strf("%04X", fetchResistorWg(rDX)) +" SI="+ strf("%04X", fetchResistorWg(rSI)) +" DI="+ strf("%04X", fetchResistorWg(rDI)) +" BP="+ strf("%04X", fetchResistorWg(rBP)) +" SP="+ strf("%04X", fetchResistorWg(rSP)) +""
+            noteadd "CS="+ strf("%04X", fetchResistorWs(rCS)) +" DS="+ strf("%04X", fetchResistorWs(rDS)) +" ES="+ strf("%04X", fetchResistorWs(rES)) +" SS="+ strf("%04X", fetchResistorWs(rSS)) +" IP="+ strf("%04X", fetchResistorWe(rIP)) +" "+ vbin_CPUtmpS.0 +""
+            noteadd ""
+            noteadd "+Other infomation"
+            noteadd "TIME="+ gettick(0) +" ms"
+            noteadd "TICK="+ emu_vint_executedCmd@ +""
+
+            notesave "error.txt"
+            noteunsel
+
+        return
+
+    #global
+
+    logmes strf("%x",__hspver__)
+
+
+    screen SCREEN_DEBUGLOG_ID, SCREEN_SIZE_X, SCREEN_SIZE_Y
+    screen SCREEN_DISPLAY_ID, SCREEN_SIZE_X, SCREEN_SIZE_Y, 4
+    screen SCREEN_CONTROL_ID, SCREEN_SIZE_Y /2, SCREEN_SIZE_X/2, 8+4
+
+
+
+    winsel SCREEN_DEBUGLOG_ID, SCRactive
+    title "AS 16bit Emulator - debug"
+    initscr
+    sysfont 11
+
+    winsel SCREEN_DISPLAY_ID, SCRactive
+    title "AS 16bit Emulator - screen"
+    initscr
+    font msgothic, 16
+
+
+
+    winsel SCREEN_CONTROL_ID, SCRactive
+    title "Controler"
+    objsize SCREEN_SIZE_Y /2, 32, 0
+    button gosub "RESET", *l_control_RESET
+    button gosub "Save dump", *l_control_dump
+    button goto "DEBUG", *l_control_debug
+
+
+
+    winsel SCREEN_DEBUGLOG_ID, SCRactive 
+    pos 0, 460 : mes "Use the remote controller to operate the v.m.."
+    pos 0, 0
+    mes "Emulator compile date:"+ __date__ +" "+ __time__ +""
+    mes "Booting emulator..."
+
+    // font setup
+
+    chdir "Resources"
+	dirlist vstr_temp, "*.FON", 1
+	notesel vstr_temp
+
+	setupFont
+
+	repeat notemax
+
+		noteget vstr_temp.1, cnt
+		exist vstr_temp.1
+		if ( strsize != -1 ) : {
+			
+			addfont vstr_temp.1
+			mes "Loaded font file: \""+ getpath( vstr_temp.1, 8 ) +"\""
+
+		}
+
+	loop
+
+	chdir "..\\"
+	noteunsel
+
+    mes "Applied fonts"
+
+    cfgAS_init "emu_conf.ascfg"
+    
+    vstr_ProcessorName = "(none)"
+    vstr_ProcessorArchName = "(none)"
+    vstr_ProcessorVendor = "(none)"
+    vint_VRAM_Format = 1
+    vstr_FontName = "Bm437 IBM VGA 8x16"
+    
+    cfgAS_read "Processor.Name", vstr_ProcessorName
+    cfgAS_read "Processor.ArchName", vstr_ProcessorArchName
+    cfgAS_read "Processor.Vendor", vstr_ProcessorVendor
+
+    cfgAS_read "Processor.ClockCycle", CPU_CLOCK_CYCLE
+    cfgAS_read "Processor.ClockPause", CPU_CLOCK_WAIT
+    cfgAS_read "Processor.RefreshTime", CPU_PIN_REFRESH
+    cfgAS_read "Graphic.RefreshTime", DISPLAY_REFRESH_TIME
+
+    color CLR_WHITE
+    
+    cfgAS_read "BIOS.MemoryTable.StartAddr.MainCodeArea", vint_Ram_BIOS_MainCode.StartAddr
+    cfgAS_read "BIOS.MemoryTable.EndAddr.MainCodeArea"  , vint_Ram_BIOS_MainCode.EndAddr
+    vint_Ram_BIOS_MainCode.SizeAddr = vint_Ram_BIOS_MainCode.EndAddr - vint_Ram_BIOS_MainCode.StartAddr +1
+    cfgAS_read "BIOS.MemoryTable.StartAddr.SubCodeArea", vint_Ram_BIOS_SubCode.StartAddr
+    cfgAS_read "BIOS.MemoryTable.EndAddr.SubCodeArea"  , vint_Ram_BIOS_SubCode.EndAddr
+    vint_Ram_BIOS_SubCode.SizeAddr = vint_Ram_BIOS_SubCode.EndAddr - vint_Ram_BIOS_SubCode.StartAddr +1
+
+    cfgAS_read "Graphic.MemoryTable.StartAddr.main", vint_Ram_Vram_main.StartAddr
+    cfgAS_read "Graphic.MemoryTable.EndAddr.main", vint_Ram_Vram_main.EndAddr
+    vint_Ram_Vram_main.SizeAddr  = vint_Ram_Vram_main.EndAddr - vint_Ram_Vram_main.StartAddr +1
+    cfgAS_read "Graphic.Format", vint_VRAM_Format
+    cfgAS_read "Graphic.Font", vstr_FontName
+
+    winsel SCREEN_DISPLAY_ID, SCRnone
+    font vstr_FontName, 16
+    mref emu_vbin_VRAM, 66
+    winsel SCREEN_DEBUGLOG_ID, SCRnone
+    font vstr_FontName, 16
+
+    vstr_BIOSpath = "bios.bin"
+    cfgAS_read "BIOS.binaryPath", vstr_BIOSpath
+
+    exist vstr_BIOSpath
+    if ( strsize == -1 ) : {
+
+        mes "BIOS program data is not found!"
+        stop
+        
+    }
+
+    sdim vbin_BIOS, strsize
+    bload vstr_BIOSpath, vbin_BIOS, strsize
+
+    onkey gosub *l_bootKeyPush
+    onexit *l_exit
+
+    mes "Ready..."
+    wait 300
+    
+
+
+*l_emuEntry
+
+    initscr
+
+    vint_CPU_Timer_isActive = 0
+    sdim emu_vbin_Memory, 1048576
+    memcpy emu_vbin_Memory, vbin_BIOS, varsize(vbin_BIOS), vint_Ram_BIOS_MainCode.StartAddr
+    sdim emu_vbin_IO, 0xFFFF
+    emu_vbin_PIN = 0
+    emu_vbin_needReboot = 0
+    sdim vstr_DisplayString, 4800
+
+    emu_vbin_Memory_Index = vint_Ram_BIOS_MainCode.StartAddr
+
+    goto *l_CPUentry
+
+    stop
+
+*l_bootKeyPush
+
+    if ( wparam == 123 ) {
+
+        color 0, 0, 192 : boxf
+        color 192, 192, 192 : boxf 5, 5, 640-5, 480-5
+        color 0, 0, 192 : boxf 10, 30, 640-10, 480-30
+        pos 10, 10 : mes "AkidukiSystems 16bit Emulator Setup Utility"
+        pos 10, 480-25 : mes "Copyright (c) 2022-2023 AkidukiSystems All Rights Reserved."
+
+        color 192, 192, 192
+        pos 15, 40
+        mes "Emulator"
+        mes " -Version: 0.9 Debug"
+        mes " -BIOS binary file: \""+ vstr_BIOSpath +"\""
+        mes "\nProcessor"
+        mes " -Name: "+ vstr_ProcessorName
+        mes " -Vendor: "+ vstr_ProcessorVendor
+        mes " -Speed: 2600 I/s (MAX)"
+        mes " -Architecture: "+ vstr_ProcessorArchName
+
+        stop
+
+    }
+
+
+    return
+
+*l_CPUentry
+
+    #addition "cpu.hsp"
+
+    stop
+
+*l_exit
+
+    if ( vint_CPU_Timer_isActive ) : KillTimer hwnd, 1
+
+    end
+    
+*l_control_RESET
+
+    emu_vbin_PIN = 1
+
+    return
+
+*l_control_dump
+
+    vsave "dump_all.bin"
+    bsave "dump_mem.bin", emu_vbin_Memory
+    vsave_start
+    vsave_put vbin_CPUresistorG
+    vsave_put vbin_CPUresistorS
+    vsave_put vbin_CPUresistorE
+    vsave_end "dump_res.bin"
+
+    return
+
+*l_control_debug
+
+    vload "dump_all.bin"
+
+    vbin_CPUtmp.0 = fetchResistorWe(rFL)
+
+        vbin_CPUtmpS.0 = ""
+        repeat 16
+            
+            switch cnt
+            case 0
+                if ( vbin_CPUtmp && fCF ) : vbin_CPUtmpS.0 += "C" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 2
+                if ( vbin_CPUtmp && fPF ) : vbin_CPUtmpS.0 += "P" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 4
+                if ( vbin_CPUtmp && fAF ) : vbin_CPUtmpS.0 += "A" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 6
+                if ( vbin_CPUtmp && fZF ) : vbin_CPUtmpS.0 += "Z" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 7
+                if ( vbin_CPUtmp && fSF ) : vbin_CPUtmpS.0 += "S" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 8
+                if ( vbin_CPUtmp && fTF ) : vbin_CPUtmpS.0 += "T" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 9
+                if ( vbin_CPUtmp && fIF ) : vbin_CPUtmpS.0 += "I" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 10
+                if ( vbin_CPUtmp && fDF ) : vbin_CPUtmpS.0 += "D" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 11
+                if ( vbin_CPUtmp && fOF ) : vbin_CPUtmpS.0 += "O" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            swend
+
+        loop
+
+        mes "AX="+ strf("%04X", fetchResistorWg(rAX)) +" BX="+ strf("%04X", fetchResistorWg(rBX)) +" CX="+ strf("%04X", fetchResistorWg(rCX)) +" DX="+ strf("%04X", fetchResistorWg(rDX)) +" SI="+ strf("%04X", fetchResistorWg(rSI)) +" DI="+ strf("%04X", fetchResistorWg(rDI)) +" BP="+ strf("%04X", fetchResistorWg(rBP)) +" SP="+ strf("%04X", fetchResistorWg(rSP)) +""
+        mes "CS="+ strf("%04X", fetchResistorWs(rCS)) +" DS="+ strf("%04X", fetchResistorWs(rDS)) +" ES="+ strf("%04X", fetchResistorWs(rES)) +" SS="+ strf("%04X", fetchResistorWs(rSS)) +" IP="+ strf("%04X", fetchResistorWe(rIP)) +" "+ vbin_CPUtmpS.0 +""
+        mes "TIME="+ gettick(0) +" ms"
+        mes "TICK="+ emu_vint_executedCmd +"\n"
+
+    stop
+
+*OnTimer_RTC
+
+    return

@@ -1,0 +1,44 @@
+
+    switch vint_CPUio_PortNumber
+
+    case 0xF0
+
+        if ( vint_CPUioTypeIsIN == 0 ) {
+
+            vint_CPUio_InterruptController_WaitStartMS = GetTickCount()
+
+            logmes vint_CPUio_InterruptController_WaitStartMS
+            logmes vint_CPUio_PortOutPut
+            logmes GetTickCount()
+
+            repeat -1
+
+                await 1
+                
+                if ( vint_CPUio_InterruptController_WaitStartMS +vint_CPUio_PortOutPut <= GetTickCount() ) : break
+
+            loop
+
+        }
+
+        return
+
+    swbreak
+
+    case 0xFF
+
+        if ( vint_CPUioTypeIsIN ) {
+
+            vint_CPUio_Result = emu_vbin_PIN
+
+        } else {
+
+            emu_vbin_PIN = vint_CPUio_PortOutPut
+
+        }
+
+        return
+
+    swbreak
+
+    swend

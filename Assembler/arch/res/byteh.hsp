@@ -1,0 +1,7 @@
+
+    sdim vtable_res_byteHighTable, 64, 32
+
+    vtable_res_byteHighTable.0x30 = "AH"
+    vtable_res_byteHighTable.0x31 = "BH"
+    vtable_res_byteHighTable.0x32 = "CH"
+    vtable_res_byteHighTable.0x33 = "DH"

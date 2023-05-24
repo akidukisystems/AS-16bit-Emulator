@@ -1,0 +1,21 @@
+Processor.Name="AkidukiSystems Virtual Processor 1601"
+Processor.ArchName="AS16"
+Processor.Vendor="AkidukiSystems"
+Processor.ClockCycle=256
+Processor.ClockPause=1
+Processor.RefreshTime=4
+
+BIOS.binaryPath=".\bios.bin"
+
+Graphic.MemoryTable.StartAddr.main=$C6D40
+Graphic.MemoryTable.EndAddr.main=$C7FFF
+Graphic.Format=2
+Graphic.Font="Bm437 PhoenixVGA 8x16"
+Graphic.RefreshTime=10
+
+BIOS.MemoryTable.StartAddr.MainCodeArea=$F0000
+BIOS.MemoryTable.EndAddr.MainCodeArea=$FFFFF
+BIOS.MemoryTable.StartAddr.SubCodeArea=$C8000
+BIOS.MemoryTable.EndAddr.SubCodeArea=$EFFFF
+
+Disk.FloppyImage.FileNameFormat="fdisk%02d.img"

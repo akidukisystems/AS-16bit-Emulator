@@ -1,0 +1,307 @@
+
+    #include "resistor.as"
+
+    vint_CPUcurrentStep = 0
+    emu_vint_executedCmd = 0
+    
+
+    // パラメータなし
+    varr_CPUparamList_0(0) = 0x62, 0x63, 0x64, 0x65
+    varr_CPUparamList_0(length(varr_CPUparamList_0)) = 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88
+    varr_CPUparamList_0(length(varr_CPUparamList_0)) = 0x70, 0x72, 0x73, 0x7B, 0x7D, 0x7E, 0x7F
+    varr_CPUparamList_0(length(varr_CPUparamList_0)) = 0xFD, 0xFE, 0xFF
+
+    // パラメータが1つ
+    varr_CPUparamList_1(0) = 0x20, 0x21, 0x22, 0x23, 0x28, 0x29, 0x2A, 0x2B  
+    varr_CPUparamList_1(length(varr_CPUparamList_1)) = 0x36, 0x37, 0x38, 0x39
+    varr_CPUparamList_1(length(varr_CPUparamList_1)) = 0x52, 0x53, 0x54, 0x55
+    varr_CPUparamList_1(length(varr_CPUparamList_1)) = 0x60, 0x61
+    varr_CPUparamList_1(length(varr_CPUparamList_1)) = 0x71, 0x7A, 0x7C
+    varr_CPUparamList_1(length(varr_CPUparamList_1)) = 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xAE, 0xAF
+
+    settick 0
+
+
+
+    initRegister
+    vint_CPUinvaildcmd = false
+
+    writeResistorWs rCS, 0x0000
+    // IPレジスタがオーバーフローする場合は、CSレジスタを利用して動作するように設定する
+    if ( emu_vbin_Memory_Index > MAX16B ) : {
+
+        writeResistorWs rCS, ( emu_vbin_Memory_Index / 0x10000 ) *0x1000            // 物理メモリアドレス ÷ 0x10000 × 0x1000 = CS
+        emu_vbin_Memory_Index = emu_vbin_Memory_Index - fetchResistorWs(rCS) *0x10  // 物理メモリアドレス - CS × 0x10 = IP
+
+    }
+    writeResistorWe rIP, emu_vbin_Memory_Index
+
+    // キーが押されたらとりあえず保存する
+    vint_CPUio_KeybdSTAT = 1
+    onkey gosub *l_CPUio_KeyBuffer
+
+    oncmd gosub *l_CPU_onTimer, WM_TIMER
+    SetTimer hwnd, 1, 5, 0
+    vint_CPU_Timer_isActive = 1
+    vint_InterruptNumber = 0
+    vint_Interrupt = 0
+    vint_fetchCmdOffset = 0
+    
+    
+
+    repeat
+
+        // 終端に来たら終り
+		if ( ( fetchResistorWs(rCS) *0x10 + fetchResistorWe(rIP) + vint_fetchCmdOffset ) >= varsize( emu_vbin_Memory ) ) {
+
+            dialog "IP="+ strf( "%04Xh", fetchResistorWe(rIP) ) +" CS="+ strf( "%04Xh", fetchResistorWs(rCS) ) +" is too big. Couldn't continue process."
+            stop
+
+        }
+
+		// 読み出し
+		
+        vbin_CPUfetchedData = 0
+        vbin_CPUfetchedData_byte = 0
+		wpoke vbin_CPUfetchedData, 0, wpeek( emu_vbin_Memory, ( fetchResistorWs(rCS) *0x10 + fetchResistorWe(rIP) + vint_fetchCmdOffset ) )
+
+        vint_fetchCmdOffset += 2
+        
+        if ( vint_CPUio_KeyBuffer_LT > 0 ) : vint_CPUio_KeyBuffer_LT --
+
+        gosub *l_CPU_do
+
+        if ( vint_CPUinvaildcmd ) : {
+
+            saveError "#UD excption"
+            vint_CPUinvaildcmd = 0
+
+            vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, 6 * 4 )
+            vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, 6 * 4 +2 )
+
+            vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+            checkDataW(vbin_CPUtmp.3)
+            writeResistorWg rSP, vbin_CPUtmp.3
+            wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rFL)
+
+            vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+            checkDataW(vbin_CPUtmp.3)
+            writeResistorWg rSP, vbin_CPUtmp.3
+            wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWs(rCS)
+            writeResistorWs rCS, vbin_CPUtmp.2
+
+            vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+            checkDataW(vbin_CPUtmp.3)
+            writeResistorWg rSP, vbin_CPUtmp.3
+            wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rIP)
+            writeResistorWe rIP, vbin_CPUtmp.1
+
+        }
+
+        if ( ( cnt \ CPU_CLOCK_CYCLE  ) == 0 ) : await CPU_CLOCK_WAIT
+
+        if ( emu_vbin_needReboot ) : break
+
+    loop
+
+    goto *l_emuEntry
+
+    stop
+
+*l_CPU_do
+
+    switch vint_CPUcurrentStep
+    case 0// 命令読み出し
+
+        if( vbin_CPUfetchedData == 0xFFFF ) : return
+
+        vbin_CPUmeirei = vbin_CPUfetchedData  //命令記録  
+
+        //init
+        vint_CPUparamLength = 0
+        vint_CPUparamCount  = 0
+        dim vint_CPUparam, 2
+
+        vint_CPUtmp.0 = vbin_CPUmeirei && 0xFF
+        vint_CPUtmp.1 = 0
+        
+        // パラメータの数を数えてみる
+        // パラメータなし
+        foreach varr_CPUparamList_0
+            if ( vint_CPUtmp.0 == varr_CPUparamList_0.cnt ) : vint_CPUtmp.1 = true : break
+        loop
+
+        if( vint_CPUtmp.1 ) : {
+            vint_CPUcurrentStep = 0
+            vint_CPUparamLength = 0
+
+            writeResistorWe rIP, fetchResistorWe(rIP) + vint_fetchCmdOffset
+            vint_fetchCmdOffset = 0
+
+            gosub *l_CPU_ExecCMD
+
+            emu_vint_executedCmd ++
+
+            if ( ( vint_Interrupt ) and ( ( fetchResistorWe(rFL) && fIF ) == fIF ) ) {
+
+                vint_Interrupt = 0
+                
+                vint_fetchCmdOffset = 0
+                vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, vint_InterruptNumber * 4 )         // オフセット
+                vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, vint_InterruptNumber * 4 +2 )      // セグメント
+
+                vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+                checkDataW(vbin_CPUtmp.3)
+                writeResistorWg rSP, vbin_CPUtmp.3
+                wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rFL)
+
+                vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+                checkDataW(vbin_CPUtmp.3)
+                writeResistorWg rSP, vbin_CPUtmp.3
+                wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWs(rCS)
+                writeResistorWs rCS, vbin_CPUtmp.2
+
+                vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+                checkDataW(vbin_CPUtmp.3)
+                writeResistorWg rSP, vbin_CPUtmp.3
+                wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rIP)
+                writeResistorWe rIP, vbin_CPUtmp.1
+
+            }
+
+            return
+        }
+
+        vint_CPUcurrentStep = 1 ; return後に行う動作を「パラメータ読み取り」に予約
+
+        // パラメータ1つ
+        vint_CPUtmp.1 = 0
+        foreach varr_CPUparamList_1
+            if ( vint_CPUtmp.0 == varr_CPUparamList_1.cnt ) : vint_CPUtmp.1 = true : break
+        loop
+
+        if( vint_CPUtmp.1 ) : {
+            vint_CPUparamLength = 1
+            return
+        }
+
+        vint_CPUparamLength = 2
+        return
+
+    swbreak
+    case 1
+
+        // パラメータ読み取り
+        vint_CPUparam.vint_CPUparamCount = vbin_CPUfetchedData
+        vint_CPUparamCount ++
+
+        if( vint_CPUparamCount == vint_CPUparamLength ) : {
+
+            vint_CPUcurrentStep = 0
+
+            writeResistorWe rIP, fetchResistorWe(rIP) + vint_fetchCmdOffset
+            vint_fetchCmdOffset = 0
+
+            gosub *l_CPU_ExecCMD
+
+            emu_vint_executedCmd ++
+
+            if ( ( vint_Interrupt ) and ( ( fetchResistorWe(rFL) && fIF ) == fIF ) ) {
+
+                vint_Interrupt = 0
+                
+                vint_fetchCmdOffset = 0
+                vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, vint_InterruptNumber * 4 )         // オフセット
+                vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, vint_InterruptNumber * 4 +2 )      // セグメント
+
+                vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+                checkDataW(vbin_CPUtmp.3)
+                writeResistorWg rSP, vbin_CPUtmp.3
+                wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rFL)
+
+                vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+                checkDataW(vbin_CPUtmp.3)
+                writeResistorWg rSP, vbin_CPUtmp.3
+                wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWs(rCS)
+                writeResistorWs rCS, vbin_CPUtmp.2
+
+                vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
+                checkDataW(vbin_CPUtmp.3)
+                writeResistorWg rSP, vbin_CPUtmp.3
+                wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rIP)
+                writeResistorWe rIP, vbin_CPUtmp.1
+
+            }
+
+        }
+
+        return
+
+    swbreak
+    swend
+
+    return
+
+
+*l_CPU_ExecCMD
+
+    vbin_CPUmeirei_Main     = vbin_CPUmeirei && 0x00FF
+    vbin_CPUmeirei_Prm.0    = RBS ( vbin_CPUmeirei && 0xFF00, 8 )
+    ;logmes "cmd: "+ strf("0x%04X", vbin_CPUmeirei_Main ) +", prmType: "+ strf("0x%04X", vbin_CPUmeirei_Prm.0 ) +", prm0: "+ strf("0x%04X", vint_CPUparam.0 ) +", prm1: "+ strf("0x%04X", vint_CPUparam.1 )
+    #addition "com.hsp"
+
+    vint_CPUinvaildcmd = true
+
+    return
+
+*l_CPUio
+    
+    #addition "io.hsp"
+
+    stop
+
+*l_CPU_Display
+
+    #addition "display.hsp"
+
+    return
+
+*l_Pin_Check
+
+    if ( emu_vbin_PIN == 1 ) : {
+
+        emu_vbin_needReboot = 1
+
+    }
+
+    return
+
+*l_CPU_Send_INT1C
+
+    vint_Interrupt = 1
+    vint_InterruptNumber = 0x1C
+
+    return
+
+*l_CPU_onTimer
+
+    // ウィンドウタイマ割り込みを用いて、CPUのピンや割り込み、ディスプレイの処理をする
+
+    gosub *l_CPU_Send_INT1C
+
+    if ( ( vint_CPU_Timer_Count \ CPU_PIN_REFRESH ) == 0 ) {
+
+        gosub *l_Pin_Check
+
+    }
+
+    gosub *l_CPU_Display
+
+    if ( ( vint_CPU_Timer_Count \ DISPLAY_REFRESH_TIME ) == 0 ) {
+
+        
+
+    }
+
+    vint_CPU_Timer_Count ++
+    return

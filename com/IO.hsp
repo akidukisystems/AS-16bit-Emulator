@@ -1,0 +1,83 @@
+
+    if ( vbin_CPUmeirei_Main == 0x49 ) : { // IN(W)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        vbin_CPUmeirei_Prm.2 = ( vbin_CPUmeirei_Prm.0 && 0x0F )
+        vint_CPUio_isWORD = 0
+
+        switch vbin_CPUmeirei_Prm.2
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.1 && 0xF0 ) == 0x00 ) : {
+
+                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.1 )
+
+            }
+        swbreak
+        case 0x04 // 即値
+            vbin_CPUtmp.0 = vint_CPUparam.1
+        swbreak
+        swend
+        
+
+
+        vint_CPUio_PortNumber = vbin_CPUtmp.0
+        vint_CPUioTypeIsIN = 1
+        gosub *l_CPUio
+
+        logmes vint_CPUio_Result
+
+        
+
+        if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
+
+            writeResistorWg vint_CPUparam.0, vint_CPUio_Result
+
+        }
+        
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x4B ) : { // OUT(W)
+
+        // パラメータの種類
+        vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
+        vbin_CPUmeirei_Prm.2 = ( vbin_CPUmeirei_Prm.0 && 0x0F )
+        vint_CPUio_isWORD = 0
+
+        switch vbin_CPUmeirei_Prm.1
+        case 0x01 // レジスタ
+            if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : {
+
+                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+
+            }
+        swbreak
+        case 0x04 // 即値
+            vbin_CPUtmp.0 = vint_CPUparam.0
+        swbreak
+        swend
+
+        if ( ( vint_CPUparam.1 && 0xF0 ) == 0x00 ) : {
+
+            vbin_CPUtmp.1 = fetchResistorWg ( vint_CPUparam.1 )
+
+        }
+        
+
+
+        vint_CPUio_PortNumber = vbin_CPUtmp.0
+        vint_CPUio_PortOutPut = vbin_CPUtmp.1
+        vint_CPUioTypeIsIN = 0
+        gosub *l_CPUio
+
+        
+
+        
+        
+
+        return
+
+    }

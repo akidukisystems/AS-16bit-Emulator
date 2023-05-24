@@ -1,0 +1,44 @@
+
+    winsel SCREEN_DISPLAY_ID, SCRnone
+    redraw 0
+
+    if ( vint_VRAM_Format == 1 ) {
+
+        ; 256bit high-color teretype
+        /*
+        repeat 80*30
+
+            vint_CPUtmp = peek( emu_vbin_Memory, cnt *2 +vint_Ram_Vram_main.StartAddr )
+
+            if ( vint_CPUtmp == 0x00 ) : break
+
+            poke vstr_DisplayString, cnt, vint_CPUtmp
+
+        loop
+
+        softinitscr
+        mes vstr_DisplayString
+        */
+    }
+
+    if ( vint_VRAM_Format == 2 ) {
+
+        ;2bit grayscale teretype
+
+        memcpy vstr_DisplayString, emu_vbin_Memory, 80*30, 0, vint_Ram_Vram_main.StartAddr
+        memexpand vstr_DisplayString, strlen(vstr_DisplayString)
+
+        color : boxf
+        color 192, 192, 192 : pos 0, 0
+        mes vstr_DisplayString
+
+    }
+
+    if ( vint_VRAM_Format == 10 ) {
+
+        ; VRAM direct addressing
+
+    }
+
+    redraw 1
+    winsel SCREEN_DEBUGLOG_ID, SCRnone

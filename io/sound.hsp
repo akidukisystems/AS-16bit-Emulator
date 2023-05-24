@@ -1,0 +1,53 @@
+
+    switch vint_CPUio_PortNumber
+
+    case 0x60
+
+        if ( vint_CPUioTypeIsIN == 0 ) {
+
+            if ( vint_CPUio_PortOutPut == 0x00 ) {
+
+                vint_CPUio_Sound_Freq = vint_CPUio_Sound_Freq_tmp
+                vint_CPUio_Sound_Time = vint_CPUio_Sound_Time_tmp
+
+                return
+
+            }
+
+            if ( vint_CPUio_PortOutPut == 0x01 ) {
+
+                beep vint_CPUio_Sound_Freq, vint_CPUio_Sound_Time
+
+                return
+
+            }
+
+        }
+
+        return
+
+    swbreak
+
+    case 0x61
+
+        if ( vint_CPUioTypeIsIN == 0 ) {
+
+            vint_CPUio_Sound_Freq_tmp = vint_CPUio_PortOutPut
+            return
+            
+        }
+
+    swbreak
+
+    case 0x62
+
+        if ( vint_CPUioTypeIsIN == 0 ) {
+
+            vint_CPUio_Sound_Time_tmp = vint_CPUio_PortOutPut
+            return
+            
+        }
+
+    swbreak
+
+    swend

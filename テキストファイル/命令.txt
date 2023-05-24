@@ -1,0 +1,186 @@
+step 0:	命令読み出し
+		1 命令バイト（ワード）を読み出して、0x0000か0x9100（NOP命令）以外の場合は実行する
+		2 命令データは記録しておく
+		3 パラメータの数を調べる
+		ない場合は実行
+		4 パラメータの数も記録
+step 1: パラメータを読む
+		1 パラメータを読む
+		2 1個読んだらループ 読み終えたら実行
+
+	
+=オペランドタイプ
+Resistor	0x1
+Memory		0x2
+Pointer		0x3
+Value		0x4
+
+
+
+=レジスタ番号
+AX 00
+BX 01
+CX 02
+DX 03
+SI 04
+DI 05
+BP 06
+SP 07
+
+CS 10
+DS 11
+ES 12
+SS 13
+
+IP 20
+FL 21
+
+AH 30
+BH 31
+CH 32
+DH 33
+
+AL 40
+BL 41
+CL 42
+DL 43
+
+AX/[AX]...16bit
+AL/[AL]...8bit
+FFh...8/16bit	（但し即値だけはword）
+WORD[FFh]...16bit
+BYTE[FFh]...8bit
+ラベル...16bit		:rabel
+定数...16			@num
+
+
+
+=命令/プレフィックス表
+命令名	サイズ	コード(hex)
+
+-データ操作				ALL OK
+MOV		b		10	2	OK
+		w		11		OK
+XCHG	w		13		OK
+
+
+
+-算術1
+INC		b		20	1	OK
+		w		21		OK
+DEC		b		22	1	OK
+		w		23		OK
+ADD		b		24	2	OK
+		w		25		OK
+SUB		b		26	2	OK
+		w		27		OK
+MUL		b		28	1	OK
+		w		29		OK
+DIV		b		2A	1	OK
+		w		2B		OK
+ADC		b		2C	2
+		w		2D
+SBB		b		2E	2
+		w		2F
+
+-算術2
+CMP		b		50	2	OK
+		w		51		OK
+IMUL	b		52	1
+		W		53
+IDIV	b		54	1
+		w		55
+
+
+-論理演算
+AND		b		30	2	OK
+		w		31		OK
+OR		b		32	2	OK
+		w		33		OK
+XOR		b		34	2	OK
+		w		35		OK
+NEG		b		36	1
+		w		37
+NOT		b		38	1
+		w		39
+ROL		b		3A	2
+		w		3B
+ROR		b		3C	2
+		w		3D
+SHL		b		3E	2	OK
+		w		3F		OK
+SHR		b		40	2	OK
+		w		41		OK
+TEST	b		42	2		ANDをとって SF, ZF, PFを設定するけど結果は破棄する
+		w		43
+
+-I/O					ALL OK
+IN		w		49	2	OK
+OUT		w		4B  2	OK
+
+-スタック
+PUSH	w		60	1	OK
+POP		w		61	1	OK
+PUSHA			62	0	OK
+POPA			63		OK
+PUSHF			64
+POPF			65
+
+-システム				ALL OK
+HLT				70	0	OK
+INT		b		71	1	OK
+INT3			72	0	OK
+INTO			73	0	OK
+CALL	w		7A	1	OK
+RET				7B　0	OK
+CALLF	w		7C　1	OK
+FRET			7D	0	OK
+IRET			7E	0	OK
+CCS				7F  1	OK
+DBG				FD	0	OK
+UD2				FE	0	OK
+NOP				FF	0	OK
+
+-フラグ
+CLI				80	0	0->IF		OK
+STI				81		1->IF		OK
+CLC				82		0->CF		OK
+STC				83		1->CF		OK
+CMC				84		NOT(CF)->CF	OK
+CLD				85		0->DF		OK
+STD				86		1->DF		OK
+LAHF			87		FLAGS->AH
+SAHF			88		AH->FLAGS
+
+-ジャンプ
+JF		W		AE	1	OK			セグメント間jump
+JMP		w		AF	1	OK
+Jcc		w			1	ALL OK
+	O		90		OF=1
+	NO		91		OF=0
+	B(NAE)	92		CF=1
+	NB(AE)	93		CF=0
+	E(Z)	94		ZF=1
+	NE(NZ)	95		ZF=0
+	BE(NA)	96		CF=1 | ZF=1
+	NBE(A)	97		CF=0 & ZF=0
+	S		98		SF=1
+	NS		99		SF=0
+	P(PE)	9A		PF=1
+	NP(PO)	9B		PF=0
+	L(NGE)	9C		SF!=OF
+	NL(GE)	9D		SF=OF
+	LE(NG)	9E		ZF=1 | SF!=OF
+	NLE(G)	9F		ZF=0 & SF=OF
+	C		A0		CF=1
+	NC		A1		CF=0
+	CXZ		A2		CX=0
+LOOP	w			1
+LOOPZ(E)			1
+LOOPNZ(NE)			1
+
+プリプロセッサ命令
+
+&DB　パラメータの値を配置する			OK
+&RESB　パラメータ１の量だけ0を配置		OK
+&RESBSF	パラメータ１まで0を配置			OK

@@ -1,0 +1,58 @@
+
+    if ( vbin_CPUmeirei_Main == 0x80 ) : { // CLI
+
+        clearFlag fIF
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x81 ) : { // STI
+
+        setFlag fIF
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x82 ) : { // CLC
+
+        clearFlag fCF
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x83 ) : { // STC
+
+        setFlag fCF
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x84 ) : { // CMC
+
+        if ( TestFlag( fCF ) == fCF ) {
+
+            clearFlag fCF
+
+        } else {
+
+            setFlag fCF
+
+        }
+        
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x85 ) : { // CLD
+
+        clearFlag fDF
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x86 ) : { // STD
+
+        setFlag fDF
+        return
+
+    }

@@ -1,0 +1,158 @@
+
+    switch vint_CPUio_PortNumber
+
+    case 0x80
+
+        if ( vint_CPUioTypeIsIN ) : {
+
+            vint_CPUio_Result = 0
+            vint_CPUio_tmp = 0
+
+            if ( vint_CPUio_KeyBuffer_LT > 0 ) : {
+
+                vint_CPUio_KeyBuffer_LT = 32
+                vint_CPUio_Result |= %00000001
+
+                getkey vint_CPUio_tmp, 3    // cancel
+                if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %00000010
+                getkey vint_CPUio_tmp, 8    // BS
+                if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %00000100
+                getkey vint_CPUio_tmp, 9    // tab
+                if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %00001000
+                getkey vint_CPUio_tmp, 13   // enter
+                if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %00010000
+                getkey vint_CPUio_tmp, 16   // shift
+                if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %00100000
+                getkey vint_CPUio_tmp, 17   // ctrl
+                if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %01000000
+                getkey vint_CPUio_tmp, 18   // alt
+                if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %10000000
+
+            }
+
+        }
+
+        return
+
+    swbreak
+
+    case 0x81
+
+        if ( vint_CPUioTypeIsIN ) : {
+
+            vint_CPUio_Result = 0
+
+            if ( vint_CPUio_KeyBuffer_LT > 0 ) : {
+
+                vint_CPUio_Result = vint_CPUio_KeyBuffer_wparam
+                vint_CPUio_KeyBuffer_LT = 32
+
+            }
+
+        }
+        
+        return
+
+    swbreak
+
+    case 0x82
+
+        if ( vint_CPUioTypeIsIN ) : {
+
+            vint_CPUio_Result = 0
+
+            if ( vint_CPUio_KeyBuffer_LT > 0 ) : {
+
+                vint_CPUio_Result = vint_CPUio_KeyBuffer_lparam
+                vint_CPUio_KeyBuffer_LT = 32
+
+            }
+
+        }
+
+        return
+
+    swbreak
+
+    case 0x83
+
+        if ( vint_CPUioTypeIsIN ) : {
+
+            vint_CPUio_Result = 0
+            vint_CPUio_tmp = 0
+
+            if ( vint_CPUio_KeyBuffer_LT > 0 ) : {
+
+                vint_CPUio_KeyBuffer_LT = 32
+
+                getkey vint_CPUio_tmp, 20    // caps lk
+                if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %00000001
+                getkey vint_CPUio_tmp, 27    // esc
+                if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %00000010
+                getkey vint_CPUio_tmp, 32    // sp
+                if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %00000100
+                getkey vint_CPUio_tmp, 33    // pgup
+                if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %00001000
+                getkey vint_CPUio_tmp, 34    // pgdw
+                if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %00010000
+                getkey vint_CPUio_tmp, 35    // end
+                if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %00100000
+                getkey vint_CPUio_tmp, 36    // home
+                if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %01000000
+
+            }
+
+        }
+
+        return
+
+    swbreak
+
+    case 0x84
+
+        if ( vint_CPUioTypeIsIN ) : {
+
+            vint_CPUio_Result = 0
+
+            if ( vint_CPUio_KeyBuffer_LT > 0 ) : {
+
+                vint_CPUio_Result = vint_CPUio_KeyBuffer_iparam
+                vint_CPUio_KeyBuffer_LT = 32
+
+            }
+
+        }
+
+        return
+
+    swbreak
+
+    case 0x8E
+
+        if ( vint_CPUioTypeIsIN ) : { // in
+
+            vint_CPUio_Result = vint_CPUio_KeybdSTAT
+
+        } else { // out
+
+            vint_CPUio_KeybdSTAT = vint_CPUio_Input
+
+        }
+
+        return
+
+    swbreak
+
+    case 0x8F
+
+        if ( vint_CPUioTypeIsIN ) : { // in
+
+            vint_CPUio_KeyBuffer_LT = 0
+
+        }
+
+        return
+
+    swbreak
+
+    swend
