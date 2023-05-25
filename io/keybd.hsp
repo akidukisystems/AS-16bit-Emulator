@@ -8,9 +8,8 @@
             vint_CPUio_Result = 0
             vint_CPUio_tmp = 0
 
-            if ( vint_CPUio_KeyBuffer_LT > 0 ) : {
+            if ( vint_CPUio_KeyBuffer_LT == 1 ) : {
 
-                vint_CPUio_KeyBuffer_LT = 32
                 vint_CPUio_Result |= %00000001
 
                 getkey vint_CPUio_tmp, 3    // cancel
@@ -42,10 +41,9 @@
 
             vint_CPUio_Result = 0
 
-            if ( vint_CPUio_KeyBuffer_LT > 0 ) : {
+            if ( vint_CPUio_KeyBuffer_LT == 1 ) : {
 
                 vint_CPUio_Result = vint_CPUio_KeyBuffer_wparam
-                vint_CPUio_KeyBuffer_LT = 32
 
             }
 
@@ -61,10 +59,9 @@
 
             vint_CPUio_Result = 0
 
-            if ( vint_CPUio_KeyBuffer_LT > 0 ) : {
+            if ( vint_CPUio_KeyBuffer_LT == 1 ) : {
 
                 vint_CPUio_Result = vint_CPUio_KeyBuffer_lparam
-                vint_CPUio_KeyBuffer_LT = 32
 
             }
 
@@ -81,9 +78,7 @@
             vint_CPUio_Result = 0
             vint_CPUio_tmp = 0
 
-            if ( vint_CPUio_KeyBuffer_LT > 0 ) : {
-
-                vint_CPUio_KeyBuffer_LT = 32
+            if ( vint_CPUio_KeyBuffer_LT == 1 ) : {
 
                 getkey vint_CPUio_tmp, 20    // caps lk
                 if ( vint_CPUio_tmp ) : vint_CPUio_Result |= %00000001
@@ -114,10 +109,9 @@
 
             vint_CPUio_Result = 0
 
-            if ( vint_CPUio_KeyBuffer_LT > 0 ) : {
+            if ( vint_CPUio_KeyBuffer_LT == 1 ) : {
 
                 vint_CPUio_Result = vint_CPUio_KeyBuffer_iparam
-                vint_CPUio_KeyBuffer_LT = 32
 
             }
 
@@ -135,7 +129,7 @@
 
         } else { // out
 
-            vint_CPUio_KeybdSTAT = vint_CPUio_Input
+            vint_CPUio_KeybdSTAT = vint_CPUio_PortOutPut
 
         }
 
@@ -145,9 +139,9 @@
 
     case 0x8F
 
-        if ( vint_CPUioTypeIsIN ) : { // in
+        if ( vint_CPUioTypeIsIN == 0 ) : { // out
 
-            vint_CPUio_KeyBuffer_LT = 0
+            vint_CPUio_KeyBuffer_LT = vint_CPUio_PortOutPut
 
         }
 

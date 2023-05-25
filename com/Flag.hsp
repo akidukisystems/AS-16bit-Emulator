@@ -56,3 +56,103 @@
         return
 
     }
+
+    if ( vbin_CPUmeirei_Main == 0x87 ) : { // LAHF
+
+        vbin_CPUtmp = %00000010
+        vbin_CPUtmp.1 = fetchResistorWe(rFL)
+
+        if ( vbin_CPUtmp.1 && fCF ) {
+
+            vbin_CPUtmp += 1
+
+        }
+
+        if ( vbin_CPUtmp.1 && fPF ) {
+
+            vbin_CPUtmp += 4
+
+        }
+
+        if ( vbin_CPUtmp.1 && fAF ) {
+
+            vbin_CPUtmp += 16
+
+        }
+
+        if ( vbin_CPUtmp.1 && fZF ) {
+
+            vbin_CPUtmp += 64
+
+        }
+
+        if ( vbin_CPUtmp.1 && fSF ) {
+
+            vbin_CPUtmp += 128
+
+        }
+
+        writeResistorWg rAH, vbin_CPUtmp
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x88 ) : { // SAHF
+
+        vbin_CPUtmp = fetchResistorWe(rFL)
+        vbin_CPUtmp.1 = fetchResistorWg(rAH)
+
+        if ( vbin_CPUtmp.1 && 1 ) {
+
+            vbin_CPUtmp = vbin_CPUtmp || fCF
+
+        } else {
+
+            vbin_CPUtmp = vbin_CPUtmp && notx(fCF)
+
+        }
+
+        if ( vbin_CPUtmp.1 && 4 ) {
+
+            vbin_CPUtmp = vbin_CPUtmp || fPF
+
+        } else {
+
+            vbin_CPUtmp = vbin_CPUtmp && notx(fPF)
+
+        }
+
+        if ( vbin_CPUtmp.1 && 16 ) {
+
+            vbin_CPUtmp = vbin_CPUtmp || fAF
+
+        } else {
+
+            vbin_CPUtmp = vbin_CPUtmp && notx(fAF)
+
+        }
+
+        if ( vbin_CPUtmp.1 && 64 ) {
+
+            vbin_CPUtmp = vbin_CPUtmp || fZF
+
+        } else {
+
+            vbin_CPUtmp = vbin_CPUtmp && notx(fZF)
+
+        }
+
+        if ( vbin_CPUtmp.1 && 128 ) {
+
+            vbin_CPUtmp = vbin_CPUtmp || fSF
+
+        } else {
+
+            vbin_CPUtmp = vbin_CPUtmp && notx(fSF)
+
+        }
+
+        writeResistorWe rFL, vbin_CPUtmp
+        return
+
+    }

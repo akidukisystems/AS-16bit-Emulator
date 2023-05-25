@@ -139,6 +139,10 @@ message_BiosMenu:
     &DW @CRLF
     &DB "BIOS Version: 0.1"
     &DW @CRLF
+    &DB "BIOS Date: 2023/05/24 15:19"
+    &DW @CRLF
+    &DB "Vendor: AkidukiSystems"
+    &DW @CRLF
     &DB 0
 
 ;   _/_/_/_/  Interrupt Routine  _/_/_/_/
@@ -180,12 +184,16 @@ int_video_charput:
     MOV     DS, @addr_ramSegment        ; 最後にVRAMに書いたアドレスを見つける
     MOV     BX, WORD[@addr_int_video_VRAMlastWrite]
 
+    CMP     AL, 7Fh
+    JE      int_video_charput_del:
+
     XOR     DX, DX
     MOV     DL, AL
     MOV     DS, C6D4h                   ; VRAMに文字書き込み
     MOV     [BX], DX
     INC     BX
 
+int_video_charput_del_ret:
     MOV     DS, @addr_ramSegment        ; 最後にVRAMに書いたアドレスを書き込む
     MOV     WORD[@addr_int_video_VRAMlastWrite], BX
 
@@ -194,6 +202,15 @@ int_video_charput:
     POP     BX
 
     IRET
+
+int_video_charput_del:
+    CMP     BX, 0
+    JE      int_video_charput_del_ret:
+    DEC     BX
+    MOV     DS, C6D4h
+    XOR     DX, DX
+    MOV     [BX], DX
+    JMP     int_video_charput_del_ret:
 
 int_video_teretype:
     PUSH    AX
@@ -345,7 +362,402 @@ int_disk_read_fin:
     IRET
 
 int_key:
+    CMP     AH, 00h
+    JE      int_key_ReadInput:
+    CMP     AH, 01h
+    JE      int_key_ReadStatus:
+    ;CMP     AH, 02h
+    ;JE      int_key_ReadShiftFlag:
+    ;CMP     AH, 05h
+    ;JE      int_key_WriteData:
 
+    IRET
+
+int_key_ReadStatus:
+    IN      AX, 80h                     ; キーが押されたか確認
+    CMP     AX, 0                       ; 0（押されていない）
+    JE      int_key_ReadStatus_NoData:
+
+    PUSH    AX
+    PUSH    BX
+    MOV     AX, SP
+    ADD     AX, 8
+    MOV     BX, [AX]
+    AND     BX, FFDFh
+    MOV     [AX], BX
+    POP     BX
+    POP     AX
+
+    PUSH    AX
+    AND     AL, 20h
+    CMP     AL, 0
+    POP     AX
+    JE      int_key_ReadStatus_DownScale:
+
+    IN      AX, 81h
+
+    CMP     AL, 106
+    JGE     int_key_ReadStatus_NotASCII?x:
+
+    CMP     AL, 8
+    JGE     int_key_ReadStatus_NotASCII?a:
+
+int_key_ReadStatus_NotASCII?a_ret:
+    CMP     AL, 27
+    JE      int_key_ReadStatus_NotASCII:
+    CMP     AL, 33
+    JGE     int_key_ReadStatus_NotASCII?b:
+
+int_key_ReadStatus_NotASCII?b_ret:
+    CMP     AL, 45
+    JE      int_key_ReadStatus_NotASCII:
+    CMP     AL, 46
+    JE      int_key_ReadStatus_NotASCII:
+    CMP     AL, 91
+    JE      int_key_ReadStatus_NotASCII:
+    CMP     AL, 92
+    JE      int_key_ReadStatus_NotASCII:
+    CMP     AL, 93
+    JE      int_key_ReadStatus_NotASCII:
+
+    CMP     AL, 112
+    JGE     int_key_ReadStatus_NotASCII?c:
+int_key_ReadStatus_NotASCII?c_ret:
+
+    CMP     AL, 144
+    JE      int_key_ReadStatus_NotASCII:
+    CMP     AL, 145
+    JE      int_key_ReadStatus_NotASCII:
+    CMP     AL, 229
+    JE      int_key_ReadStatus_NotASCII:
+
+    CMP     AL, BAh
+    JE      int_key_ReadStatus_DownScale_JP?_ret:
+    CMP     AL, BBh
+    JE      int_key_ReadStatus_DownScale_JP?_ret:
+
+    CMP     AL, 31h
+    JGE     int_key_ReadStatus_UpScale_Num?:
+
+int_key_ReadStatus_UpScale_Num?_ret:
+    CMP     AL, 41h
+    JGE     int_key_ReadStatus_UpScale_Alp?:
+
+int_key_ReadStatus_UpScale_Alp?_ret:
+    CMP     AL, 30h
+    JE      int_key_ReadStatus_Raw:
+    CMP     AL, 20h
+    JE      int_key_ReadStatus_Raw:
+
+    CMP     AL, E2h
+    JE      int_key_ReadStatus_UpScale_Back:
+
+    CMP     AL, C0h
+    JE      int_key_ReadStatus_UpScale_JP:
+    CMP     AL, DBh
+    JGE     int_key_ReadStatus_UpScale_JP?:
+int_key_ReadStatus_UpScale_JP?_ret:
+
+    MOV     AH, AL
+    SUB     AL, 80h
+    IRET
+
+int_key_ReadStatus_UpScale_Num?:
+    CMP     AL, 39h
+    JG      int_key_ReadStatus_UpScale_Num?_ret:
+
+    MOV     AH, AL
+    SUB     AL, 10h
+    IRET
+
+int_key_ReadStatus_UpScale_Alp?:
+    CMP     AL, 5Ah
+    JG      int_key_ReadStatus_UpScale_Alp?_ret:
+
+    MOV     AH, AL
+    IRET
+
+int_key_ReadStatus_UpScale_JP?:
+    CMP     AL, DEh
+    JG      int_key_ReadStatus_UpScale_JP?_ret:
+
+int_key_ReadStatus_UpScale_JP:
+    MOV     AH, AL
+    SUB     AL, 60h
+    IRET
+
+int_key_ReadStatus_UpScale_Back:
+    MOV     AH, AL
+    MOV     AL, 5Fh
+    IRET
+
+
+
+int_key_ReadStatus_DownScale:
+    IN      AX, 81h
+
+    CMP     AL, 16
+    JE      int_key_ReadStatus_NoData:
+
+    CMP     AL, BAh
+    JE      int_key_ReadStatus_DownScale_JP:
+    CMP     AL, BBh
+    JE      int_key_ReadStatus_DownScale_JP:
+
+    CMP     AL, 31h
+    JGE     int_key_ReadStatus_DownScale_Num?:
+
+int_key_ReadStatus_DownScale_Num?_ret:
+    CMP     AL, 41h
+    JGE     int_key_ReadStatus_DownScale_Alp?:
+
+int_key_ReadStatus_DownScale_Alp?_ret:
+    CMP     AL, 30h
+    JE      int_key_ReadStatus_Raw:
+    CMP     AL, 20h
+    JE      int_key_ReadStatus_Raw:
+
+    CMP     AL, E2h
+    JE      int_key_ReadStatus_DownScale_Back:
+
+    CMP     AL, C0h
+    JE      int_key_ReadStatus_DownScale_JP:
+    CMP     AL, DBh
+    JGE     int_key_ReadStatus_DownScale_JP?:
+int_key_ReadStatus_DownScale_JP?_ret:
+
+    MOV     AH, AL
+    SUB     AL, 90h
+    IRET
+
+int_key_ReadStatus_DownScale_Num?:
+    CMP     AL, 39h
+    JG      int_key_ReadStatus_DownScale_Num?_ret:
+
+    MOV     AH, AL
+    IRET
+
+int_key_ReadStatus_DownScale_Alp?:
+    CMP     AL, 5Ah
+    JG      int_key_ReadStatus_DownScale_Alp?_ret:
+
+    MOV     AH, AL
+    ADD     AL, 20h
+    IRET
+
+int_key_ReadStatus_DownScale_JP?:
+    CMP     AL, DEh
+    JG      int_key_ReadStatus_DownScale_JP?_ret:
+
+int_key_ReadStatus_DownScale_JP:
+    MOV     AH, AL
+    SUB     AL, 80h
+    IRET
+
+int_key_ReadStatus_DownScale_Back:
+    MOV     AH, AL
+    MOV     AL, 5Ch
+    IRET
+
+int_key_ReadStatus_Raw:
+    MOV     AH, AL
+    IRET
+
+int_key_ReadStatus_NoData:
+    PUSH    AX
+    PUSH    BX
+    MOV     AX, SP
+    ADD     AX, 8
+    MOV     BX, [AX]
+    OR      BX, 0020h
+    MOV     [AX], BX
+    POP     BX
+    POP     AX
+    IRET
+
+int_key_ReadStatus_NotASCII?a:
+    CMP     AL, 19
+    JG      int_key_ReadStatus_NotASCII?a_ret:
+    JMP     int_key_ReadStatus_NotASCII:
+
+int_key_ReadStatus_NotASCII?b:
+    CMP     AL, 40
+    JG      int_key_ReadStatus_NotASCII?b_ret:
+    JMP     int_key_ReadStatus_NotASCII:
+
+int_key_ReadStatus_NotASCII?c:
+    CMP     AL, 123
+    JG      int_key_ReadStatus_NotASCII?c_ret:
+    JMP     int_key_ReadStatus_NotASCII:
+
+int_key_ReadStatus_NotASCII?x:
+    MOV     AH, AL
+    SUB     AL, 64
+    IRET
+
+int_key_ReadStatus_NotASCII:
+    MOV     AL, 0
+    IRET
+
+
+
+int_key_ReadInput:
+    IN      AX, 80h                     ; キーが押されたか確認
+    CMP     AL, 0                       ; 0（押されていない）
+    JE      int_key_ReadInput:
+
+    PUSH    AX
+    AND     AL, 20h
+    CMP     AL, 0
+    POP     AX
+    JE      int_key_ReadInput_DownScale:
+
+    IN      AX, 81h
+
+    PUSH    AX
+    XOR     AX, AX
+    OUT     8Fh, AX
+    POP     AX
+
+    CMP     AL, 16
+    JE      int_key_ReadInput:
+
+    CMP     AL, BAh
+    JE      int_key_ReadInput_DownScale_JP?_ret:
+    CMP     AL, BBh
+    JE      int_key_ReadInput_DownScale_JP?_ret:
+
+    CMP     AL, 31h
+    JGE     int_key_ReadInput_UpScale_Num?:
+
+int_key_ReadInput_UpScale_Num?_ret:
+    CMP     AL, 41h
+    JGE     int_key_ReadInput_UpScale_Alp?:
+
+int_key_ReadInput_UpScale_Alp?_ret:
+    CMP     AL, 30h
+    JE      int_key_ReadInput_Raw:
+    CMP     AL, 20h
+    JE      int_key_ReadInput_Raw:
+
+    CMP     AL, E2h
+    JE      int_key_ReadInput_UpScale_Back:
+
+    CMP     AL, C0h
+    JE      int_key_ReadInput_UpScale_JP:
+    CMP     AL, DBh
+    JGE     int_key_ReadInput_UpScale_JP?:
+int_key_ReadInput_UpScale_JP?_ret:
+
+    MOV     AH, AL
+    SUB     AL, 80h
+    IRET
+
+int_key_ReadInput_UpScale_Num?:
+    CMP     AL, 39h
+    JG      int_key_ReadInput_UpScale_Num?_ret:
+
+    MOV     AH, AL
+    SUB     AL, 10h
+    IRET
+
+int_key_ReadInput_UpScale_Alp?:
+    CMP     AL, 5Ah
+    JG      int_key_ReadInput_UpScale_Alp?_ret:
+
+    MOV     AH, AL
+
+    IRET
+
+int_key_ReadInput_UpScale_JP?:
+    CMP     AL, DEh
+    JG      int_key_ReadInput_UpScale_JP?_ret:
+
+int_key_ReadInput_UpScale_JP:
+    MOV     AH, AL
+    SUB     AL, 60h
+    IRET
+
+int_key_ReadInput_UpScale_Back:
+    MOV     AH, AL
+    MOV     AL, 5Fh
+    IRET
+
+
+
+int_key_ReadInput_DownScale:
+    IN      AX, 81h
+
+    PUSH    AX
+    XOR     AX, AX
+    OUT     8Fh, AX
+    POP     AX
+
+    CMP     AL, 16
+    JE      int_key_ReadInput:
+
+    CMP     AL, BAh
+    JE      int_key_ReadInput_DownScale_JP:
+    CMP     AL, BBh
+    JE      int_key_ReadInput_DownScale_JP:
+
+    CMP     AL, 31h
+    JGE     int_key_ReadInput_DownScale_Num?:
+
+int_key_ReadInput_DownScale_Num?_ret:
+    CMP     AL, 41h
+    JGE     int_key_ReadInput_DownScale_Alp?:
+
+int_key_ReadInput_DownScale_Alp?_ret:
+    CMP     AL, 30h
+    JE      int_key_ReadInput_Raw:
+    CMP     AL, 20h
+    JE      int_key_ReadInput_Raw:
+
+    CMP     AL, E2h
+    JE      int_key_ReadInput_DownScale_Back:
+
+    CMP     AL, C0h
+    JE      int_key_ReadInput_DownScale_JP:
+    CMP     AL, DBh
+    JGE     int_key_ReadInput_DownScale_JP?:
+int_key_ReadInput_DownScale_JP?_ret:
+
+    MOV     AH, AL
+    SUB     AL, 90h
+    IRET
+
+int_key_ReadInput_DownScale_Num?:
+    CMP     AL, 39h
+    JG      int_key_ReadInput_DownScale_Num?_ret:
+
+    MOV     AH, AL
+    IRET
+
+int_key_ReadInput_DownScale_Alp?:
+    CMP     AL, 5Ah
+    JG      int_key_ReadInput_DownScale_Alp?_ret:
+
+    MOV     AH, AL
+    ADD     AL, 20h
+    IRET
+
+int_key_ReadInput_DownScale_JP?:
+    CMP     AL, DEh
+    JG      int_key_ReadInput_DownScale_JP?_ret:
+
+int_key_ReadInput_DownScale_JP:
+    MOV     AH, AL
+    SUB     AL, 80h
+    IRET
+
+int_key_ReadInput_DownScale_Back:
+    MOV     AH, AL
+    MOV     AL, 5Ch
+    IRET
+
+int_key_ReadInput_Raw:
+    MOV     AH, AL
     IRET
 
 

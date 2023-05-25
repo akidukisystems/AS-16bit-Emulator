@@ -66,8 +66,6 @@
 		wpoke vbin_CPUfetchedData, 0, wpeek( emu_vbin_Memory, ( fetchResistorWs(rCS) *0x10 + fetchResistorWe(rIP) + vint_fetchCmdOffset ) )
 
         vint_fetchCmdOffset += 2
-        
-        if ( vint_CPUio_KeyBuffer_LT > 0 ) : vint_CPUio_KeyBuffer_LT --
 
         gosub *l_CPU_do
 

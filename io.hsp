@@ -33,6 +33,6 @@
     vint_CPUio_KeyBuffer_lparam = lparam
     vint_CPUio_KeyBuffer_iparam = iparam
 
-    vint_CPUio_KeyBuffer_LT = 64
+    vint_CPUio_KeyBuffer_LT = 1
 
     return

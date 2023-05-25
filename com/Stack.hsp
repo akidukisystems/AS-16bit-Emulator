@@ -182,3 +182,25 @@
         return
 
     }
+
+    if ( vbin_CPUmeirei_Main == 0x64 ) : { // PUSHF
+
+        vbin_CPUtmp.1 = fetchResistorWg(rSP) -2
+        checkDataW(vbin_CPUtmp.1)
+        writeResistorWg rSP, vbin_CPUtmp.1
+        wpoke emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP), fetchResistorWe(rFL)
+
+        return
+
+    }
+
+    if ( vbin_CPUmeirei_Main == 0x65 ) : { // POPF
+
+        writeResistorWe rFL, wpeek ( emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP) )
+        vbin_CPUtmp.1 = fetchResistorWg(rSP) +2
+        checkDataW(vbin_CPUtmp.1)
+        writeResistorWg rSP, vbin_CPUtmp.1
+
+        return
+
+    }

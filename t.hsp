@@ -1,0 +1,5 @@
+
+    onkey *a
+    stop
+    *a
+    mes wparam

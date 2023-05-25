@@ -65,8 +65,6 @@
             vbin_CPUtmp.1 = fetchResistorWg ( vint_CPUparam.1 )
 
         }
-        
-
 
         vint_CPUio_PortNumber = vbin_CPUtmp.0
         vint_CPUio_PortOutPut = vbin_CPUtmp.1

@@ -123,8 +123,8 @@ PUSH	w		60	1	OK
 POP		w		61	1	OK
 PUSHA			62	0	OK
 POPA			63		OK
-PUSHF			64
-POPF			65
+PUSHF			64		OK
+POPF			65		OK
 
 -ƒVƒXƒeƒ€				ALL OK
 HLT				70	0	OK

@@ -20,20 +20,21 @@
     INT     10h                         ; ビデオ割り込み
 
 keyloop:
-    IN      AX, 80h                     ; キーが押されたか確認
-    CMP     AX, 0                       ; 0（押されていない）ならループに戻る
-    JE      keyloop:
+    MOV     AH, 1                       ; キーが押されたか確認
+    INT     16h
+    JZ      keyloop:                    ; 0（押されていない）ならループに戻る
 
-    MOV     BL, AL
-    AND     BL, 10h
-    CMP     BL, 10h
+    XOR     AX, AX
+    INT     16h                         ; 押されたならキーコード取得
+
+    CMP     AH, 8                       ; BSキー押下
+    JE      backspace:
+
+    CMP     AH, 13                      ; Enterキー押下
     JE      doCommand:
 
-    IN      AX, 81h                     ; 押されたならキーコード取得
-
-    MOV     DS, 07B0h                   ; 9000hを基準にメモリ操作
-
-    MOV     BH, BYTE[0000h]             ; 入力された文字を9002h以降に、文字数を9000hに記録
+    MOV     DS, 07B0h                   ; 7B00hを基準にメモリ操作
+    MOV     BH, BYTE[0000h]             ; 入力された文字を7B02h以降に、文字数を7B00hに記録
     ADD     BH, 0002h
     MOV     [BH], AL
     INC     BH
@@ -41,12 +42,36 @@ keyloop:
     SUB     BH, 0002h
     MOV     BYTE[0000h], BH
     XOR     BX, BX
-
     MOV     DS, BX                      ; データセグメントをもどす
 
     MOV     AH, 0Ah
     INT     10h
 
+    JMP     keyloop:
+
+backspace:
+    MOV     DS, 07B0h                   ; 7B00hにある文字数を読み込む
+    MOV     BH, BYTE[0000h]
+    CMP     BH, 0                       ; 文字数が0の場合は終了
+    JE      backspace_not:
+    
+    MOV     AL, 7Fh                     ; DEL文字を描画（一文字削除）
+    MOV     AH, 0Ah
+    INT     10h
+
+    ADD     BH, 0002h                   ; 7B02h以降にある文字の終端を削除し、文字数を-1
+    DEC     BH
+    MOV     [BH], 0
+    SUB     BH, 0002h
+    MOV     BYTE[0000h], BH
+    XOR     BX, BX
+    MOV     DS, BX                      ; データセグメントをもどす
+    
+    JMP     keyloop:
+
+backspace_not:
+    XOR     BX, BX
+    MOV     DS, BX                      ; データセグメントをもどす
     JMP     keyloop:
 
 doCommand:
@@ -64,14 +89,35 @@ doCommand_filenameCMP:
     MOV     AX, [SI]                    ; 文字が空だったり終端の場合はラベルendに
     CMP     AL, 0
     JZ      doCommand_filenameend:
-    MOV     BX, [DI]
+
+    MOV     BX, [DI]                    ; 文字がスペースの場合も
     CMP     BL, 20h
     JE      doCommand_filenameend:
 
+    CMP     AL, 41h
+    JGE     doCommand_filenameCMP_al:
+
+doCommand_filenameCMP_al_ret:
+    CMP     BL, 41h
+    JGE     doCommand_filenameCMP_bl:
+
+doCommand_filenameCMP_bl_ret:
     CMP     AL, BL                      ; 文字が一緒ならループ続行
     JE      doCommand_filenameCorrect:
 
     JMP     doCommand_not:
+
+doCommand_filenameCMP_al:
+    CMP     AL, 5Ah
+    JG      doCommand_filenameCMP_al_ret:
+    ADD     AL, 20h
+    JMP     doCommand_filenameCMP_al_ret:
+
+doCommand_filenameCMP_bl:
+    CMP     BL, 5Ah
+    JG      doCommand_filenameCMP_bl_ret:
+    ADD     BL, 20h
+    JMP     doCommand_filenameCMP_bl_ret:
 
 doCommand_filenameCorrect:
     INC     SI
@@ -126,8 +172,6 @@ doCommand_filenameEqual:
     MOV     BX, 512                     ; クラスタ番号 * クラスタあたりのセクタ数 * セクタあたりのサイズ + 7C00h
     MUL     BX                          ; これでファイルの場所がわかる
     ADD     AX, 7C00h
-    
-    DBG
 
     CMP     [AX], 40AFh
 
@@ -143,42 +187,39 @@ callfile_ret:
     JMP     keyloop:
 
 callfile:
-    MOV     BX, 10h
+    MOV     BX, 10h                     ; ファイルの先頭アドレスを10で割り、CSレジスタで使えるようにする
     DIV     BX
 
-    DBG
-
-    PUSHA
+    PUSHA                               ; PUSH
     PUSH    DS
     PUSH    ES
 
-    XOR     BX, BX
+    XOR     BX, BX                      ; 初期化
     MOV     CX, BX
     MOV     DX, BX
     MOV     SI, BX
     MOV     DI, BX
     MOV     BP, BX
 
-    MOV     DS, BX
+    MOV     DS, BX                      ; スタック状態を記録
     MOV     WORD[7AF0h], SP
     MOV     WORD[7AF2h], SS
     MOV     SP, BX
 
-    MOV     DS, AX
+    MOV     DS, AX                      ; セグメントレジスタをCSと同じ場所に
     MOV     ES, AX
     MOV     SS, AX
 
-    CALLF   AX
+    CALLF   AX                          ; far call
 
-    XOR     BX, BX
+    XOR     BX, BX                      ; スタック状態を復帰
     MOV     DS, BX
     MOV     SP, WORD[7AF0h]
     MOV     SS, WORD[7AF2h]
 
-    POP     ES
+    POP     ES                          ; POP
     POP     DS
     POPA
-    DBG
 
     JMP     callfile_ret:
 

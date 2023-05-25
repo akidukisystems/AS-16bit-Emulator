@@ -3,7 +3,7 @@
 
     vtable_com_transform.0.0 = "JNAE"
     vtable_com_transform.1.0 = "JB"
-    vtable_com_transform.0.1 = "AE"
+    vtable_com_transform.0.1 = "JAE"
     vtable_com_transform.1.1 = "JNB"
     vtable_com_transform.0.2 = "JZ"
     vtable_com_transform.1.2 = "JE"
@@ -23,3 +23,5 @@
     vtable_com_transform.1.9 = "JLE"
     vtable_com_transform.0.10 = "JG"
     vtable_com_transform.1.10 = "JNLE"
+    vtable_com_transform.0.11 = "JGE"
+    vtable_com_transform.1.11 = "JNL"

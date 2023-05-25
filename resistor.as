@@ -154,7 +154,7 @@
         }
 
         if ( cfb_checkFlags && fSF ) : {
-            if ( ( cfb_data && 0x8000 ) ) : {
+            if ( ( cfb_data && 0x80 ) ) : {
                 writeResistorWe rFL, fetchResistorWe(rFL) || fSF
             } else {
                 writeResistorWe rFL, fetchResistorWe(rFL) && notx(fSF)
@@ -212,7 +212,7 @@
         }
 
         if ( cfb_checkFlagscmp && fSF ) : {
-            if ( ( cfb_datacmp && 0x8000 ) or ( cfb_datacmp < 0 ) ) : {
+            if ( ( cfb_datacmp && 0x80 ) or ( cfb_datacmp < 0 ) ) : {
                 writeResistorWe rFL, fetchResistorWe(rFL) || fSF
             } else {
                 writeResistorWe rFL, fetchResistorWe(rFL) && notx(fSF)
@@ -220,7 +220,7 @@
         }
 
         if ( cfb_checkFlagscmp && fOF ) : {
-            if ( ( cfb_datacmp > MAX8BS ) or ( cfb_datacmp > 0 ) ) : {
+            if ( cfb_datacmp > MAX8BS ) : {
                 writeResistorWe rFL, fetchResistorWe(rFL) || fOF
             } else {
                 writeResistorWe rFL, fetchResistorWe(rFL) && notx(fOF)
@@ -336,7 +336,7 @@
         }
 
         if ( cfw_checkFlagscmp && fOF ) : {
-            if ( ( cfw_datacmp > MAX16BS ) or ( cfw_datacmp > 0 ) ) : {
+            if ( cfw_datacmp > MAX16BS ) : {
                 writeResistorWe rFL, fetchResistorWe(rFL) || fOF
             } else {
                 writeResistorWe rFL, fetchResistorWe(rFL) && notx(fOF)
