@@ -229,7 +229,7 @@ fin:
     JMP     fin:
 
 message1:
-    &DB     "AkidukiSystems SampleOS Version 0.1"
+    &DB     "AkidukiSystems SampleOS Version 0.2"
     &DW     @CRLF
     &DB     "Ready..."
     &DW     @CRLF
