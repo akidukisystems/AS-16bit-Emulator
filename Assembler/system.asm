@@ -1,5 +1,5 @@
 
-    #config codesize 1024
+    #config codesize 2048
     #config filename "system.sys"
     #origin addr 8800h
     #enum   @CRLF       0A0Dh
@@ -93,31 +93,17 @@ doCommand_filenameCMP:
     MOV     BX, [DI]                    ; 文字がスペースの場合も
     CMP     BL, 20h
     JE      doCommand_filenameend:
+    CMP     BL, 0                       ; 空エントリの場合はFATの終端とみなす
+    JE      doCommand_Fail:
+    CMP     BL, FFh                     ; 削除済エントリ
+    JE      doCommand_not:
 
-    CMP     AL, 41h
-    JGE     doCommand_filenameCMP_al:
+    CALL    lowerclasscode:             ; 文字を小文字化
 
-doCommand_filenameCMP_al_ret:
-    CMP     BL, 41h
-    JGE     doCommand_filenameCMP_bl:
-
-doCommand_filenameCMP_bl_ret:
     CMP     AL, BL                      ; 文字が一緒ならループ続行
     JE      doCommand_filenameCorrect:
 
     JMP     doCommand_not:
-
-doCommand_filenameCMP_al:
-    CMP     AL, 5Ah
-    JG      doCommand_filenameCMP_al_ret:
-    ADD     AL, 20h
-    JMP     doCommand_filenameCMP_al_ret:
-
-doCommand_filenameCMP_bl:
-    CMP     BL, 5Ah
-    JG      doCommand_filenameCMP_bl_ret:
-    ADD     BL, 20h
-    JMP     doCommand_filenameCMP_bl_ret:
 
 doCommand_filenameCorrect:
     INC     SI
@@ -141,12 +127,14 @@ doCommand_not:
     MOV     SI, 7B02h                   ; 不一致なら次のファイルへ
 
     CMP     CX, 16                      ; 検索終わったら、当てはまるファイル名はない
+    DBG
     JE      doCommand_Fail:
 
     JMP     doCommand_fileentry:
 
 doCommand_Fail:
-    MOV     SI, message2:
+    DBG
+    MOV     SI, message.notfound_cmd:
     MOV     AH, 0Eh
     INT     10h
 
@@ -162,9 +150,14 @@ doCommand_filenameEqual:
     MOV     AX, CX                      ; ファイルエントリの番号 * ファイルエントリのサイズ + 先頭クラスタ番号 + FATがある位置
     MOV     BX, 20h                     ; これでクラスタ番号が格納されているところがわかる
     MUL     BX
-    ADD     AX, 16h
     MOV     DI, 8000h
     ADD     DI, AX
+
+    CALL    doCommand_kakutyoushi:
+
+    CMP     AX, 0
+    JNE     doCommand_notexecutable:
+    ADD     DI, 16h
 
     MOV     BX, [DI]                    ; ファイルがあるクラスタの番号を読む
     MOV     AX, 2
@@ -176,8 +169,13 @@ doCommand_filenameEqual:
     CMP     [AX], 40AFh
 
     JE      callfile:
-callfile_ret:
 
+doCommand_notexecutable:
+    MOV     SI, message.notexecutable:
+    MOV     AH, 0Eh
+    INT     10h
+
+callfile_ret:
     MOV     SI, messageRet:             ; 文字列のあるオフセット
     MOV     AH, 0Eh
     INT     10h                         ; ビデオ割り込み
@@ -185,6 +183,51 @@ callfile_ret:
     MOV     BYTE[7B00h], 0
 
     JMP     keyloop:
+
+
+doCommand_kakutyoushi:
+    PUSHA
+    PUSHF
+    XOR     CX, CX
+    ADD     DI, 8
+    MOV     DX, DI
+    MOV     SI, doCommand_kakutyoushi.dat:
+
+doCommand_kakutyoushi.loop:
+    MOV     AX, [DI]
+    MOV     BX, [SI]
+    CALL    lowerclasscode:
+    CMP     AL, BL
+    DBG
+    JNE     doCommand_kakutyoushi.next:
+    INC     CX
+    INC     DI
+    INC     SI
+    CMP     CX, 3
+    JNE     doCommand_kakutyoushi.loop:
+    
+    POPF
+    POPA
+    XOR     AX, AX
+    RET
+
+doCommand_kakutyoushi.next:
+    XOR     CX, CX
+    MOV     DI, DX
+    INC     SI
+    MOV     AX, [SI]
+    CMP     AL, 0
+    JNE     doCommand_kakutyoushi.loop:
+
+    POPF
+    POPA
+    MOV     AX, 1
+    RET
+    
+doCommand_kakutyoushi.dat:
+    &DB     "SYS"
+    &DB     "COM"
+    &DB     0
 
 callfile:
     MOV     BX, 10h                     ; ファイルの先頭アドレスを10で割り、CSレジスタで使えるようにする
@@ -223,6 +266,33 @@ callfile:
 
     JMP     callfile_ret:
 
+; lowerclasscode
+; In...AL, BL
+; Out..AL, BL
+; FLAGS...Not Change
+; 入力されたアスキーコードを、大文字のアルファベットから小文字に変換します
+; BLレジスタの変更を許可しない場合は、BXレジスタをスタックにプッシュし、41h-5Ah以外の範囲に設定してからCALLしてください
+lowerclasscode:
+    CMP     AL, 41h
+    JGE     lowerclasscode.al:
+
+lowerclasscode.al_ret:
+    CMP     BL, 41h
+    JGE     lowerclasscode.bl:
+
+lowerclasscode.al:
+    CMP     AL, 5Ah
+    JG      lowerclasscode.al_ret:
+    ADD     AL, 20h
+    JMP     lowerclasscode.al_ret:
+
+lowerclasscode.bl:
+    CMP     BL, 5Ah
+    JG      lowerclasscode.ret:
+    ADD     BL, 20h
+
+lowerclasscode.ret:
+    RET
 
 fin:
     HLT
@@ -236,15 +306,14 @@ message1:
     &DB     ">"
     &DB     0
 
-message2:
+message.notfound_cmd:
     &DW     @CRLF
     &DB     "Not found this command."
     &DB     0
 
-message3:
+message.notexecutable:
     &DW     @CRLF
-    &DB     "great."
-    &DW     @CRLF
+    &DB     "Not executable file."
     &DB     0
 
 messageRet:
