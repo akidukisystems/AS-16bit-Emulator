@@ -11,6 +11,13 @@
     FAT_CNT     = 0     ;           (size)
     FAT_POS     = 1     ; clst      (number)
     FAT_SIZE    = 0     ; clst      (size)
+    vint_cmdmode = 0
+
+    if ( dir_cmdline == "make" ) {
+
+        vint_cmdmode = 1
+
+    }
 
     sysfont 11
 
@@ -151,4 +158,9 @@
 
     loop
 
+    if ( vint_cmdmode ) {
+
+        end 0
+
+    }
     

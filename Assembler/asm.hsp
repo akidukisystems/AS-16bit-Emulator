@@ -54,6 +54,20 @@
     pos 0, 24
     mesbox vstr_message, 640, 400, 0, 0
 
+    vint_cmdmode = 0
+
+    if ( dir_cmdline != "" ) {
+
+        vstr_inputfileName = dir_cmdline
+        vint_cmdmode = 1
+        vstr_message += "Loaded ASM file. (\""+ vstr_inputfileName +"\")\n"
+        objprm 2, vstr_message
+
+
+        goto *l_run
+
+    }
+
     stop
 
 *l_oaa
@@ -1491,4 +1505,13 @@
 
     bsave vstr_filename, vbin_assembledData
 
-    stop
+    if ( vint_cmdmode ) {
+
+        end 0
+
+    } else {
+
+        dialog "complete"
+        stop
+
+    }
