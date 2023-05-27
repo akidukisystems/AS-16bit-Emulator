@@ -7,10 +7,6 @@
 
             vint_CPUio_InterruptController_WaitStartMS = GetTickCount()
 
-            logmes vint_CPUio_InterruptController_WaitStartMS
-            logmes vint_CPUio_PortOutPut
-            logmes GetTickCount()
-
             repeat -1
 
                 await 1
