@@ -5,15 +5,13 @@
     #enum   @CRLF       0A0Dh
 
     JMP     100h
-    &DB     "CM"
     &RESBSF 100h
 
     MOV     SI, message1:
     MOV     AH, 0Eh
     INT     10h
     
-    XOR     CX, CX          ; データセグメントをいじるのでpushする
-    PUSH    DS
+    XOR     CX, CX          ; データセグメントをいじるので0にする
     MOV     DS, CX
     MOV     DI, CX
 
@@ -23,6 +21,20 @@ fileread:
     MUL     BX
     ADD     AX, 8000h
     MOV     BX, AX
+
+    PUSH    AX
+    PUSH    BX
+    MOV     AX, CX          ; 6ファイルごとに改行する
+    CMP     AX, 0
+    JE      fileread.crlf_ret:
+    MOV     BX, 6
+    DIV     BX
+    CMP     DX, 0
+    JE      fileread.crlf:
+fileread.crlf_ret:
+    POP     BX
+    POP     AX
+
     PUSH    CX              ; CXはこの後使うのでpush
     XOR     CX, CX
     
@@ -81,7 +93,7 @@ owari:
     INC     CX
     CMP     CX, 16          ; 次のファイルエントリへ、16個見たらおわり
     JNE     fileread:
-    POP     DS              ; リターン
+    MOV     DS, ES             ; リターン
     MOV     SI, message1:
     MOV     AH, 0Eh
     INT     10h
@@ -89,7 +101,7 @@ owari:
 
 owari2:
     POP     CX              ; リターン
-    POP     DS
+    MOV     DS, ES
     MOV     SI, message1:
     MOV     AH, 0Eh
     INT     10h
@@ -104,6 +116,15 @@ umerukakutyo:
     JNE     umerukakutyo:
     JMP     owari:
 
+fileread.crlf:
+    MOV     DS, ES
+    MOV     SI, message1:
+    MOV     AH, 0Eh
+    DBG
+    INT     10h
+    XOR     AX, AX
+    MOV     DS, AX
+    JMP     fileread.crlf_ret:
 
 halt:
     HLT

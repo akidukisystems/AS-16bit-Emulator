@@ -5,7 +5,6 @@
     #enum   @CRLF       0A0Dh
 
     JMP     100h
-    &DB     "CM"
     &RESBSF 100h
 
     MOV     SI, message:
