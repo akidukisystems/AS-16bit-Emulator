@@ -25,3 +25,7 @@
     vtable_com_transform.1.10 = "JNLE"
     vtable_com_transform.0.11 = "JGE"
     vtable_com_transform.1.11 = "JNL"
+    vtable_com_transform.0.12 = "LOOPZ"
+    vtable_com_transform.1.12 = "LOOPE"
+    vtable_com_transform.0.13 = "LOOPNZ"
+    vtable_com_transform.1.13 = "LOOPNE"
