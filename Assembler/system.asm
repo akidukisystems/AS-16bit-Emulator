@@ -74,6 +74,8 @@ backspace_not:
     MOV     DS, BX                      ; データセグメントをもどす
     JMP     keyloop:
 
+
+
 doCommand:
     MOV     SI, 7B02h                   ; SIは入力されたコマンド、DIは検索対象のファイル名
     XOR     CX, CX
@@ -89,6 +91,8 @@ doCommand_filenameCMP:
     MOV     AX, [SI]                    ; 文字が空だったり終端の場合はラベルendに
     CMP     AL, 0
     JZ      doCommand_filenameend:
+    CMP     AL, 2Eh
+    JZ      doCommand_filenameStrKakutyo:
 
     MOV     BX, [DI]                    ; 文字がスペースの場合も
     CMP     BL, 20h
@@ -114,6 +118,48 @@ doCommand_filenameCorrect:
 
     JMP     doCommand_filenameCMP:
 
+doCommand_filenameStrKakutyo:
+    MOV     DI, 8000h
+    MOV     AX, CX                      ; CXはファイルエントリのカウンタ 20hをかけるとファイルエントリの先頭になる
+    MOV     BX, 20h
+    MUL     BX
+    ADD     DI, AX
+    ADD     DI, 8
+    INC     SI
+
+doCommand_filenameStrKakutyo.loop:
+    MOV     AX, [SI]                    ; 文字が空だったり終端の場合はラベルendに
+    CMP     AL, 0
+    JZ      doCommand_filenameStrKakutyo.end:
+
+    MOV     BX, [DI]                    ; 文字がスペースの場合も
+    CMP     BL, 20h
+    JE      doCommand_filenameStrKakutyo.end:
+
+    CALL    lowerclasscode:             ; 文字を小文字化
+
+    CMP     AL, BL                      ; 文字が一緒ならループ続行
+    DBG
+    JE      doCommand_filenameStrKakutyoCorrect:
+
+    JMP     doCommand_not:
+
+doCommand_filenameStrKakutyoCorrect:
+    INC     SI
+    INC     DI
+
+    CMP     SI, 7B0Eh                   ; ファイル名を検証し終わったら一致
+    JE      doCommand_filenameEqual:
+
+    JMP     doCommand_filenameStrKakutyo.loop:
+
+doCommand_filenameStrKakutyo.end:
+    MOV     AX, [DI]                    ; ファイル名の終端に来て、文字数が一緒なら一致
+    MOV     BX, [SI]
+    CMP     AL, BL
+    JZ      doCommand_filenameEqual:
+    JMP     doCommand_not:
+
 doCommand_filenameend:
     MOV     AX, [DI]                    ; ファイル名の終端に来て、文字数が一緒なら一致
     SUB     AL, 20h
@@ -127,13 +173,11 @@ doCommand_not:
     MOV     SI, 7B02h                   ; 不一致なら次のファイルへ
 
     CMP     CX, 16                      ; 検索終わったら、当てはまるファイル名はない
-    DBG
     JE      doCommand_Fail:
 
     JMP     doCommand_fileentry:
 
 doCommand_Fail:
-    DBG
     MOV     SI, message.notfound_cmd:
     MOV     AH, 0Eh
     INT     10h
@@ -142,7 +186,7 @@ doCommand_Fail:
     MOV     AH, 0Eh
     INT     10h                         ; ビデオ割り込み
 
-    MOV     BYTE[7B00h], 0
+    MOV     BYTE[7B00h], 0              ; 入力文字数リセット
 
     JMP     keyloop:
 
@@ -153,9 +197,9 @@ doCommand_filenameEqual:
     MOV     DI, 8000h
     ADD     DI, AX
 
-    CALL    doCommand_kakutyoushi:
+    CALL    doCommand_kakutyoushi:      ; 拡張子が実行可能か判定
 
-    CMP     AX, 0
+    CMP     AX, 0                       ; 実行可能（0）なら続行、不可（1）なら終了
     JNE     doCommand_notexecutable:
     ADD     DI, 16h
 
@@ -168,7 +212,7 @@ doCommand_filenameEqual:
 
     CMP     [AX], 40AFh
 
-    JE      callfile:
+    JE      callfile:                   ; ファイルを実行
 
 doCommand_notexecutable:
     MOV     SI, message.notexecutable:
@@ -179,6 +223,7 @@ callfile_ret:
     MOV     SI, messageRet:             ; 文字列のあるオフセット
     MOV     AH, 0Eh
     INT     10h                         ; ビデオ割り込み
+    DBG
 
     MOV     BYTE[7B00h], 0
 
@@ -189,33 +234,32 @@ doCommand_kakutyoushi:
     PUSHA
     PUSHF
     XOR     CX, CX
-    ADD     DI, 8
-    MOV     DX, DI
+    ADD     DI, 8                       ; エントリ先頭から9バイトが拡張子
+    MOV     DX, DI                      ; 拡張子の位置を記録しとく
     MOV     SI, doCommand_kakutyoushi.dat:
 
 doCommand_kakutyoushi.loop:
-    MOV     AX, [DI]
+    MOV     AX, [DI]                    ; 文字列読み込み
     MOV     BX, [SI]
-    CALL    lowerclasscode:
-    CMP     AL, BL
-    DBG
+    CALL    lowerclasscode:             ; 小文字にする
+    CMP     AL, BL                      ; 比較して違うなら、他の拡張子か調べる
     JNE     doCommand_kakutyoushi.next:
-    INC     CX
+    INC     CX                          ; 次の文字へ
     INC     DI
     INC     SI
-    CMP     CX, 3
+    CMP     CX, 3                       ; 拡張子を比較し終えて、すべて一致なら続行（リターン）
     JNE     doCommand_kakutyoushi.loop:
     
     POPF
     POPA
-    XOR     AX, AX
+    XOR     AX, AX                      ; 終了コード（AX）は0
     RET
 
 doCommand_kakutyoushi.next:
     XOR     CX, CX
-    MOV     DI, DX
-    INC     SI
-    MOV     AX, [SI]
+    MOV     DI, DX                      ; 記録しといた拡張子の位置を復元
+    INC     SI                          ; お次の拡張子
+    MOV     AX, [SI]                    ; 終端ならおしまい
     CMP     AL, 0
     JNE     doCommand_kakutyoushi.loop:
 
@@ -224,7 +268,7 @@ doCommand_kakutyoushi.next:
     MOV     AX, 1
     RET
     
-doCommand_kakutyoushi.dat:
+doCommand_kakutyoushi.dat:              ; 実行可能な拡張子一覧
     &DB     "SYS"
     &DB     "COM"
     &DB     0
@@ -299,7 +343,7 @@ fin:
     JMP     fin:
 
 message1:
-    &DB     "AkidukiSystems SampleOS Version 0.2"
+    &DB     "AkidukiSystems SampleOS Version 0.3"
     &DW     @CRLF
     &DB     "Ready..."
     &DW     @CRLF
