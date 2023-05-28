@@ -45,18 +45,9 @@ BL 41
 CL 42
 DL 43
 
-AX/[AX]...16bit
-AL/[AL]...8bit
-FFh...8/16bit	（但し即値だけはword）
-WORD[FFh]...16bit
-BYTE[FFh]...8bit
-ラベル...16bit		:rabel
-定数...16			@num
-
-
 
 =命令/プレフィックス表
-命令名	サイズ	コード(hex)
+命令名	サイズ	コード(16進) オペランド 実装済
 
 -データ操作				ALL OK
 MOV		b		10	2	OK
@@ -118,7 +109,7 @@ TEST	b		42	2		ANDをとって SF, ZF, PFを設定するけど結果は破棄する
 IN		w		49	2	OK
 OUT		w		4B  2	OK
 
--スタック
+-スタック				ALL OK
 PUSH	w		60	1	OK
 POP		w		61	1	OK
 PUSHA			62	0	OK
@@ -141,7 +132,7 @@ DBG				FD	0	OK
 UD2				FE	0	OK
 NOP				FF	0	OK
 
--フラグ
+-フラグ					ALL OK
 CLI				80	0	0->IF		OK
 STI				81		1->IF		OK
 CLC				82		0->CF		OK
@@ -149,10 +140,10 @@ STC				83		1->CF		OK
 CMC				84		NOT(CF)->CF	OK
 CLD				85		0->DF		OK
 STD				86		1->DF		OK
-LAHF			87		FLAGS->AH
-SAHF			88		AH->FLAGS
+LAHF			87		FLAGS->AH	OK
+SAHF			88		AH->FLAGS	OK
 
--ジャンプ
+-ジャンプ							ALL OK
 JF		W		AE	1	OK			セグメント間jump
 JMP		w		AF	1	OK
 Jcc		w			1	ALL OK
@@ -175,9 +166,9 @@ Jcc		w			1	ALL OK
 	C		A0		CF=1
 	NC		A1		CF=0
 	CXZ		A2		CX=0
-LOOP	w			1
-LOOPZ(E)			1
-LOOPNZ(NE)			1
+LOOP	w		B0	1				OK
+LOOPZ(E)		B1	1				OK
+LOOPNZ(NE)		B2	1				OK
 
 プリプロセッサ命令
 
