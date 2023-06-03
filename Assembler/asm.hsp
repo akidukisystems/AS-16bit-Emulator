@@ -27,6 +27,9 @@
 
     #include "as.header.as"
     #include "cfg.as"
+    #include "..\\msglib.as"
+
+    init_msglib 0, 0, 0
 
     title "Assembler"
 
@@ -45,14 +48,11 @@
     cfgAS_init "asm_conf.ascfg"
     vstr_inputfileName = ""
 
-    pos 0, 0 : objsize 128, 24, 0
+    pos 0, 480-24 : objsize 128, 24, 0
     button goto "Open...", *l_oaa
-    pos 128, 0 : button goto "Assemble", *l_run
+    pos 128, 480-24 : button goto "Assemble", *l_run
 
-    vstr_message = "Ready...\n"
-
-    pos 0, 24
-    mesbox vstr_message, 640, 400, 0, 0
+    putmes_msglib "Ready...\n"
 
     vint_cmdmode = 0
 
@@ -60,8 +60,7 @@
 
         vstr_inputfileName = dir_cmdline
         vint_cmdmode = 1
-        vstr_message += "Loaded ASM file. (\""+ vstr_inputfileName +"\")\n"
-        objprm 2, vstr_message
+        putmes_msglib "Loaded ASM file. (\""+ vstr_inputfileName +"\")\n"
 
 
         goto *l_run
@@ -76,8 +75,7 @@
     if ( stat ) {
 
         vstr_inputfileName = refstr
-        vstr_message += "Loaded ASM file. (\""+ refstr +"\")\n"
-        objprm 2, vstr_message
+        putmes_msglib "Loaded ASM file. (\""+ refstr +"\")\n"
 
     }
 
@@ -121,10 +119,7 @@
     if ( strsize == -1 ) : stop
     noteload vstr_inputfileName
 
-
-
-    vstr_message += "Assembler: Cleaning Code...\n"
-    objprm 2, vstr_message
+    putmes_msglib "Assembler: Cleaning Code...\n"
 
     // code cleaning.
     repeat notemax
@@ -249,8 +244,7 @@
 
     notesel vstr_fixedData
 
-    vstr_message += "Assembler: Preprocessing...\n"
-    objprm 2, vstr_message
+    putmes_msglib "Assembler: Preprocessing...\n"
 
     repeat notemax
 
@@ -267,16 +261,14 @@
                 if ( vstr_code.2 == "codesize" ) {
 
                     sdim vbin_assembledData, intdh( vstr_code.3 )
-                    vstr_message += "Assembler: Codesize:"+ intdh( vstr_code.3 ) +" Bytes\n"
-                    objprm 2, vstr_message
+                    putmes_msglib "Assembler: Codesize:"+ intdh( vstr_code.3 ) +" Bytes\n"      
 
                 }
 
                 if ( vstr_code.2 == "filename" ) {
 
                     vstr_filename = strtrim( vstr_code.3, 0, '"' )
-                    vstr_message += "Assembler: filename:\""+ vstr_filename +"\"\n"
-                    objprm 2, vstr_message
+                    putmes_msglib "Assembler: filename:\""+ vstr_filename +"\"\n"
 
                 }
 
@@ -287,8 +279,7 @@
                 vtable_enum.1.vint_enumIndex = str( intdh( vstr_code.3 ) )
                 vint_enumIndex ++
 
-                vstr_message += "Assembler: Defined value. (Name:"+ vstr_code.2 +" Value:"+ strf( "%04Xh", intdh( vstr_code.3 ) ) +")\n"
-                objprm 2, vstr_message
+                putmes_msglib "Assembler: Defined value. (Name:"+ vstr_code.2 +" Value:"+ strf( "%04Xh", intdh( vstr_code.3 ) ) +")\n"
 
             swbreak
             case "#origin"
@@ -350,8 +341,7 @@
 
     */
     
-    vstr_message += "Assembler: 1st passing...\n"
-    objprm 2, vstr_message
+    putmes_msglib "Assembler: 1st passing...\n"
 
     repeat notemax
 
@@ -404,8 +394,7 @@
 
                 if ( ( intdh( vstr_code.2 ) - vint_currentaddress ) < 0 ) {
                 
-                    vstr_message += ""+ strf( "%04Xh", vstr_code.2 ) +" is vaild value.\n"
-                    objprm 2, vstr_message
+                    putmes_msglib ""+ strf( "%04Xh", vstr_code.2 ) +" is vaild value.\n"
                     stop
 
                 }
@@ -434,8 +423,7 @@
 
                                 if ( int( vtable_enum.1.cnt ) > 0xFF ) {
 
-                                    vstr_message += "Error: invaild value.\n"
-                                    objprm 2, vstr_message
+                                    putmes_msglib "Error: invaild value.\n"
                                     stop
 
                                 }
@@ -466,8 +454,7 @@
 
                         if ( vint_temp > 0xFF ) {
 
-                            vstr_message += "Error: invaild value.\n"
-                            objprm 2, vstr_message
+                            putmes_msglib "Error: invaild value.\n"
                             stop
 
                         }
@@ -526,8 +513,7 @@
 
                         if ( vint_temp > 0xFFFF ) {
 
-                            vstr_message += "Error: invaild value.\n"
-                            objprm 2, vstr_message
+                            putmes_msglib "Error: invaild value.\n"
                             stop
 
                         }
@@ -1465,8 +1451,7 @@
 
     // 2nd pass
 
-    vstr_message += "Assembler: 2nd passing...\n"
-    objprm 2, vstr_message
+    putmes_msglib "Assembler: 2nd passing...\n"
 
     // convert label to binary address
     repeat length2( vtable_labeluse )
@@ -1478,16 +1463,14 @@
 
             if ( vtable_label.0.cnt == "" ) {
 
-                vstr_message += "Assembler: This label is undefined. (Name:"+ vtable_labeluse.0.vint_thisNoteIndex +")\n"
-                objprm 2, vstr_message
+                putmes_msglib "Assembler: This label is undefined. (Name:"+ vtable_labeluse.0.vint_thisNoteIndex +")\n"
                 stop
 
             }
             if ( vtable_labeluse.0.vint_thisNoteIndex == vtable_label.0.cnt ) {
 
                 wpoke vbin_assembledData, int( vtable_labeluse.1.vint_thisNoteIndex ), int( vtable_label.1.cnt )
-                vstr_message += "Assembler: Over writed address. (Name:"+ vtable_label.0.cnt +" Value:"+ strf( "%04Xh", vtable_label.1.cnt ) +" at:"+ strf( "%04Xh", vtable_labeluse.1.vint_thisNoteIndex ) +")\n"
-                objprm 2, vstr_message
+                putmes_msglib "Assembler: Over writed address. (Name:"+ vtable_label.0.cnt +" Value:"+ strf( "%04Xh", vtable_label.1.cnt ) +" at:"+ strf( "%04Xh", vtable_labeluse.1.vint_thisNoteIndex ) +")\n"
 
                 break
 
@@ -1500,8 +1483,7 @@
     loop
 
     // finish
-    vstr_message += "Assemble has competed. Saved binary file at \""+ vstr_filename +"\".\n"
-    objprm 2, vstr_message
+    putmes_msglib "Assemble has competed. Saved binary file at \""+ vstr_filename +"\".\n"
 
     bsave vstr_filename, vbin_assembledData
 

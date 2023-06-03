@@ -2,6 +2,9 @@
     #packopt name "diskmake"
     #packopt version "version.txt"
     #include "user32.as"
+    #include "..\\msglib.as"
+
+    init_msglib 0, 0, 0
 
     SECTOR_SIZE = 0     ; bytes     (size)
     TRUCK_SIZE  = 0     ; sector    (size)
@@ -61,7 +64,7 @@
             if ( vint_filesize != SECTOR_SIZE ) : dialog "File \""+ vstr_filename +"\" is too small" : stop
             bload vstr_filename, vbin_LoadData, vint_filesize
             memcpy vbin_saveBinaryData, vbin_LoadData, SECTOR_SIZE, 0, 0
-            mes "write MBR"
+            putmes_msglib "write MBR\n"
         swbreak
         case "+"
             // FILE
@@ -140,7 +143,7 @@
             // ファイルデータ書き込み
             memcpy vbin_saveBinaryData, vbin_LoadData, vint_filesize, (FAT_POS + FAT_SIZE*FAT_CNT)*CLST_SIZE*SECTOR_SIZE + vint_nextFilePos*SECTOR_SIZE*CLST_SIZE, 0
 
-            mes "write FILE:\""+ vstr_filename +"\" FatEntry:(b)"+ (FAT_POS*CLST_SIZE*SECTOR_SIZE + vint_filecnt *0x20) +" ClstEntry:(c)"+ (FAT_POS + vint_nextFilePos) +" FileSize:(b)"+ vint_filesize
+            putmes_msglib "write FILE:\""+ vstr_filename +"\" FatEntry:(b)"+ (FAT_POS*CLST_SIZE*SECTOR_SIZE + vint_filecnt *0x20) +" ClstEntry:(c)"+ (FAT_POS + vint_nextFilePos) +" FileSize:(b)"+ vint_filesize +"\n"
             
             vint_nextFilePos += vint_filecluster
             vint_filecnt ++
@@ -152,7 +155,7 @@
                 memcpy vbin_saveBinaryData, vbin_FATdata, FAT_SIZE*CLST_SIZE*SECTOR_SIZE, (FAT_POS + FAT_SIZE*cnt)*CLST_SIZE*SECTOR_SIZE, 0
             loop
             bsave vstr_filename, vbin_saveBinaryData
-            mes "Saved at \""+ vstr_filename +"\""
+            putmes_msglib "Saved at \""+ vstr_filename +"\"\n"
         swbreak
         swend
 
