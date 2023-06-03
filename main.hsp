@@ -165,19 +165,19 @@
 
 
 
-    winsel SCREEN_DEBUGLOG_ID, SCRactive
+    winsel SCREEN_DEBUGLOG_ID, SCRnone
     title "AS 16bit Emulator - debug"
     initscr
     sysfont 11
 
-    winsel SCREEN_DISPLAY_ID, SCRactive
+    winsel SCREEN_DISPLAY_ID, SCRnone
     title "AS 16bit Emulator - screen"
     initscr
     font msgothic, 16
 
 
 
-    winsel SCREEN_CONTROL_ID, SCRactive
+    winsel SCREEN_CONTROL_ID, SCRnone
     title "Controler"
     objsize SCREEN_SIZE_Y /2, 32, 0
     button gosub "RESET", *l_control_RESET
@@ -186,7 +186,7 @@
 
 
 
-    winsel SCREEN_DEBUGLOG_ID, SCRactive 
+    winsel SCREEN_DEBUGLOG_ID, SCRnone 
     pos 0, 460 : mes "Use the remote controller to operate the v.m.."
     pos 0, 0
     mes "Emulator compile date:"+ __date__ +" "+ __time__ +""
