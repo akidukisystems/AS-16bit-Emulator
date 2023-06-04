@@ -31,7 +31,7 @@ keyloop:
     JE      backspace:
 
     CMP     AH, 13                      ; Enterキー押下
-    JE      doCommand:
+    JE      splitcommand:
 
     MOV     DS, 07B0h                   ; 7B00hを基準にメモリ操作
     MOV     BH, BYTE[0000h]             ; 入力された文字を7B02h以降に、文字数を7B00hに記録
@@ -76,8 +76,40 @@ backspace_not:
 
 
 
+splitcommand:
+    MOV     SI, 7B02h
+    MOV     DI, 7AE0h
+    XOR     CX, CX
+
+splitcommand.loop:
+    MOV     AX, [SI]
+    CMP     AL, 20h
+    JE      splitcommand.split:
+    CMP     AL, 0
+    JE      splitcommand.end:
+    MOV     [DI], AL
+    DBG
+    INC     SI
+    INC     DI
+    JMP     splitcommand.loop:
+
+splitcommand.split:
+    INC     CX
+    MOV     DI, 7AE0h
+    MOV     BX, CX
+    MOV     AX, 10h
+    MUL     BX
+    SUB     DI, AX
+    INC     SI
+    JMP     splitcommand.loop:
+
+splitcommand.end:
+    JMP     doCommand:
+    
+
+
 doCommand:
-    MOV     SI, 7B02h                   ; SIは入力されたコマンド、DIは検索対象のファイル名
+    MOV     SI, 7AE0h                   ; SIは入力されたコマンド、DIは検索対象のファイル名
     XOR     CX, CX
 
 doCommand_fileentry:
@@ -113,10 +145,11 @@ doCommand_filenameCorrect:
     INC     SI
     INC     DI
 
-    CMP     SI, 7B0Ah                   ; ファイル名を検証し終わったら一致
+    CMP     SI, 7AECh                   ; ファイル名を検証し終わったら一致
     JE      doCommand_filenameEqual:
 
     JMP     doCommand_filenameCMP:
+
 
 doCommand_filenameStrKakutyo:
     MOV     DI, 8000h
@@ -148,7 +181,7 @@ doCommand_filenameStrKakutyoCorrect:
     INC     SI
     INC     DI
 
-    CMP     SI, 7B0Eh                   ; ファイル名を検証し終わったら一致
+    CMP     SI, 7AE9h                   ; ファイル名を検証し終わったら一致
     JE      doCommand_filenameEqual:
 
     JMP     doCommand_filenameStrKakutyo.loop:
@@ -160,6 +193,7 @@ doCommand_filenameStrKakutyo.end:
     JZ      doCommand_filenameEqual:
     JMP     doCommand_not:
 
+
 doCommand_filenameend:
     MOV     AX, [DI]                    ; ファイル名の終端に来て、文字数が一緒なら一致
     SUB     AL, 20h
@@ -170,7 +204,7 @@ doCommand_filenameend:
 
 doCommand_not:
     INC     CX
-    MOV     SI, 7B02h                   ; 不一致なら次のファイルへ
+    MOV     SI, 7AE0h                   ; 不一致なら次のファイルへ
 
     CMP     CX, 16                      ; 検索終わったら、当てはまるファイル名はない
     JE      doCommand_Fail:
@@ -218,16 +252,7 @@ doCommand_notexecutable:
     MOV     SI, message.notexecutable:
     MOV     AH, 0Eh
     INT     10h
-
-callfile_ret:
-    MOV     SI, messageRet:             ; 文字列のあるオフセット
-    MOV     AH, 0Eh
-    INT     10h                         ; ビデオ割り込み
-    DBG
-
-    MOV     BYTE[7B00h], 0
-
-    JMP     keyloop:
+    JMP     callfile_ret:
 
 
 doCommand_kakutyoushi:
@@ -308,7 +333,15 @@ callfile:
     POP     DS
     POPA
 
-    JMP     callfile_ret:
+callfile_ret:
+    MOV     SI, messageRet:             ; 文字列のあるオフセット
+    MOV     AH, 0Eh
+    INT     10h                         ; ビデオ割り込み
+    DBG
+
+    MOV     BYTE[7B00h], 0
+
+    JMP     keyloop:
 
 ; lowerclasscode
 ; In...AL, BL
@@ -338,9 +371,13 @@ lowerclasscode.bl:
 lowerclasscode.ret:
     RET
 
-fin:
+
+
+halt:
     HLT
-    JMP     fin:
+    JMP     halt:
+
+
 
 message1:
     &DB     "AkidukiSystems SampleOS Version 0.3"
