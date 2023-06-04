@@ -45,13 +45,17 @@
 
     #define WAITMS 2
 
+    vstr_cfg_ArchName = ""
+
     cfgAS_init "asm_conf.ascfg"
+    cfgAS_read "Assembler.ArchName", vstr_cfg_ArchName
     vstr_inputfileName = ""
 
     pos 0, 480-24 : objsize 128, 24, 0
     button goto "Open...", *l_oaa
     pos 128, 480-24 : button goto "Assemble", *l_run
 
+    putmes_msglib "Architecture: "+ vstr_cfg_ArchName +"\n"
     putmes_msglib "Ready...\n"
 
     vint_cmdmode = 0
