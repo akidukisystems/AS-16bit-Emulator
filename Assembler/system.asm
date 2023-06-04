@@ -380,7 +380,7 @@ halt:
 
 
 message1:
-    &DB     "AkidukiSystems SampleOS Version 0.3"
+    &DB     "AkidukiSystems SampleOS Version 0.4"
     &DW     @CRLF
     &DB     "Ready..."
     &DW     @CRLF

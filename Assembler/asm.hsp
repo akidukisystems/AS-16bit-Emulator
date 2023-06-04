@@ -1,6 +1,6 @@
 
     #packopt name "asm"
-    #packopt version "version.txt"
+    #packopt version "asmver.txt"
 
     sysfont 11
     #module

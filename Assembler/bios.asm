@@ -137,7 +137,7 @@ message_BiosMenu:
     &DB "AkidukiSystems BIOS Setup Utility"
     &DW @CRLF
     &DW @CRLF
-    &DB "BIOS Version: 0.1"
+    &DB "BIOS Version: 0.2"
     &DW @CRLF
     &DB "BIOS Date: 2023/05/24 15:19"
     &DW @CRLF

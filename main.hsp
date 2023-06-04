@@ -306,7 +306,7 @@
         color 192, 192, 192
         pos 15, 40
         mes "Emulator"
-        mes " -Version: 0.9 Debug"
+        mes " -Version: 0.10 Debug"
         mes " -BIOS binary file: \""+ vstr_BIOSpath +"\""
         mes "\nProcessor"
         mes " -Name: "+ vstr_ProcessorName
