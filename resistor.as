@@ -86,14 +86,6 @@
 		else : _p01 = p01
     return _p01
 
-    // 16進数で数字を表示
-    // 引数：   int hmesi=表示する値
-    // 影響：なし
-    // 戻り値：なし
-    #deffunc hmes int hmesi
-        mes strf( "%08X", hmesi )
-    return
-
     #deffunc checkDataB var cdb_data    // データが8bit符号なし整数の範囲を超えているか
         if ( ( cdb_data > MAX8B ) or ( cdb_data < 0 ) ) : {
             cdb_data = MAX8B && cdb_data
