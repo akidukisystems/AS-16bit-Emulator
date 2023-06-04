@@ -126,10 +126,6 @@ fileread.crlf:
     MOV     DS, AX
     JMP     fileread.crlf_ret:
 
-halt:
-    HLT
-    JMP     halt:
-
 message1:
     &DW     @CRLF
     &DB     0
