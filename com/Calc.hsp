@@ -838,7 +838,7 @@
         if ( vbin_CPUtmp.0 == ZERO ) : {
 
             // #DE 除算エラー 例外
-            mes "#DE"
+            putmes_msglib "#DE\n", SCREEN_DEBUGLOG_ID
             stop
 
         }
@@ -849,7 +849,7 @@
         if ( vbin_CPUtmp.2 > MAX8B ) : {
 
             // #DE 除算エラー 例外
-            mes "#DE"
+            putmes_msglib "#DE\n", SCREEN_DEBUGLOG_ID
             stop
 
         }
@@ -893,7 +893,7 @@
         if ( vbin_CPUtmp.0 == ZERO ) : {
 
             // #DE 除算エラー 例外
-            mes "#DE"
+            putmes_msglib "#DE\n", SCREEN_DEBUGLOG_ID
             stop
 
         }
@@ -904,7 +904,7 @@
         if ( vbin_CPUtmp.2 > MAX16B ) : {
 
             // #DE 除算エラー 例外
-            mes "#DE"
+            putmes_msglib "#DE\n", SCREEN_DEBUGLOG_ID
             stop
 
         }

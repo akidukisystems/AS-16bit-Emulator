@@ -311,15 +311,10 @@
 
         loop
 
-        mes "AX="+ strf("%04X", fetchResistorWg(rAX)) +" BX="+ strf("%04X", fetchResistorWg(rBX)) +" CX="+ strf("%04X", fetchResistorWg(rCX)) +" DX="+ strf("%04X", fetchResistorWg(rDX)) +" SI="+ strf("%04X", fetchResistorWg(rSI)) +" DI="+ strf("%04X", fetchResistorWg(rDI)) +" BP="+ strf("%04X", fetchResistorWg(rBP)) +" SP="+ strf("%04X", fetchResistorWg(rSP)) +""
-        mes "CS="+ strf("%04X", fetchResistorWs(rCS)) +" DS="+ strf("%04X", fetchResistorWs(rDS)) +" ES="+ strf("%04X", fetchResistorWs(rES)) +" SS="+ strf("%04X", fetchResistorWs(rSS)) +" IP="+ strf("%04X", fetchResistorWe(rIP)) +" "+ vbin_CPUtmpS.0 +""
-        mes "TIME="+ gettick(0) +" ms"
-        mes "TICK="+ emu_vint_executedCmd +"\n"
-
-        logmes "AX="+ strf("%04X", fetchResistorWg(rAX)) +" BX="+ strf("%04X", fetchResistorWg(rBX)) +" CX="+ strf("%04X", fetchResistorWg(rCX)) +" DX="+ strf("%04X", fetchResistorWg(rDX)) +" SI="+ strf("%04X", fetchResistorWg(rSI)) +" DI="+ strf("%04X", fetchResistorWg(rDI)) +" BP="+ strf("%04X", fetchResistorWg(rBP)) +" SP="+ strf("%04X", fetchResistorWg(rSP)) +""
-        logmes "CS="+ strf("%04X", fetchResistorWs(rCS)) +" DS="+ strf("%04X", fetchResistorWs(rDS)) +" ES="+ strf("%04X", fetchResistorWs(rES)) +" SS="+ strf("%04X", fetchResistorWs(rSS)) +" IP="+ strf("%04X", fetchResistorWe(rIP)) +" "+ vbin_CPUtmpS.0 +""
-        logmes "TIME="+ gettick(0) +" ms"
-        logmes "TICK="+ emu_vint_executedCmd +"\n"
+        putmes_msglib "AX="+ strf("%04X", fetchResistorWg(rAX)) +" BX="+ strf("%04X", fetchResistorWg(rBX)) +" CX="+ strf("%04X", fetchResistorWg(rCX)) +" DX="+ strf("%04X", fetchResistorWg(rDX)) +" SI="+ strf("%04X", fetchResistorWg(rSI)) +" DI="+ strf("%04X", fetchResistorWg(rDI)) +" BP="+ strf("%04X", fetchResistorWg(rBP)) +" SP="+ strf("%04X", fetchResistorWg(rSP)) +"\n", SCREEN_DEBUGLOG_ID
+        putmes_msglib "CS="+ strf("%04X", fetchResistorWs(rCS)) +" DS="+ strf("%04X", fetchResistorWs(rDS)) +" ES="+ strf("%04X", fetchResistorWs(rES)) +" SS="+ strf("%04X", fetchResistorWs(rSS)) +" IP="+ strf("%04X", fetchResistorWe(rIP)) +" "+ vbin_CPUtmpS.0 +"\n", SCREEN_DEBUGLOG_ID
+        putmes_msglib "TIME="+ gettick(0) +" ms\n", SCREEN_DEBUGLOG_ID
+        putmes_msglib "TICK="+ emu_vint_executedCmd +"\n\n", SCREEN_DEBUGLOG_ID
 
         return
 

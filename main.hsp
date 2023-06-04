@@ -10,6 +10,7 @@
     #include "cfg.as"
     #include "hspda.as"
     #include "kernel32.as"
+    #include "msglib.as"
 
     #uselib "user32.dll"
     #func SetTimer  "SetTimer"  int, int, int, int
@@ -159,7 +160,7 @@
     logmes strf("%x",__hspver__)
 
 
-    screen SCREEN_DEBUGLOG_ID, SCREEN_SIZE_X, SCREEN_SIZE_Y
+    init_msglib SCREEN_DEBUGLOG_ID, 0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y
     screen SCREEN_DISPLAY_ID, SCREEN_SIZE_X, SCREEN_SIZE_Y, 4
     screen SCREEN_CONTROL_ID, SCREEN_SIZE_Y /2, SCREEN_SIZE_X/2, 8+4
 
@@ -167,8 +168,6 @@
 
     winsel SCREEN_DEBUGLOG_ID, SCRnone
     title "AS 16bit Emulator - debug"
-    initscr
-    sysfont 11
 
     winsel SCREEN_DISPLAY_ID, SCRnone
     title "AS 16bit Emulator - screen"
@@ -186,7 +185,7 @@
 
 
 
-    winsel SCREEN_DEBUGLOG_ID, SCRnone 
+    winsel SCREEN_DISPLAY_ID, SCRnone 
     pos 0, 460 : mes "Use the remote controller to operate the v.m.."
     pos 0, 0
     mes "Emulator compile date:"+ __date__ +" "+ __time__ +""
@@ -207,7 +206,7 @@
 		if ( strsize != -1 ) : {
 			
 			addfont vstr_temp.1
-			mes "Loaded font file: \""+ getpath( vstr_temp.1, 8 ) +"\""
+			putmes_msglib "Loaded font file: \""+ getpath( vstr_temp.1, 8 ) +"\"\n", SCREEN_DEBUGLOG_ID
 
 		}
 
@@ -216,7 +215,7 @@
 	chdir "..\\"
 	noteunsel
 
-    mes "Applied fonts"
+    putmes_msglib "Applied fonts\n", SCREEN_DEBUGLOG_ID
 
     cfgAS_init "emu_conf.ascfg"
     
@@ -253,8 +252,6 @@
     winsel SCREEN_DISPLAY_ID, SCRnone
     font vstr_FontName, 16
     mref emu_vbin_VRAM, 66
-    winsel SCREEN_DEBUGLOG_ID, SCRnone
-    font vstr_FontName, 16
 
     vstr_BIOSpath = "bios.bin"
     cfgAS_read "BIOS.binaryPath", vstr_BIOSpath
@@ -395,10 +392,10 @@
 
         loop
 
-        mes "AX="+ strf("%04X", fetchResistorWg(rAX)) +" BX="+ strf("%04X", fetchResistorWg(rBX)) +" CX="+ strf("%04X", fetchResistorWg(rCX)) +" DX="+ strf("%04X", fetchResistorWg(rDX)) +" SI="+ strf("%04X", fetchResistorWg(rSI)) +" DI="+ strf("%04X", fetchResistorWg(rDI)) +" BP="+ strf("%04X", fetchResistorWg(rBP)) +" SP="+ strf("%04X", fetchResistorWg(rSP)) +""
-        mes "CS="+ strf("%04X", fetchResistorWs(rCS)) +" DS="+ strf("%04X", fetchResistorWs(rDS)) +" ES="+ strf("%04X", fetchResistorWs(rES)) +" SS="+ strf("%04X", fetchResistorWs(rSS)) +" IP="+ strf("%04X", fetchResistorWe(rIP)) +" "+ vbin_CPUtmpS.0 +""
-        mes "TIME="+ gettick(0) +" ms"
-        mes "TICK="+ emu_vint_executedCmd +"\n"
+        putmes_msglib "AX="+ strf("%04X", fetchResistorWg(rAX)) +" BX="+ strf("%04X", fetchResistorWg(rBX)) +" CX="+ strf("%04X", fetchResistorWg(rCX)) +" DX="+ strf("%04X", fetchResistorWg(rDX)) +" SI="+ strf("%04X", fetchResistorWg(rSI)) +" DI="+ strf("%04X", fetchResistorWg(rDI)) +" BP="+ strf("%04X", fetchResistorWg(rBP)) +" SP="+ strf("%04X", fetchResistorWg(rSP)) +"\n", SCREEN_DEBUGLOG_ID
+        putmes_msglib "CS="+ strf("%04X", fetchResistorWs(rCS)) +" DS="+ strf("%04X", fetchResistorWs(rDS)) +" ES="+ strf("%04X", fetchResistorWs(rES)) +" SS="+ strf("%04X", fetchResistorWs(rSS)) +" IP="+ strf("%04X", fetchResistorWe(rIP)) +" "+ vbin_CPUtmpS.0 +"\n", SCREEN_DEBUGLOG_ID
+        putmes_msglib "TIME="+ gettick(0) +" ms\n", SCREEN_DEBUGLOG_ID
+        putmes_msglib "TICK="+ emu_vint_executedCmd +"\n\n", SCREEN_DEBUGLOG_ID
 
     stop
 
