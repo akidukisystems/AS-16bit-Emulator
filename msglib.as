@@ -80,7 +80,3 @@
 
 
     #global
-
-    init_msglib 0, 0, 0
-    putmes_msglib "this is a pen"
-
