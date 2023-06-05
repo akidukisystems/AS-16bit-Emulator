@@ -262,26 +262,20 @@ searchFile_fileentry:
 searchFile_filenameCMP:
     MOV     AX, [SI]                    ; 文字が空だったり終端の場合はラベルendに
     CMP     AL, 0
-    DBG
     JZ      searchFile_filenameend:
     CMP     AL, 2Eh
-    DBG
     JZ      searchFile_filenameStrKakutyo:
 
     MOV     BX, [DI]                    ; 文字がスペースの場合も
     CMP     BL, 20h
-    DBG
     JE      searchFile_filenameend:
     CMP     BL, 0                       ; 空エントリの場合はFATの終端とみなす
-    DBG
     JE      searchFile_Fail:
     CMP     BL, FFh                     ; 削除済エントリ
-    DBG
     JE      searchFile_not:
 
     CALLF   WORD[7AF4h]                 ; 文字を小文字化
 
-    DBG
     CMP     AL, BL                      ; 文字が一緒ならループ続行
     JE      searchFile_filenameCorrect:
 
@@ -296,7 +290,6 @@ searchFile_filenameCorrect:
     SUB     BX, 08h
     CMP     AX, BX
     PUSH    AX
-    DBG
 
     JE      searchFile_filenameEqual:
 
