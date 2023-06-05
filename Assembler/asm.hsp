@@ -410,6 +410,16 @@
 
             }
 
+            if ( vstr_code.1 == "&RESB0" ) {
+
+                vint_currentaddress = (vint_currentaddress / 16 +1 )*16
+                vint_assembledDataNextIndex = (vint_assembledDataNextIndex / 16 +1 )*16
+
+                continue cnt+1
+
+            }
+
+
             if ( vstr_code.1 == "&DB" ) {
 
                 repeat -1, 2
