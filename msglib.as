@@ -31,7 +31,7 @@
     #deffunc func_putmes_msglib str msg, int id
 
         if ( win.id != 1 ) : return -1
-        stack = ginfo_act
+        stack = ginfo_sel
         gsel id, 0
 
         text += msg
@@ -46,7 +46,7 @@
     #deffunc func_cls_msglib int id
 
         if ( win.id != 1 ) : return -1
-        stack = ginfo_act
+        stack = ginfo_sel
         gsel id, 0
 
         text = ""
