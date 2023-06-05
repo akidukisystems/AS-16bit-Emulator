@@ -11,9 +11,25 @@
     MOV     ES, AX
 
     MOV     WORD[8200h], AX
+    MOV     AX, return_only:
+    MOV     BX, 10h
+    DIV     BX
+    MOV     WORD[7AF4h], AX
 
     MOV     AH, 20h                     ; 初期化
     INT     10h                         ; ビデオ割り込み
+
+    MOV     SI, start.dat:              ; SI...検索対象のファイル名
+    CALL    searchFile:
+    JCXZ    notfound_start.dat:
+    CALL    fileEntry2Addr:
+
+    MOV     SI, AX                      ; SI...検索対象のファイル名
+    CALL    searchFile:
+    CALL    fileEntry2Addr:
+    MOV     BX, 10h
+    DIV     BX
+    MOV     WORD[7AF4h], AX
 
     MOV     SI, message1:               ; 文字列のあるオフセット
     MOV     AH, 0Eh                     ; テレタイプモード
@@ -88,7 +104,6 @@ splitcommand.loop:
     CMP     AL, 0
     JE      splitcommand.end:
     MOV     [DI], AL
-    DBG
     INC     SI
     INC     DI
     JMP     splitcommand.loop:
@@ -104,113 +119,28 @@ splitcommand.split:
     JMP     splitcommand.loop:
 
 splitcommand.end:
-    JMP     doCommand:
-    
-
-
-doCommand:
-    MOV     SI, 7AE0h                   ; SIは入力されたコマンド、DIは検索対象のファイル名
-    XOR     CX, CX
-
-doCommand_fileentry:
-    MOV     DI, 8000h
-    MOV     AX, CX                      ; CXはファイルエントリのカウンタ 20hをかけるとファイルエントリの先頭になる
-    MOV     BX, 20h
-    MUL     BX
-    ADD     DI, AX
-
-doCommand_filenameCMP:
-    MOV     AX, [SI]                    ; 文字が空だったり終端の場合はラベルendに
-    CMP     AL, 0
-    JZ      doCommand_filenameend:
-    CMP     AL, 2Eh
-    JZ      doCommand_filenameStrKakutyo:
-
-    MOV     BX, [DI]                    ; 文字がスペースの場合も
-    CMP     BL, 20h
-    JE      doCommand_filenameend:
-    CMP     BL, 0                       ; 空エントリの場合はFATの終端とみなす
-    JE      doCommand_Fail:
-    CMP     BL, FFh                     ; 削除済エントリ
-    JE      doCommand_not:
-
-    CALL    lowerclasscode:             ; 文字を小文字化
-
-    CMP     AL, BL                      ; 文字が一緒ならループ続行
-    JE      doCommand_filenameCorrect:
-
-    JMP     doCommand_not:
-
-doCommand_filenameCorrect:
-    INC     SI
-    INC     DI
-
-    CMP     SI, 7AECh                   ; ファイル名を検証し終わったら一致
-    JE      doCommand_filenameEqual:
-
-    JMP     doCommand_filenameCMP:
-
-
-doCommand_filenameStrKakutyo:
-    MOV     DI, 8000h
-    MOV     AX, CX                      ; CXはファイルエントリのカウンタ 20hをかけるとファイルエントリの先頭になる
-    MOV     BX, 20h
-    MUL     BX
-    ADD     DI, AX
-    ADD     DI, 8
-    INC     SI
-
-doCommand_filenameStrKakutyo.loop:
-    MOV     AX, [SI]                    ; 文字が空だったり終端の場合はラベルendに
-    CMP     AL, 0
-    JZ      doCommand_filenameStrKakutyo.end:
-
-    MOV     BX, [DI]                    ; 文字がスペースの場合も
-    CMP     BL, 20h
-    JE      doCommand_filenameStrKakutyo.end:
-
-    CALL    lowerclasscode:             ; 文字を小文字化
-
-    CMP     AL, BL                      ; 文字が一緒ならループ続行
     DBG
-    JE      doCommand_filenameStrKakutyoCorrect:
+    MOV     SI, 7AE0h                   ; SI...検索対象のファイル名
+    DBG
+    CALL    searchFile:
+    DBG
+    JCXZ    doCommand_Fail:
+    DBG
 
-    JMP     doCommand_not:
+    CALL    fileEntry2Addr:
+    DBG
 
-doCommand_filenameStrKakutyoCorrect:
-    INC     SI
-    INC     DI
+    CMP     [AX], 40AFh
+    DBG
 
-    CMP     SI, 7AE9h                   ; ファイル名を検証し終わったら一致
-    JE      doCommand_filenameEqual:
+    JE      callfile:                   ; ファイルを実行
 
-    JMP     doCommand_filenameStrKakutyo.loop:
-
-doCommand_filenameStrKakutyo.end:
-    MOV     AX, [DI]                    ; ファイル名の終端に来て、文字数が一緒なら一致
-    MOV     BX, [SI]
-    CMP     AL, BL
-    JZ      doCommand_filenameEqual:
-    JMP     doCommand_not:
-
-
-doCommand_filenameend:
-    MOV     AX, [DI]                    ; ファイル名の終端に来て、文字数が一緒なら一致
-    SUB     AL, 20h
-    MOV     BX, [SI]
-    CMP     AL, BL
-    JZ      doCommand_filenameEqual:
-    JMP     doCommand_not:
-
-doCommand_not:
-    INC     CX
-    MOV     SI, 7AE0h                   ; 不一致なら次のファイルへ
-
-    CMP     CX, 16                      ; 検索終わったら、当てはまるファイル名はない
-    JE      doCommand_Fail:
-
-    JMP     doCommand_fileentry:
-
+doCommand_notexecutable:
+    MOV     SI, message.notexecutable:
+    MOV     AH, 0Eh
+    INT     10h
+    JMP     callfile_ret:
+    
 doCommand_Fail:
     MOV     SI, message.notfound_cmd:
     MOV     AH, 0Eh
@@ -224,37 +154,6 @@ doCommand_Fail:
 
     JMP     keyloop:
 
-doCommand_filenameEqual:
-    MOV     AX, CX                      ; ファイルエントリの番号 * ファイルエントリのサイズ + 先頭クラスタ番号 + FATがある位置
-    MOV     BX, 20h                     ; これでクラスタ番号が格納されているところがわかる
-    MUL     BX
-    MOV     DI, 8000h
-    ADD     DI, AX
-
-    CALL    doCommand_kakutyoushi:      ; 拡張子が実行可能か判定
-
-    CMP     AX, 0                       ; 実行可能（0）なら続行、不可（1）なら終了
-    JNE     doCommand_notexecutable:
-    ADD     DI, 16h
-
-    MOV     BX, [DI]                    ; ファイルがあるクラスタの番号を読む
-    MOV     AX, 2
-    MUL     BX
-    MOV     BX, 512                     ; クラスタ番号 * クラスタあたりのセクタ数 * セクタあたりのサイズ + 7C00h
-    MUL     BX                          ; これでファイルの場所がわかる
-    ADD     AX, 7C00h
-
-    CMP     [AX], 40AFh
-
-    JE      callfile:                   ; ファイルを実行
-
-doCommand_notexecutable:
-    MOV     SI, message.notexecutable:
-    MOV     AH, 0Eh
-    INT     10h
-    JMP     callfile_ret:
-
-
 doCommand_kakutyoushi:
     PUSHA
     PUSHF
@@ -266,7 +165,7 @@ doCommand_kakutyoushi:
 doCommand_kakutyoushi.loop:
     MOV     AX, [DI]                    ; 文字列読み込み
     MOV     BX, [SI]
-    CALL    lowerclasscode:             ; 小文字にする
+    CALLF   WORD[7AF4h]                 ; 小文字にする
     CMP     AL, BL                      ; 比較して違うなら、他の拡張子か調べる
     JNE     doCommand_kakutyoushi.next:
     INC     CX                          ; 次の文字へ
@@ -297,6 +196,8 @@ doCommand_kakutyoushi.dat:              ; 実行可能な拡張子一覧
     &DB     "SYS"
     &DB     "COM"
     &DB     0
+
+
 
 callfile:
     MOV     BX, 10h                     ; ファイルの先頭アドレスを10で割り、CSレジスタで使えるようにする
@@ -337,46 +238,188 @@ callfile_ret:
     MOV     SI, messageRet:             ; 文字列のあるオフセット
     MOV     AH, 0Eh
     INT     10h                         ; ビデオ割り込み
-    DBG
+
 
     MOV     BYTE[7B00h], 0
 
     JMP     keyloop:
 
-; lowerclasscode
-; In...AL, BL
-; Out..AL, BL
-; FLAGS...Not Change
-; 入力されたアスキーコードを、大文字のアルファベットから小文字に変換します
-; BLレジスタの変更を許可しない場合は、BXレジスタをスタックにプッシュし、41h-5Ah以外の範囲に設定してからCALLしてください
-lowerclasscode:
-    CMP     AL, 41h
-    JGE     lowerclasscode.al:
+searchFile:
+    PUSH    AX
+    PUSH    BX
+    PUSH    DX
+    PUSH    DI
+    PUSH    SI
+    XOR     CX, CX
 
-lowerclasscode.al_ret:
-    CMP     BL, 41h
-    JGE     lowerclasscode.bl:
+searchFile_fileentry:
+    MOV     DI, 8000h
+    MOV     AX, CX                      ; CXはファイルエントリのカウンタ 20hをかけるとファイルエントリの先頭になる
+    MOV     BX, 20h
+    MUL     BX
+    ADD     DI, AX
 
-lowerclasscode.al:
-    CMP     AL, 5Ah
-    JG      lowerclasscode.al_ret:
-    ADD     AL, 20h
-    JMP     lowerclasscode.al_ret:
+searchFile_filenameCMP:
+    MOV     AX, [SI]                    ; 文字が空だったり終端の場合はラベルendに
+    CMP     AL, 0
+    DBG
+    JZ      searchFile_filenameend:
+    CMP     AL, 2Eh
+    DBG
+    JZ      searchFile_filenameStrKakutyo:
 
-lowerclasscode.bl:
-    CMP     BL, 5Ah
-    JG      lowerclasscode.ret:
-    ADD     BL, 20h
+    MOV     BX, [DI]                    ; 文字がスペースの場合も
+    CMP     BL, 20h
+    DBG
+    JE      searchFile_filenameend:
+    CMP     BL, 0                       ; 空エントリの場合はFATの終端とみなす
+    DBG
+    JE      searchFile_Fail:
+    CMP     BL, FFh                     ; 削除済エントリ
+    DBG
+    JE      searchFile_not:
 
-lowerclasscode.ret:
+    CALLF   WORD[7AF4h]                 ; 文字を小文字化
+
+    DBG
+    CMP     AL, BL                      ; 文字が一緒ならループ続行
+    JE      searchFile_filenameCorrect:
+
+    JMP     searchFile_not:
+
+searchFile_filenameCorrect:
+    INC     SI
+    INC     DI
+
+    POP     AX
+    MOV     BX, SI
+    SUB     BX, 08h
+    CMP     AX, BX
+    PUSH    AX
+    DBG
+
+    JE      searchFile_filenameEqual:
+
+    JMP     searchFile_filenameCMP:
+
+
+searchFile_filenameStrKakutyo:
+    MOV     DI, 8000h
+    MOV     AX, CX                      ; CXはファイルエントリのカウンタ 20hをかけるとファイルエントリの先頭になる
+    MOV     BX, 20h
+    MUL     BX
+    ADD     DI, AX
+    ADD     DI, 8
+    INC     SI
+
+searchFile_filenameStrKakutyo.loop:
+    MOV     AX, [SI]                    ; 文字が空だったり終端の場合はラベルendに
+    CMP     AL, 0
+    JZ      searchFile_filenameStrKakutyo.end:
+
+    MOV     BX, [DI]                    ; 文字がスペースの場合も
+    CMP     BL, 20h
+    JE      searchFile_filenameStrKakutyo.end:
+
+    CALLF   WORD[7AF4h]                 ; 文字を小文字化
+
+    CMP     AL, BL                      ; 文字が一緒ならループ続行
+    JE      searchFile_filenameStrKakutyoCorrect:
+
+    JMP     searchFile_not:
+
+searchFile_filenameStrKakutyoCorrect:
+    INC     SI
+    INC     DI
+
+    POP     AX
+    MOV     BX, SI
+    SUB     BX, 0Ch
+    CMP     AX, BX
+    PUSH    AX
+    JE      searchFile_filenameEqual:
+
+    JMP     searchFile_filenameStrKakutyo.loop:
+
+searchFile_filenameStrKakutyo.end:
+    MOV     AX, [DI]                    ; ファイル名の終端に来て、文字数が一緒なら一致
+    MOV     BX, [SI]
+    CMP     AL, BL
+    JZ      searchFile_filenameEqual:
+    JMP     searchFile_not:
+
+
+searchFile_filenameend:
+    MOV     AX, [DI]                    ; ファイル名の終端に来て、文字数が一緒なら一致
+    SUB     AL, 20h
+    MOV     BX, [SI]
+    CMP     AL, BL
+    JZ      searchFile_filenameEqual:
+    JMP     searchFile_not:
+
+searchFile_not:
+    INC     CX
+    POP     SI                          ; 不一致なら次のファイルへ, SIをpop
+    PUSH    SI
+
+    CMP     CX, 16                      ; 検索終わったら、当てはまるファイル名はない
+    JE      searchFile_Fail:
+
+    JMP     searchFile_fileentry:
+
+searchFile_Fail:
+    POP     SI
+    POP     DI
+    POP     DX
+    POP     BX
+    POP     AX
+    XOR     CX, CX
+    RET
+
+searchFile_filenameEqual:
+    POP     SI
+    POP     DI
+    POP     DX
+    POP     BX
+    POP     AX
+    RET
+
+fileEntry2Addr:
+    PUSH    BX
+    PUSH    DI
+    MOV     AX, CX                      ; ファイルエントリの番号 * ファイルエントリのサイズ + 先頭クラスタ番号 + FATがある位置
+    MOV     BX, 20h                     ; これでクラスタ番号が格納されているところがわかる
+    MUL     BX
+    MOV     DI, 8000h
+    ADD     DI, AX
+    ADD     DI, 16h
+
+    MOV     BX, [DI]                    ; ファイルがあるクラスタの番号を読む
+    MOV     AX, 2
+    MUL     BX
+    MOV     BX, 512                     ; クラスタ番号 * クラスタあたりのセクタ数 * セクタあたりのサイズ + 7C00h
+    MUL     BX                          ; これでファイルの場所がわかる
+    ADD     AX, 7C00h
+    POP     DI
+    POP     BX
     RET
 
 
+
+notfound_start.dat:
+    MOV     SI, start.dat:
+    MOV     AH, 0Eh
+    INT     10h
+    MOV     SI, messageNotFound:
+    INT     10h
 
 halt:
     HLT
     JMP     halt:
 
+    &RESB0
+return_only:
+    FRET
 
 
 message1:
@@ -400,4 +443,12 @@ message.notexecutable:
 messageRet:
     &DW     @CRLF
     &DB     ">"
+    &DB     0
+
+messageNotFound:
+    &DB     " is not found."
+    &DB     0
+
+start.dat:
+    &DB     "START.DAT"
     &DB     0
