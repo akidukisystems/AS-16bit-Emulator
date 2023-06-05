@@ -9,7 +9,8 @@
 ?init
 !boot.bin
 +system.sys
-+version.txt
++jpnkey16.sys
++start.dat
 +exit.com
 +dir.com
 +cls.com

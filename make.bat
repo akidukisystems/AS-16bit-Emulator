@@ -57,6 +57,7 @@
     cd Assembler\
     asm.exe boot.asm
     asm.exe system.asm
+    asm.exe jpnkey16.asm
     cd ..\
     exit /b
 
