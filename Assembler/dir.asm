@@ -1,5 +1,5 @@
 
-    #config codesize    1024
+    #config codesize    2048
     #config filename    "dir.com"
     #origin addr        0
     #enum   @CRLF       0A0Dh
@@ -89,6 +89,10 @@ umeru:
 owari:
     CMP     DI, 0           ; ファイル名が8文字より少なかったら、表示ずれを防ぐため埋める
     JNE     umerukakutyo:
+    MOV     AL, 20h         ; ファイル名がくっつかないようスペースを入れる
+    MOV     AH, 0Ah
+    INT     10h
+
     POP     CX              ; CXを戻す このCXはファイルエントリ番号
     INC     CX
     CMP     CX, 16          ; 次のファイルエントリへ、16個見たらおわり
