@@ -1,6 +1,6 @@
 
-    #config codesize 512
-    #config filename "jpnkey16.sys"
+    #config codesize    512
+    #config filename    "jpnkey16.sys"
     #origin addr 0
     #enum   @CRLF       0A0Dh
 
