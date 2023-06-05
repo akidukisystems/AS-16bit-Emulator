@@ -21,7 +21,7 @@
 
     MOV     SI, start.dat:              ; SI...検索対象のファイル名
     CALL    searchFile:
-    JCXZ    notfound_start.dat:
+    JC      notfound_start.dat:
     CALL    fileEntry2Addr:
 
     MOV     SI, AX                      ; SI...検索対象のファイル名
@@ -119,19 +119,13 @@ splitcommand.split:
     JMP     splitcommand.loop:
 
 splitcommand.end:
-    DBG
     MOV     SI, 7AE0h                   ; SI...検索対象のファイル名
-    DBG
     CALL    searchFile:
-    DBG
-    JCXZ    doCommand_Fail:
-    DBG
+    JC      doCommand_Fail:
 
     CALL    fileEntry2Addr:
-    DBG
 
     CMP     [AX], 40AFh
-    DBG
 
     JE      callfile:                   ; ファイルを実行
 
@@ -244,6 +238,14 @@ callfile_ret:
 
     JMP     keyloop:
 
+; searchfile
+; in
+;   SI...ファイル名があるアドレス
+; out
+;   FLAGS...
+;     CF... 0: ファイルあり
+;           1: ファイルなし
+;   CX...ファイルエントリ
 searchFile:
     PUSH    AX
     PUSH    BX
@@ -367,6 +369,7 @@ searchFile_Fail:
     POP     BX
     POP     AX
     XOR     CX, CX
+    STC
     RET
 
 searchFile_filenameEqual:
@@ -375,6 +378,7 @@ searchFile_filenameEqual:
     POP     DX
     POP     BX
     POP     AX
+    CLC
     RET
 
 fileEntry2Addr:
