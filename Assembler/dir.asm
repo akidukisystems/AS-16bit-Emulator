@@ -106,9 +106,6 @@ owari:
 owari2:
     POP     CX              ; リターン
     MOV     DS, ES
-    MOV     SI, message1:
-    MOV     AH, 0Eh
-    INT     10h
     FRET
 
 umerukakutyo:
