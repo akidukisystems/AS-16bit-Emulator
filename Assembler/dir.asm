@@ -6,10 +6,6 @@
 
     JMP     100h
     &RESBSF 100h
-
-    MOV     SI, message1:
-    MOV     AH, 0Eh
-    INT     10h
     
     XOR     CX, CX          ; データセグメントをいじるので0にする
     MOV     DS, CX

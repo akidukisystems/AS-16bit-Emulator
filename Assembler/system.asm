@@ -31,6 +31,13 @@
     DIV     BX
     MOV     WORD[7AF4h], AX
 
+    MOV     SI, version.com:
+    CALL    searchFile:
+    JC      notfound_version.com:
+    CALL    fileEntry2Addr:
+
+    CALL    callfile:
+
     MOV     SI, message1:               ; 文字列のあるオフセット
     MOV     AH, 0Eh                     ; テレタイプモード
     INT     10h                         ; ビデオ割り込み
@@ -125,19 +132,29 @@ splitcommand.end:
 
     CALL    fileEntry2Addr:
 
-    CMP     [AX], 40AFh
+    PUSH    AX
 
-    JE      callfile:                   ; ファイルを実行
-
-doCommand_notexecutable:
-    MOV     SI, message.notexecutable:
+    MOV     SI, messageCRLF:
     MOV     AH, 0Eh
     INT     10h
-    JMP     callfile_ret:
+
+    POP     AX
+
+    CALL    callfile:                   ; ファイルを実行
+
+    MOV     SI, messageRet:             ; 文字列のあるオフセット
+    MOV     AH, 0Eh
+    INT     10h                         ; ビデオ割り込み
+
+    MOV     BYTE[7B00h], 0
+
+    JMP     keyloop:
     
 doCommand_Fail:
-    MOV     SI, message.notfound_cmd:
+    MOV     SI, messageCRLF:
     MOV     AH, 0Eh
+    INT     10h
+    MOV     SI, message.notfound_cmd:
     INT     10h
 
     MOV     SI, messageRet:             ; 文字列のあるオフセット
@@ -194,6 +211,9 @@ doCommand_kakutyoushi.dat:              ; 実行可能な拡張子一覧
 
 
 callfile:
+    CMP     [AX], 40AFh
+    JNE     callfile.notexec:
+
     MOV     BX, 10h                     ; ファイルの先頭アドレスを10で割り、CSレジスタで使えるようにする
     DIV     BX
 
@@ -228,15 +248,16 @@ callfile:
     POP     DS
     POPA
 
-callfile_ret:
-    MOV     SI, messageRet:             ; 文字列のあるオフセット
+    CLC
+
+    RET
+
+callfile.notexec:
+    MOV     SI, message.notexecutable:
     MOV     AH, 0Eh
-    INT     10h                         ; ビデオ割り込み
-
-
-    MOV     BYTE[7B00h], 0
-
-    JMP     keyloop:
+    INT     10h
+    STC
+    RET
 
 ; searchfile
 ; in
@@ -410,6 +431,14 @@ notfound_start.dat:
     MOV     SI, messageNotFound:
     INT     10h
 
+notfound_version.com:
+    MOV     SI, version.com:
+    MOV     AH, 0Eh
+    INT     10h
+    MOV     SI, messageNotFound:
+    INT     10h
+
+
 halt:
     HLT
     JMP     halt:
@@ -420,7 +449,6 @@ return_only:
 
 
 message1:
-    &DB     "AkidukiSystems SampleOS Version 0.4"
     &DW     @CRLF
     &DB     "Ready..."
     &DW     @CRLF
@@ -428,12 +456,10 @@ message1:
     &DB     0
 
 message.notfound_cmd:
-    &DW     @CRLF
     &DB     "Not found this command."
     &DB     0
 
 message.notexecutable:
-    &DW     @CRLF
     &DB     "Not executable file."
     &DB     0
 
@@ -442,10 +468,18 @@ messageRet:
     &DB     ">"
     &DB     0
 
+messageCRLF:
+    &DW     @CRLF
+    &DB     0
+
 messageNotFound:
     &DB     " is not found."
     &DB     0
 
 start.dat:
     &DB     "START.DAT"
+    &DB     0
+
+version.com:
+    &DB     "VERSION.COM"
     &DB     0
