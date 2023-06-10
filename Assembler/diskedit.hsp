@@ -1,0 +1,291 @@
+
+    #packopt name "diskedit"
+    #packopt version "editver.txt"
+    ;#runtime "hsp3utf"
+    #include "user32.as"
+    #include "..\\msglib.as"
+    #include "hspmath.as"
+    #include "as.header.as"
+    #include "cfg.as"
+
+    cfgAS_init "diskedit.ascfg"
+
+    vc_sectorSize = 0
+    vc_truckPerSector = 0
+    vc_cylsPerTruck = 0
+    vc_headCount = 0
+    vc_clstPerSector = 0
+    vc_fatCount = 0
+    vc_fatPosClst = 0
+    vc_fatSizeClst = 0
+
+    cfgAS_read "sectorSize", vc_sectorSize
+    cfgAS_read "truckPerSector", vc_truckPerSector
+    cfgAS_read "cylsPerTruck", vc_cylsPerTruck
+    cfgAS_read "headCount", vc_headCount
+    cfgAS_read "clstPerSector", vc_clstPerSector
+    cfgAS_read "fatCount", vc_fatCount
+    cfgAS_read "fatPosClst", vc_fatPosClst
+    cfgAS_read "fatSizeClst", vc_fatSizeClst
+
+    init_msglib 1, 0, 0
+    gsel 0, 1
+
+    putmes_msglib "Loaded config\n", 1
+
+    title "ディスクイメージ 編集ソフトウェア"
+
+    vs_line = ""
+    mesbox vs_line, 640, 128, 0, 0
+
+    vs_fileNameList = "ファイルを選択"
+    vi_fileNameIndex = 0
+    vi_isLoadedImage = 0
+
+    objsize 128, 24, 0
+    combox vi_fileNameIndex, 0, vs_fileNameList
+
+    objsize 64, 24, 0
+    button goto "追加", *l_add
+    pos 64, ginfo_cy -24
+    button goto "削除", *l_del
+    pos 128, ginfo_cy -24
+    button goto "書出", *l_out
+
+    pos 0, 480-24
+    button goto "読込", *l_load
+    pos 64, 480-24
+    button goto "書込", *l_save
+    pos 192, 480-24
+    button goto "ヘルプ", *l_help
+
+    stop
+
+*l_load
+
+    dialog "img", 16, "ディスクイメージ"
+
+    if ( stat != 1 ) : stop
+
+    putmes_msglib "Selected image file=\""+ refstr +"\"\n", 1
+
+    exist refstr
+    vs_tmp = refstr
+    vi_tmp = strsize
+
+    putmes_msglib "total file size="+ vi_tmp +" Bytes\n", 1
+
+    sdim vb_disk, vi_tmp
+    bload vs_tmp, vb_disk, vi_tmp
+
+    putmes_msglib "FAT address=0x0400\n", 1
+
+    gosub *l_refreshFile
+
+    stop
+
+*l_save
+
+    if ( vi_isLoadedImage != 1 ) : stop
+
+    dialog "img", 16, "ディスクイメージ"
+
+    if ( stat != 1 ) : stop
+
+    putmes_msglib "Saving image file=\""+ refstr +"\"\n", 1
+
+    bsave refstr, vb_disk, varsize(vb_disk)
+
+    putmes_msglib "Saved image file=\""+ refstr +"\"\n", 1
+
+    stop
+
+*l_add
+
+    if ( vi_isLoadedImage != 1 ) : stop
+
+    dialog "*", 16, ""
+
+    if ( stat != 1 ) : stop
+
+    putmes_msglib "Selected file=\""+ refstr +"\"\n", 1
+
+    exist refstr
+    vs_tmp = refstr
+    vi_tmp = strsize
+
+    putmes_msglib "total file size="+ vi_tmp +" Bytes\n", 1
+
+    sdim vbin_LoadData, vi_tmp
+    bload vs_tmp, vbin_LoadData, vi_tmp
+
+    vs_tmp = getpath(vs_tmp, 8)
+            
+    // ファイル名が8.3形式に収まらないならエラー
+    if ( strlen( strtrim( vs_tmp, 3, '.' ) ) > 11 ) : putmes_msglib "Filename \""+ vs_tmp +"\" is too long\n", 1 : stop
+
+    // 大文字にする
+    CharUpper varptr(vs_tmp)
+
+    // ファイル名と拡張子で分けて、スペース埋めする
+    vint_filenameDot = instr( vs_tmp, 0, "." )
+    vs_tmp_Name = strf( "%-8s", strmid( vs_tmp, 0, vint_filenameDot ) )
+    vs_tmp_Kaku = strf( "%3s", strmid( vs_tmp, vint_filenameDot +1, 3 ) )
+
+    // 作成日時を算出
+    // 作成時刻         hhhh hmmm mmms ssss
+    // sは実際には2で割られた値が入る
+    vbin_fileCreateTime = 0
+    vint_temp.0 = gettime(4)
+    vint_temp.0 = vint_temp.0 << 11
+    vint_temp.0 = vint_temp.0 || %0000011111111111
+    vint_temp.1 = vbin_fileCreateTime || %1111100000000000
+    vbin_fileCreateTime = vint_temp.0 && vint_temp.1
+    vint_temp.0 = gettime(5)
+    vint_temp.0 = vint_temp.0 << 5
+    vint_temp.0 = vint_temp.0 || %1111100000011111
+    vint_temp.1 = vbin_fileCreateTime || %0000011111100000
+    vbin_fileCreateTime = vint_temp.0 && vint_temp.1
+    vint_temp.0 = gettime(6)
+    vint_temp.0 /= 2
+    vint_temp.0 = vint_temp.0 || %1111111111100000
+    vint_temp.1 = vbin_fileCreateTime || %0000000000011111
+    vbin_fileCreateTime = vint_temp.0 && vint_temp.1
+
+    // 作成日           yyyy yyym mmmd dddd
+    // yは1980から起算した値
+    vbin_fileCreateDate = 0
+    vint_temp.0 = gettime(0)
+    vint_temp.0 -= 1980
+    vint_temp.0 = vint_temp.0 << 9
+    vint_temp.0 = vint_temp.0 || %0000000111111111
+    vint_temp.1 = vbin_fileCreateDate || %1111111000000000
+    vbin_fileCreateDate = vint_temp.0 && vint_temp.1
+    vint_temp.0 = gettime(1)
+    vint_temp.0 = vint_temp.0 << 5
+    vint_temp.0 = vint_temp.0 || %1111111000011111
+    vint_temp.1 = vbin_fileCreateDate || %0000000111100000
+    vbin_fileCreateDate = vint_temp.0 && vint_temp.1
+    vint_temp.0 = gettime(3)
+    vint_temp.0 = vint_temp.0 || %1111111111100000
+    vint_temp.1 = vbin_fileCreateDate || %0000000000011111
+    vbin_fileCreateDate = vint_temp.0 && vint_temp.1
+
+    sdim vbin_FATdata, 0x20
+
+    // FAT情報書き込み
+    poke  vbin_FATdata, 0   , vs_tmp_Name+vs_tmp_Kaku
+    wpoke vbin_FATdata, 0x0C, vbin_fileCreateTime
+    wpoke vbin_FATdata, 0x0E, vbin_fileCreateDate
+    wpoke vbin_FATdata, 0x10, vbin_fileCreateDate
+    wpoke vbin_FATdata, 0x12, vbin_fileCreateTime
+    wpoke vbin_FATdata, 0x14, vbin_fileCreateDate
+    wpoke vbin_FATdata, 0x16, vi_fileNextclst
+    lpoke vbin_FATdata, 0x18, vi_tmp
+
+    memcpy vb_disk, vbin_FATdata, 0x20, vi_fileNextEntry * 0x20 +( vc_fatPosClst * vc_clstPerSector * vc_sectorSize ), 0
+    memcpy vb_disk, vbin_LoadData, vi_tmp, vi_fileNextclst *vc_clstPerSector *vc_sectorSize, 0
+
+    putmes_msglib "Added entry \""+ strf( "0x%08X", vi_fileNextEntry * 0x20 +( vc_fatPosClst * vc_clstPerSector * vc_sectorSize ) ) +"\"\nRefreshing file list\n", 1
+
+    gosub *l_refreshFile
+
+    putmes_msglib "Refreshed file list\n", 1
+
+    stop
+
+*l_del
+
+    if ( vi_isLoadedImage != 1 ) : stop
+
+    if ( vi_fileNameIndex == 0 ) : stop
+
+    wpoke vb_disk, (vi_fileNameIndex -1) * 0x20 +( vc_fatPosClst * vc_clstPerSector * vc_sectorSize ), 0x00E5
+
+    putmes_msglib "Deleted entry \""+ strf( "0x%08X", (vi_fileNameIndex -1) * 0x20 +( vc_fatPosClst * vc_clstPerSector * vc_sectorSize ) ) +"\"\nRefreshing file list\n", 1
+
+    gosub *l_refreshFile
+
+    putmes_msglib "Refreshed file list\n", 1
+
+    stop
+
+*l_out
+
+    if ( vi_isLoadedImage != 1 ) : stop
+
+    if ( vi_fileNameIndex == 0 ) : stop
+
+    if ( peek( vb_disk, ( vc_fatPosClst * vc_clstPerSector * vc_sectorSize ) + (vi_fileNameIndex -1) *0x20 ) == 0xE5 ) : stop
+
+    getstr vs_fileName_Name, vb_disk, ( vc_fatPosClst * vc_clstPerSector * vc_sectorSize ) + (vi_fileNameIndex -1) *0x20, 0x20, 8
+    getstr vs_fileName_Kaku, vb_disk, ( vc_fatPosClst * vc_clstPerSector * vc_sectorSize ) + (vi_fileNameIndex -1) *0x20 +8, 0x20, 3
+
+    putmes_msglib "Exporting file \""+ vs_fileName_Name +"."+ vs_fileName_Kaku +"\"\n", 1
+
+    vi_fileDataPos = wpeek( vb_disk, ( vc_fatPosClst * vc_clstPerSector * vc_sectorSize ) + (vi_fileNameIndex -1) * 0x20 + 0x16 )
+    vi_fileSize = lpeek( vb_disk, ( vc_fatPosClst * vc_clstPerSector * vc_sectorSize ) + (vi_fileNameIndex -1) * 0x20 + 0x18 )
+    sdim vb_savefile, vi_fileSize
+
+    memcpy vb_savefile, vb_disk, vi_fileSize, 0, vi_fileDataPos *vc_clstPerSector *vc_sectorSize
+
+    bsave vs_fileName_Name +"."+ vs_fileName_Kaku, vb_savefile, vi_fileSize
+
+    putmes_msglib "Saved at \""+ vs_fileName_Name +"."+ vs_fileName_Kaku +"\"\n", 1
+
+    stop
+
+*l_help
+
+    dialog "読込: ディスクイメージを読み込みます\n書込: ディスクイメージを書き込みます\n追加: ディスクイメージにファイルを追加します\n削除: ディスクイメージからファイルを削除します\n書出: ディスクイメージにあるファイルを書き出します", 0, ""
+
+    stop
+
+*l_refreshFile
+
+    vs_fileName = ""
+    vs_fileName_name = ""
+    vs_fileName_kaku = ""
+    vi_fileDataPos = 0
+    vi_fileSize = 0
+
+    vi_fileNextclst = 0
+    vi_fileNextEntry = 0
+
+    sdim vs_fileNameList_array, , 16
+
+    repeat 16
+
+        if ( peek( vb_disk, ( vc_fatPosClst * vc_clstPerSector * vc_sectorSize ) + cnt *0x20 ) == 0x00 ) : break             ; fatの終端
+        if ( peek( vb_disk, ( vc_fatPosClst * vc_clstPerSector * vc_sectorSize ) + cnt *0x20 ) == 0xE5 ) : continue cnt+1    ; 削除済
+
+        getstr vs_fileName, vb_disk, ( vc_fatPosClst * vc_clstPerSector * vc_sectorSize ) + cnt *0x20, 0, 11
+        getstr vs_fileName_name, vs_fileName, 0, 0x20, 8
+        getstr vs_fileName_kaku, vs_fileName, 8, 0x20, 3
+
+        vi_fileDataPos = wpeek( vb_disk, ( vc_fatPosClst * vc_clstPerSector * vc_sectorSize ) + cnt * 0x20 + 0x16 )
+        vi_fileSize = lpeek( vb_disk, ( vc_fatPosClst * vc_clstPerSector * vc_sectorSize ) + cnt * 0x20 + 0x18 )
+
+        vs_fileNameList_array.cnt = vs_fileName_name +"."+ vs_fileName_kaku
+
+        putmes_msglib "Found file entry(name=\""+ vs_fileName_name +"."+ vs_fileName_kaku +"\", cluster="+ vi_fileDataPos +", size="+ vi_fileSize +")\n", 1
+
+        vi_fileNextclst = vi_fileDataPos + ceil( double( vi_fileSize ) / double( vc_sectorSize ) )
+        vi_fileNextEntry = cnt +1
+
+    loop
+
+    vs_fileNameList = "ファイルを選択"
+
+    foreach vs_fileNameList_array
+
+        if ( vs_fileNameList_array.cnt == "" ) : break
+        vs_fileNameList += "\n"+ vs_fileNameList_array.cnt
+
+    loop
+
+    objprm 1, vs_fileNameList
+
+    vi_isLoadedImage = 1
+
+    return

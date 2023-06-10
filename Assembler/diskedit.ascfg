@@ -1,0 +1,8 @@
+sectorSize=512
+truckPerSector=18
+cylsPerTruck=80
+headCount=2
+clstPerSector=2
+fatCount=2
+fatPosClst=1
+fatSizeClst=1
