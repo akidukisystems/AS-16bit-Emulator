@@ -294,7 +294,7 @@ searchFile_filenameCMP:
     JE      searchFile_filenameend:
     CMP     BL, 0                       ; 空エントリの場合はFATの終端とみなす
     JE      searchFile_Fail:
-    CMP     BL, FFh                     ; 削除済エントリ
+    CMP     BL, E5h                     ; 削除済エントリ
     JE      searchFile_not:
 
     CALLF   WORD[7AF4h]                 ; 文字を小文字化
@@ -456,7 +456,7 @@ message1:
     &DB     0
 
 message.notfound_cmd:
-    &DB     "Not found this command."
+    &DB     "Not found this file."
     &DB     0
 
 message.notexecutable:
