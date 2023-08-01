@@ -320,6 +320,20 @@ searchFile_filenameCorrect:
 
 
 searchFile_filenameStrKakutyo:
+    PUSH    DI
+    AND     DI, 000Fh                   ; 拡張子の識別をする前に、ファイル名が一致してるか確認
+    CMP     DI, 8                       ; 8バイト分比較済（つまり、ファイル名は一致）の場合はスキップ
+    POP     DI
+    JGE     searchFile_filenameStrKakutyo_skip:
+
+    PUSH    BX                          ; 比較しきってない場合は、今指してるFATの文字がスペース
+    MOV     BX, [DI]                    ; （つまり、ファイル名一致）の場合はOK
+    CMP     BL, 20h                     ; スペースではない場合は、探すファイル名と今見ているファイル名が違うのでjmp
+    POP     BX
+
+    JNE     searchFile_not:
+
+searchFile_filenameStrKakutyo_skip:
     MOV     DI, 8000h
     MOV     AX, CX                      ; CXはファイルエントリのカウンタ 20hをかけるとファイルエントリの先頭になる
     MOV     BX, 20h
@@ -474,6 +488,7 @@ messageCRLF:
 
 messageNotFound:
     &DB     " is not found."
+    &DW     @CRLF
     &DB     0
 
 start.dat:
