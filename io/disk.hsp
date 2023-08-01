@@ -162,6 +162,27 @@
                     logmes ( vint_CPUio_disk_HeadNum*vint_CPUio_disk_DiskCilSize*vint_CPUio_disk_DiskTruckSize + vint_CPUio_disk_TruckNum*vint_CPUio_disk_DiskTruckSize + ( vint_CPUio_disk_SectorNum -1 ) ) *vint_CPUio_disk_DiskSectorSize
                 }
 
+                if ( vint_CPUio_PortOutPut == 0x04 ) {
+
+                    logmes strf( "%04X", vint_CPUio_disk_DataSegment *0x10 + vint_CPUio_disk_DataOffset )
+                    logmes "head:"+ vint_CPUio_disk_HeadNum +" truck:"+ vint_CPUio_disk_TruckNum +" sector:"+ vint_CPUio_disk_SectorNum
+
+                    if ( ( vint_CPUio_disk_HeadNum*vint_CPUio_disk_DiskCilSize*vint_CPUio_disk_DiskTruckSize + vint_CPUio_disk_TruckNum*vint_CPUio_disk_DiskTruckSize + vint_CPUio_disk_SectorNum ) *vint_CPUio_disk_DiskSectorSize > vint_CPUio_disk_buffersize ) {
+
+                        vint_CPUio_disk_statval = 0xFF
+                        vint_CPUio_disk_errcode = 0x04
+                        return
+
+                    }
+
+                    logmes ( vint_CPUio_disk_HeadNum*vint_CPUio_disk_DiskCilSize*vint_CPUio_disk_DiskTruckSize + vint_CPUio_disk_TruckNum*vint_CPUio_disk_DiskTruckSize + ( vint_CPUio_disk_SectorNum -1 ) ) *vint_CPUio_disk_DiskSectorSize
+                    logmes vint_CPUio_disk_DataSegment *0x10 + vint_CPUio_disk_DataOffset
+
+                    memcpy vbin_CPUio_disk_buffer, emu_vbin_Memory, 512, ( vint_CPUio_disk_HeadNum*vint_CPUio_disk_DiskCilSize*vint_CPUio_disk_DiskTruckSize + vint_CPUio_disk_TruckNum*vint_CPUio_disk_DiskTruckSize + ( vint_CPUio_disk_SectorNum -1 ) ) *vint_CPUio_disk_DiskSectorSize, vint_CPUio_disk_DataSegment *0x10 + vint_CPUio_disk_DataOffset
+
+                    logmes ( vint_CPUio_disk_HeadNum*vint_CPUio_disk_DiskCilSize*vint_CPUio_disk_DiskTruckSize + vint_CPUio_disk_TruckNum*vint_CPUio_disk_DiskTruckSize + ( vint_CPUio_disk_SectorNum -1 ) ) *vint_CPUio_disk_DiskSectorSize
+                }
+
                 if ( vint_CPUio_PortOutPut == 0x05 ) {
 
                     exist strf( "fdisk%d.img", vint_CPUio_disk_DiskNum )
@@ -181,6 +202,22 @@
                     vint_CPUio_disk_DiskTruckSize = wpeek( vbin_CPUio_disk_buffer, 0x10 )
                     vint_CPUio_disk_DiskCilSize = wpeek( vbin_CPUio_disk_buffer, 0x12 )
                     vint_CPUio_disk_DiskHeadCnt = peek( vbin_CPUio_disk_buffer, 0x14 )
+
+                }
+
+                if ( vint_CPUio_PortOutPut == 0x08 ) {
+
+                    exist strf( "fdisk%d.img", vint_CPUio_disk_DiskNum )
+                    vint_CPUio_disk_buffersize = strsize
+                    if ( vint_CPUio_disk_buffersize == -1 ) {
+
+                        vint_CPUio_disk_statval = 0xFF
+                        vint_CPUio_disk_errcode = 0x05
+                        return
+
+                    }
+
+                    bsave strf( "fdisk%d.img", vint_CPUio_disk_DiskNum ), vbin_CPUio_disk_buffer, vint_CPUio_disk_buffersize
 
                 }
 
