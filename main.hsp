@@ -189,6 +189,7 @@
     pos 0, 460 : mes "Use the remote controller to operate the v.m.."
     pos 0, 0
     mes "Emulator compile date:"+ __date__ +" "+ __time__ +""
+    mes "Press [F12] to setup"
     mes "Booting emulator..."
 
     // font setup
@@ -302,7 +303,7 @@
         color 192, 192, 192 : boxf 5, 5, 640-5, 480-5
         color 0, 0, 192 : boxf 10, 30, 640-10, 480-30
         pos 10, 10 : mes "AkidukiSystems 16bit Emulator Setup Utility"
-        pos 10, 480-25 : mes "Copyright (c) 2022-2023 AkidukiSystems All Rights Reserved."
+        pos 10, 480-25 : mes "Copyright (c) 2022-2023 AkidukiSystems CC BY-SA 4.0"
 
         color 192, 192, 192
         pos 15, 40
