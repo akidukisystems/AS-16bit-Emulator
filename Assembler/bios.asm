@@ -54,6 +54,10 @@ waitBiosMenu_wait:
     JE      waitBiosMenu_wait:
 
     IN      AX, 81h                     ; 押されたならキーコード取得
+    PUSH    AX
+    XOR     AX, AX
+    OUT     8Fh, AX
+    POP     AX
     CMP     AX, 123                     ; F12キー（123）ならBIOSセットアップ画面を出す
     JNE     waitBiosMenu_wait:
     JMP     BiosMenu_Entry:
@@ -110,6 +114,10 @@ BiosMenu_Keywait:
     JE      BiosMenu_Keywait:
 
     IN      AX, 81h                     ; 押されたならキーコード取得
+    PUSH    AX
+    XOR     AX, AX
+    OUT     8Fh, AX
+    POP     AX
     CMP     AX, 27                      ; Escキー（27）ならリセット
     JNE     BiosMenu_Keywait:
     MOV     AX, 1                       
@@ -125,6 +133,8 @@ message1:
     &DB "AkidukiSystems 16bit Emulator  Version 0.9 Debug"
     &DW @CRLF
     &DB "AkidukiSystems BIOS Version 0.1"
+    &DW @CRLF
+    &DB "Press [F12] to Setup Utility"
     &DW @CRLF
     &DB 0
 
@@ -282,6 +292,9 @@ int_disk:
     JE      int_disk_init:
     CMP     AH, 2                       ; 読み込み
     JE      int_disk_read:
+    CMP     AH, 3                       ; 読み込み
+    JE      int_disk_write:
+
 
     IRET
 
@@ -361,6 +374,67 @@ int_disk_read_fin:
     CLC
     IRET
 
+int_disk_write:
+    PUSH    BX
+
+    XOR     BX, BX
+    MOV     BX, DL
+    OUT     26h, BX                     ; ヘッド番号2bit
+    MOV     BX, DH
+    OUT     27h, BX                     ; ディスク番号2bit
+
+    MOV     BX, 5
+    OUT     28h, BX                     ; ディスク選択
+    IN      BX, 20h                     ; エラー確認
+    JNZ     int_disk_write_diskerr:
+
+    POP     BX
+
+int_disk_write_loop:
+    PUSH    DX
+
+    OUT     22h, BX                     ; 読み込み先オフセット
+    MOV     DX, ES
+    OUT     23h, DX                     ; 読み込み先セグメント
+
+    XOR     DX, DX
+    MOV     DX, CL
+    OUT     25h, DX                     ; トラック上位2bit, セクタ6bit ttssssss
+    MOV     DX, CH
+    OUT     24h, DX                     ; トラック下位8bit tttttttt
+
+    MOV     DX, 4
+    OUT     28h, DX                     ; 読み込み
+    IN      20h, DX                     ; エラー確認
+    JNZ     int_disk_write_writeerr:
+
+    POP     DX
+
+    DEC     AL
+    CMP     AL, 0
+    JZ      int_disk_write_fin:
+    INC     CL
+    ADD     BX, 512
+    JMP     int_disk_write_loop:
+
+int_disk_write_diskerr:
+    STC
+    POP     BX
+    IRET
+
+int_disk_write_writeerr:
+    STC
+    POP     DX
+    IRET
+
+int_disk_write_fin:
+    MOV     DX, 8
+    OUT     28h, DX
+    CLC
+    IRET
+
+
+
 int_key:
     CMP     AH, 00h
     JE      int_key_ReadInput:
@@ -378,8 +452,8 @@ int_key_ReadStatus:
     CMP     AX, 0                       ; 0（押されていない）
     JE      int_key_ReadStatus_NoData:
 
-    PUSH    AX
-    PUSH    BX
+    PUSH    AX                          ; フラグ編集
+    PUSH    BX                          ; ZF = 0
     MOV     AX, SP
     ADD     AX, 8
     MOV     BX, [AX]
@@ -564,8 +638,8 @@ int_key_ReadStatus_Raw:
     IRET
 
 int_key_ReadStatus_NoData:
-    PUSH    AX
-    PUSH    BX
+    PUSH    AX                      ; フラグ編集
+    PUSH    BX                      ; ZF = 1
     MOV     AX, SP
     ADD     AX, 8
     MOV     BX, [AX]
