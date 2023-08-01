@@ -84,16 +84,16 @@
 
 :clean
     echo make^> clean
-    del hsptmp
-    del obj
-    del packfile
-    del *.ax
-    del Assembler\hsptmp
-    del Assembler\obj
-    del Assembler\packfile
-    del Assembler\*.ax
-    del error.txt
-    del dump_*.bin
+    del /s hsptmp
+    del /s obj
+    del /s packfile
+    del /s *.ax
+    del /s Assembler\hsptmp
+    del /s Assembler\obj
+    del /s Assembler\packfile
+    del /s Assembler\*.ax
+    del /s error.txt
+    del /s dump_*.bin
     exit /b
 
 :cleanbin
