@@ -14,3 +14,4 @@ Assembler/*.com
 Assembler/*.sys
 Assembler/*.bin
 Assembler/*.img
+Assembler/bom.asm
