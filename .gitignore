@@ -8,6 +8,7 @@ packfile
 error.txt
 dump_*.bin
 github.css
+stacktrace.txt
 
 #ASM Assembled Binary
 Assembler/*.com
@@ -15,4 +16,3 @@ Assembler/*.sys
 Assembler/*.bin
 Assembler/*.img
 Assembler/bom.asm
-stacktrace.txt
