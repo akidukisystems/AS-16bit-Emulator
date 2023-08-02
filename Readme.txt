@@ -88,4 +88,4 @@ VileR 様
 連絡先：support@AkidukiSystems.com
 ホームページ：https://akidukisystems.com
 
-最終更新    : 2023/06/04
+最終更新    : 2023/08/02
