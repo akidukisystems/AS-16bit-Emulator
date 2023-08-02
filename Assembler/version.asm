@@ -14,5 +14,5 @@
     FRET
 
 string:
-    &DB     "AkidukiSystems SampleOS Version 0.5"
+    &DB     "AkidukiSystems SampleOS Version 0.6"
     &DB     0

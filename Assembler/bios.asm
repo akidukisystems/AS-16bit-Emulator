@@ -164,9 +164,9 @@ fin:
 ;   _/_/_/_/  Data  _/_/_/_/
 
 message1:
-    &DB "AkidukiSystems 16bit Emulator  Version 0.9 Debug"
+    &DB "AkidukiSystems 16bit Emulator  Version 0.11 Debug"
     &DW @CRLF
-    &DB "AkidukiSystems BIOS Version 0.1"
+    &DB "AkidukiSystems BIOS Version 0.2"
     &DW @CRLF
     &DB "Press [F12] to Setup Utility"
     &DW @CRLF
@@ -183,7 +183,7 @@ message_BiosMenu:
     &DW @CRLF
     &DB "BIOS Version: 0.2"
     &DW @CRLF
-    &DB "BIOS Date: 2023/05/24 15:19"
+    &DB "BIOS Date: 2023/08/02 18:08"
     &DW @CRLF
     &DB "Vendor: AkidukiSystems"
     &DW @CRLF
