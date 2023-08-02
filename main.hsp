@@ -11,6 +11,7 @@
     #include "hspda.as"
     #include "kernel32.as"
     #include "msglib.as"
+    #include "stacktrace.hsp"
 
     #uselib "user32.dll"
     #func SetTimer  "SetTimer"  int, int, int, int
@@ -288,6 +289,7 @@
     emu_vbin_PIN = 0
     emu_vbin_needReboot = 0
     sdim vstr_DisplayString, 4800
+    initiation_stack
 
     emu_vbin_Memory_Index = vint_Ram_BIOS_MainCode.StartAddr
 
@@ -350,6 +352,9 @@
     vsave_put vbin_CPUresistorS
     vsave_put vbin_CPUresistorE
     vsave_end "dump_res.bin"
+    sdim vint_temp
+    vint_temp = putstacltrace()
+    bsave "stacktrace.txt", vint_temp
 
     return
 

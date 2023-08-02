@@ -1,0 +1,126 @@
+
+    #module stacktrace
+
+    #deffunc initiation_stack
+
+        vint_isGetTrace = 0
+        vstr_stackstring = ""
+
+    return
+
+    #deffunc setTrace int bool
+
+        vint_isGetTrace = bool
+
+    return
+
+    #deffunc calling int from_segment, int from_offset, int to_segment, int to_offset, int type
+
+        if ( vint_isGetTrace == 0 ) : return
+
+        vstr_type = ""
+
+        switch type
+        case 1
+            vstr_type = "INT"
+        swbreak
+        case 2
+            vstr_type = "INT3"
+        swbreak
+        case 3
+            vstr_type = "INTO"
+        swbreak
+        case 4
+            vstr_type = "CALL"
+        swbreak
+        case 5
+            vstr_type = "CALLF"
+        swbreak
+        case 6
+            vstr_type = "UD2"
+        swbreak
+        swend
+
+        vstr_stackstring += "CALL: "+ strf( "[%8s]", vstr_type ) +""+ strf( "%04X", from_segment ) +":"+ strf( "%04X", from_offset ) +" -> "+ strf( "%04X", to_segment ) +":"+ strf( "%04X", to_offset ) +"\n"
+
+    return
+
+    #deffunc jumping int from_segment, int from_offset, int to_segment, int to_offset, int type
+
+        if ( vint_isGetTrace == 0 ) : return
+
+        vstr_type = ""
+
+        switch type
+        case 1
+            vstr_type = "JF"
+        swbreak
+        case 2
+            vstr_type = "JMP"
+        swbreak
+        case 3
+            vstr_type = "Jcc"
+        swbreak
+        case 4
+            vstr_type = "JCXZ"
+        swbreak
+        case 5
+            vstr_type = "LOOP"
+        swbreak
+        case 6
+            vstr_type = "LOOPZ"
+        swbreak
+        case 7
+            vstr_type = "LOOPNZ"
+        swbreak
+        swend
+
+        vstr_stackstring += "JUMP: "+ strf( "[%8s]", vstr_type ) +""+ strf( "%04X", from_segment ) +":"+ strf( "%04X", from_offset ) +" -> "+ strf( "%04X", to_segment ) +":"+ strf( "%04X", to_offset ) +"\n"
+
+    return
+
+    #deffunc returned int from_segment, int from_offset, int to_segment, int to_offset, int type
+
+        if ( vint_isGetTrace == 0 ) : return
+
+        vstr_type = ""
+
+        switch type
+        case 1
+            vstr_type = "RET"
+        swbreak
+        case 2
+            vstr_type = "FRET"
+        swbreak
+        case 3
+            vstr_type = "IRET"
+        swbreak
+        swend
+
+        vstr_stackstring += "RET : "+ strf( "[%8s]", vstr_type ) +""+ strf( "%04X", from_segment ) +":"+ strf( "%04X", from_offset ) +" -> "+ strf( "%04X", to_segment ) +":"+ strf( "%04X", to_offset ) +"\n"
+
+    return
+
+    #deffunc halted int from_segment, int from_offset, int type
+
+        if ( vint_isGetTrace == 0 ) : return
+
+        vstr_type = ""
+
+        switch type
+        case 1
+            vstr_type = "HLT"
+        swbreak
+        swend
+
+        vstr_stackstring += "HALT: "+ strf( "[%8s]", vstr_type ) +""+ strf( "%04X", from_segment ) +":"+ strf( "%04X", from_offset ) +"\n"
+
+    return
+
+    #defcfunc putstacltrace
+
+    return vstr_stackstring
+
+    #global
+
+    

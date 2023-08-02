@@ -1,6 +1,8 @@
 
     if ( vbin_CPUmeirei_Main == 0x70 ) : { // HLT
 
+        halted fetchResistorWs(rCS), fetchResistorWe(rIP), 1
+
         repeat
 
             if ( ( cnt \ CPU_CLOCK_CYCLE  ) == 0 ) : await CPU_CLOCK_WAIT
@@ -31,6 +33,8 @@
         vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, vbin_CPUtmp.0 * 4 )         // オフセット
         vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, vbin_CPUtmp.0 * 4 +2 )      // セグメント
 
+        calling fetchResistorWs(rCS), fetchResistorWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 1
+
         vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
         checkDataW(vbin_CPUtmp.3)
         writeResistorWg rSP, vbin_CPUtmp.3
@@ -56,6 +60,8 @@
 
         vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, 3 * 4 )
         vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, 3 * 4 +2 )
+
+        calling fetchResistorWs(rCS), fetchResistorWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 2
 
         vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
         checkDataW(vbin_CPUtmp.3)
@@ -88,6 +94,8 @@
 
         vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, 4 * 4 )
         vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, 4 * 4 +2 )
+
+        calling fetchResistorWs(rCS), fetchResistorWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 3
 
         vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
         checkDataW(vbin_CPUtmp.3)
@@ -147,6 +155,8 @@
         swbreak
         swend
 
+        calling fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 4
+
         vbin_CPUtmp.1 = fetchResistorWg(rSP) -2
         checkDataW(vbin_CPUtmp.1)
         writeResistorWg rSP, vbin_CPUtmp.1
@@ -159,7 +169,11 @@
 
     if ( vbin_CPUmeirei_Main == 0x7B ) : { // RET
 
-        writeResistorWe rIP, wpeek ( emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP) )
+        vint_CPUtmp = wpeek ( emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP) )
+
+        returned fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vint_CPUtmp, 1
+
+        writeResistorWe rIP, vint_CPUtmp
         vbin_CPUtmp.0 = fetchResistorWg(rSP) +2
         checkDataW(vbin_CPUtmp.0)
         writeResistorWg rSP, vbin_CPUtmp.0
@@ -205,6 +219,8 @@
         swbreak
         swend
 
+        calling fetchResistorWs(rCS), fetchResistorWe(rIP), vbin_CPUtmp.0, 0, 5
+
         vbin_CPUtmp.1 = fetchResistorWg(rSP) -2
         checkDataW(vbin_CPUtmp.1)
         writeResistorWg rSP, vbin_CPUtmp.1
@@ -224,6 +240,9 @@
 
     if ( vbin_CPUmeirei_Main == 0x7D ) : { // FRET
 
+        vbin_CPUtmp.2 = fetchResistorWs(rCS)
+        vbin_CPUtmp.3 = fetchResistorWe(rIP)
+
         writeResistorWe rIP, wpeek ( emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP) )
         vbin_CPUtmp.0 = fetchResistorWg(rSP) +2
         checkDataW(vbin_CPUtmp.0)
@@ -234,11 +253,16 @@
         checkDataW(vbin_CPUtmp.0)
         writeResistorWg rSP, vbin_CPUtmp.0
 
+        returned vbin_CPUtmp.2, vbin_CPUtmp.3, fetchResistorWs(rCS), fetchResistorWe(rIP), 2
+
         return
 
     }
 
     if ( vbin_CPUmeirei_Main == 0x7E ) : { // IRET
+
+        vbin_CPUtmp.2 = fetchResistorWs(rCS)
+        vbin_CPUtmp.3 = fetchResistorWe(rIP)
 
         writeResistorWe rIP, wpeek ( emu_vbin_Memory, fetchResistorWs(rSS) *0x10 + fetchResistorWg(rSP) )
         vbin_CPUtmp.0 = fetchResistorWg(rSP) +2
@@ -254,6 +278,8 @@
         vbin_CPUtmp.0 = fetchResistorWg(rSP) +2
         checkDataW(vbin_CPUtmp.0)
         writeResistorWg rSP, vbin_CPUtmp.0
+
+        returned vbin_CPUtmp.2, vbin_CPUtmp.3, fetchResistorWs(rCS), fetchResistorWe(rIP), 3
 
         return
 
@@ -324,6 +350,8 @@
 
         vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, 6 * 4 )
         vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, 6 * 4 +2 )
+
+        calling fetchResistorWs(rCS), fetchResistorWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 6
 
         vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
         checkDataW(vbin_CPUtmp.3)
