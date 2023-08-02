@@ -33,7 +33,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 ŠJ”­ŠÂ‹«
-OS			: Windows 10 Pro (AMD64/x86_64)
+OS			: Windows 11 Pro 22H2 (Build 22621.1992)
 ¿ÌÄ³ª±		: Microsoft VS Code, knowbug, hspc.exe, hsp3.6beta1
 CPU			: AMD Ryzen 5 4500
 Graphic		: NVIDIA GeForce RTX 3060
