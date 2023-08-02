@@ -3,6 +3,8 @@
     #config filename "system.sys"
     #origin addr 8800h
     #enum   @CRLF       0A0Dh
+
+    DBG
     
     XOR     AX, AX
     MOV     SS, AX
@@ -13,6 +15,7 @@
     MOV     WORD[8200h], AX
     MOV     AX, return_only:
     MOV     BX, 10h
+    XOR     DX, DX
     DIV     BX
     MOV     WORD[7AF4h], AX
 
@@ -215,6 +218,7 @@ callfile:
     JNE     callfile.notexec:
 
     MOV     BX, 10h                     ; ファイルの先頭アドレスを10で割り、CSレジスタで使えるようにする
+    XOR     DX, DX
     DIV     BX
 
     PUSHA                               ; PUSH

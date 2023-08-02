@@ -96,6 +96,40 @@ waitBiosMenu_timeout:
 
     JMP     fin:
 
+;   _/_/_/_/  Functions  _/_/_/_/
+
+editFlag:
+    CMP     AL, 0
+    JE      editFlag_Set:
+    CMP     AL, 1
+    JE      editFlag_del:
+    RET
+
+editFlag_Set:
+    PUSH    AX                          ; フラグ編集
+    PUSH    BX                          ; ZF = 0
+    MOV     AX, SP
+    ADD     AX, 10
+    MOV     BX, [AX]
+    AND     BX, DX
+    MOV     [AX], BX
+    POP     BX
+    POP     AX
+    RET
+
+editFlag_del:
+    PUSH    AX                          ; フラグ編集
+    PUSH    BX                          ; ZF = 0
+    MOV     AX, SP
+    ADD     AX, 10
+    MOV     BX, [AX]
+    NOT     DX
+    AND     BX, DX
+    MOV     [AX], BX
+    POP     BX
+    POP     AX
+    RET
+
 ;   _/_/_/_/  BIOS Menu  _/_/_/_/
 
 BiosMenu_Entry:
@@ -310,11 +344,18 @@ int_disk_init:
 
     CMP     AH, 0
     JNZ     int_disk_init_err:          ; エラーあったらおわり
-    CLC
+
+    MOV     AL, 1                       ; CFクリア
+    MOV     DX, 0001h
+    CALL    editFlag:
+
     IRET
 
 int_disk_init_err:
-    STC
+    MOV     AL, 0                       ; CFセット
+    MOV     DX, 0001h
+    CALL    editFlag:
+
     IRET
 
 int_disk_read:
@@ -361,17 +402,23 @@ int_disk_read_loop:
     JMP     int_disk_read_loop:
 
 int_disk_read_diskerr:
-    STC
     POP     BX
+    MOV     AL, 0                       ; CFセット
+    MOV     DX, 0001h
+    CALL    editFlag:
     IRET
 
 int_disk_read_readerr:
-    STC
     POP     DX
+    MOV     AL, 0                       ; CFセット
+    MOV     DX, 0001h
+    CALL    editFlag:
     IRET
 
 int_disk_read_fin:
-    CLC
+    MOV     AL, 1                       ; CFクリア
+    MOV     DX, 0001h
+    CALL    editFlag:
     IRET
 
 int_disk_write:
@@ -418,19 +465,25 @@ int_disk_write_loop:
     JMP     int_disk_write_loop:
 
 int_disk_write_diskerr:
-    STC
     POP     BX
+    MOV     AL, 0                       ; CFセット
+    MOV     DX, 0001h
+    CALL    editFlag:
     IRET
 
 int_disk_write_writeerr:
-    STC
     POP     DX
+    MOV     AL, 0                       ; CFセット
+    MOV     DX, 0001h
+    CALL    editFlag:
     IRET
 
 int_disk_write_fin:
     MOV     DX, 8
     OUT     28h, DX
-    CLC
+    MOV     AL, 1                       ; CFクリア
+    MOV     DX, 0001h
+    CALL    editFlag:
     IRET
 
 
@@ -452,15 +505,9 @@ int_key_ReadStatus:
     CMP     AX, 0                       ; 0（押されていない）
     JE      int_key_ReadStatus_NoData:
 
-    PUSH    AX                          ; フラグ編集
-    PUSH    BX                          ; ZF = 0
-    MOV     AX, SP
-    ADD     AX, 8
-    MOV     BX, [AX]
-    AND     BX, FFDFh
-    MOV     [AX], BX
-    POP     BX
-    POP     AX
+    MOV     AL, 1
+    MOV     DX, 0020h
+    CALL    editFlag:
 
     PUSH    AX
     AND     AL, 20h
@@ -598,6 +645,7 @@ int_key_ReadStatus_DownScale_Alp?_ret:
     JE      int_key_ReadStatus_DownScale_JP:
     CMP     AL, DBh
     JGE     int_key_ReadStatus_DownScale_JP?:
+
 int_key_ReadStatus_DownScale_JP?_ret:
 
     MOV     AH, AL
@@ -638,15 +686,9 @@ int_key_ReadStatus_Raw:
     IRET
 
 int_key_ReadStatus_NoData:
-    PUSH    AX                      ; フラグ編集
-    PUSH    BX                      ; ZF = 1
-    MOV     AX, SP
-    ADD     AX, 8
-    MOV     BX, [AX]
-    OR      BX, 0020h
-    MOV     [AX], BX
-    POP     BX
-    POP     AX
+    MOV     AL, 0
+    MOV     DX, 0020h
+    CALL    editFlag:
     IRET
 
 int_key_ReadStatus_NotASCII?a:
@@ -721,6 +763,7 @@ int_key_ReadInput_UpScale_Alp?_ret:
     JE      int_key_ReadInput_UpScale_JP:
     CMP     AL, DBh
     JGE     int_key_ReadInput_UpScale_JP?:
+
 int_key_ReadInput_UpScale_JP?_ret:
 
     MOV     AH, AL
@@ -795,6 +838,7 @@ int_key_ReadInput_DownScale_Alp?_ret:
     JE      int_key_ReadInput_DownScale_JP:
     CMP     AL, DBh
     JGE     int_key_ReadInput_DownScale_JP?:
+
 int_key_ReadInput_DownScale_JP?_ret:
 
     MOV     AH, AL

@@ -117,7 +117,6 @@ fileread.crlf:
     MOV     DS, ES
     MOV     SI, message1:
     MOV     AH, 0Eh
-    DBG
     INT     10h
     XOR     AX, AX
     MOV     DS, AX
