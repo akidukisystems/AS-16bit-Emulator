@@ -1,0 +1,6 @@
+;
+;	source generated packfile
+;
+;!name=emulator
+;!version=version.txt
++start.ax
