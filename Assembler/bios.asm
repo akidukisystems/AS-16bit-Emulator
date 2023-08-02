@@ -107,7 +107,7 @@ editFlag:
 
 editFlag_Set:
     PUSH    AX                          ; フラグ編集
-    PUSH    BX                          ; ZF = 0
+    PUSH    BX
     MOV     AX, SP
     ADD     AX, 10
     MOV     BX, [AX]
@@ -119,7 +119,7 @@ editFlag_Set:
 
 editFlag_del:
     PUSH    AX                          ; フラグ編集
-    PUSH    BX                          ; ZF = 0
+    PUSH    BX
     MOV     AX, SP
     ADD     AX, 10
     MOV     BX, [AX]
