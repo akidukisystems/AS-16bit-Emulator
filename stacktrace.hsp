@@ -14,6 +14,16 @@
 
     return
 
+    #defcfunc check_isEnableTrace
+
+    return vint_isGetTrace
+
+    #deffunc clearTrace
+
+        vstr_stackstring = ""
+
+    return
+
     #deffunc calling int from_segment, int from_offset, int to_segment, int to_offset, int type
 
         if ( vint_isGetTrace == 0 ) : return
@@ -38,6 +48,9 @@
         swbreak
         case 6
             vstr_type = "UD2"
+        swbreak
+        case 7
+            vstr_type = "#UD2"
         swbreak
         swend
 
