@@ -77,6 +77,8 @@
             vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, 6 * 4 )
             vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, 6 * 4 +2 )
 
+            calling fetchResistorWs(rCS), fetchResistorWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 7
+
             vbin_CPUtmp.3 = fetchResistorWg(rSP) -2
             checkDataW(vbin_CPUtmp.3)
             writeResistorWg rSP, vbin_CPUtmp.3
