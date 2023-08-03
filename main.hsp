@@ -161,12 +161,9 @@
     logmes strf("%x",__hspver__)
 
     vint_isEnableStacktrace = 0
-
-    mes "ss"
+    vstr_configFileName = "emu_conf.ascfg"
 
     if ( dir_cmdline != "" ) {
-
-    mes "ss1"
 
         sdim vstr_temp_array
         vstr_temp = dir_cmdline
@@ -174,12 +171,9 @@
 
         foreach vstr_temp_array
 
-            mes "ss2"
-
             if ( ( vstr_temp_array.cnt == "--enablestacktrace" ) or ( vstr_temp_array.cnt == "-s" ) ) {
 
                 vint_isEnableStacktrace = 1
-                mes "ss3"
 
             }
 
@@ -208,8 +202,12 @@
     title "Controler"
     objsize SCREEN_SIZE_Y /2, 32, 0
     button gosub "RESET", *l_control_RESET
-    button gosub "Save dump", *l_control_dump
-    button goto "DEBUG", *l_control_debug
+    button gosub "DUMP", *l_control_dump
+    button goto  "DEBUG", *l_control_debug
+    button gosub "CLEAR LOG", *l_control_clearLog
+    button gosub "TOGGLE TRACE", *l_control_tglTrace
+    button gosub "CLEAR TRACE", *l_control_clearTrace
+
 
 
 
@@ -246,7 +244,7 @@
 
     putmes_msglib "Applied fonts\n", SCREEN_DEBUGLOG_ID
 
-    cfgAS_init "emu_conf.ascfg"
+    cfgAS_init vstr_configFileName
     
     vstr_ProcessorName = "(none)"
     vstr_ProcessorArchName = "(none)"
@@ -434,6 +432,32 @@
         putmes_msglib "TICK="+ emu_vint_executedCmd +"\n\n", SCREEN_DEBUGLOG_ID
 
     stop
+
+*l_control_clearLog
+
+    cls_msglib SCREEN_DEBUGLOG_ID
+
+    return
+
+*l_control_tglTrace
+
+    if ( check_isEnableTrace() ) {
+
+        setTrace 0
+
+    } else {
+
+        setTrace 1
+
+    }
+
+    return
+
+*l_control_clearTrace
+
+    clearTrace
+
+    return
 
 *OnTimer_RTC
 
