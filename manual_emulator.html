@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>manual_emulator.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="%E8%B5%B7%E5%8B%95%E6%96%B9%E6%B3%95">起動方法</h1>
+<p>emulator.exe を実行します。一般的なコンピュータと同じ様に、BIOSをロードして起動処理が進行します。</p>
+<h1 id="%E3%82%A6%E3%82%A3%E3%83%B3%E3%83%89%E3%82%A6%E3%81%AE%E8%AA%AC%E6%98%8E">ウィンドウの説明</h1>
+<h2 id="screen%E7%94%BB%E9%9D%A2">screen画面</h2>
+<p>仮想コンピュータが出力する画面を表示します。現段階では、テキストの表示しかサポートされていません。仮想コンピュータが使用するメインメモリのVRAM領域（C6D40h-C7FFFhの12C0hバイト）を参照します。</p>
+<h2 id="debug%E7%94%BB%E9%9D%A2">debug画面</h2>
+<p>仮想コンピュータのデバッグ情報を表示します。プログラム内にあるデバッグ命令（DBG命令）を実行する時点での、全レジスタの内容が出力されます。</p>
+<h2 id="control%E7%94%BB%E9%9D%A2">Control画面</h2>
+<p>仮想コンピュータの制御を行います。</p>
+<h3 id="reset%E3%83%9C%E3%82%BF%E3%83%B3">RESETボタン</h3>
+<p>仮想コンピュータをリセットします。</p>
+<h3 id="dump%E3%83%9C%E3%82%BF%E3%83%B3">DUMPボタン</h3>
+<p>ボタン押下時の仮想コンピュータの内容や、記録されていればスタックトレースを、ダンプファイルとして出力します。カレントディレクトリに &quot;dump_all.bin&quot;, &quot;dump_mem.bin&quot;, &quot;dump_res.bin&quot;, 場合により &quot;stacktrace.txt&quot; ファイルを生成します。 &quot;dump_all.bin&quot; には仮想コンピュータおよびエミュレータのメモリ内容、 &quot;dump_mem.bin&quot; には仮想コンピュータのメインメモリ、 &quot;dump_res.bin&quot; には仮想コンピュータの全レジスタが保存されます。</p>
+<h3 id="clear-log%E3%83%9C%E3%82%BF%E3%83%B3">CLEAR LOGボタン</h3>
+<p>debug画面の内容を全消去します。デバッグ情報が多すぎてシステムの動作が不安定になった際に有用です。</p>
+<h3 id="toggle-trace%E3%83%9C%E3%82%BF%E3%83%B3">TOGGLE TRACEボタン</h3>
+<p>スタックトレースの機能を切り替えます。トレース情報が多すぎてシステムの動作が不安定になった際に有用です。</p>
+<h3 id="clear-trace%E3%83%9C%E3%82%BF%E3%83%B3">CLEAR TRACEボタン</h3>
+<p>スタックトレースの内容を全消去します。トレース情報が多すぎてシステムの動作が不安定になった際に有用です。</p>
+<h1 id="%E3%83%88%E3%83%A9%E3%83%96%E3%83%AB%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%88">トラブルシュート</h1>
+<p>プログラムには必ず不具合が含まれます。ケース別に簡易的な診断をできます。</p>
+<h2 id="emulatorexe%E8%B5%B7%E5%8B%95%E7%9B%B4%E5%BE%8C%E3%81%AB%E3%82%A8%E3%83%A9%E3%83%BC">emulator.exe起動直後にエラー</h2>
+<p>「内部エラーが発生しました」というダイアログが表示された場合、エミュレータの不具合である可能性があります。エミュレータの製作者にお問い合わせください。</p>
+<h2 id="%E8%B5%B7%E5%8B%95%E5%BE%8C%E3%81%AB%E9%BB%92%E3%81%84%E7%94%BB%E9%9D%A2%E3%81%A7%E9%80%B2%E8%A1%8C%E3%81%97%E3%81%AA%E3%81%84">起動後に黒い画面で進行しない</h2>
+<p>BIOS、ブートローダ、OSが原因の可能性があります。各プログラムの製作者にお問い合わせください。
+Control画面のDUMPボタンをクリックし、生成されたダンプファイルを送付すると良いかも知れません。</p>
+<h2 id="%E7%89%B9%E5%AE%9A%E3%81%AE%E6%93%8D%E4%BD%9C%E3%82%92%E3%81%99%E3%82%8B%E3%81%A8%E3%83%95%E3%83%AA%E3%83%BC%E3%82%BA%E3%81%99%E3%82%8B">特定の操作をするとフリーズする</h2>
+<p>BIOS、ブートローダ、OSが原因の可能性があります。各プログラムの製作者にお問い合わせください。
+Control画面のDUMPボタンをクリックし、生成されたダンプファイルを送付すると良いかも知れません。</p>
+<h1 id="%E9%96%8B%E7%99%BA%E3%83%84%E3%83%BC%E3%83%AB">開発ツール</h1>
+<p>このプログラムでは、誰でも簡単（？）にBIOSやブートローダ、OSが製作できるよう、アセンブラやディスクイメージ生成などの開発支援ツールを提供しています。作りは結構お粗末で、構文エラーの検出ができず、不正な命令があるとすぐに#UD2例外を発生させますが、少なくとも、手作業でKB単位のasmファイルをアセンブルするよりはマシになります。それぞれassemblerフォルダ下にあります。</p>
+<h2 id="%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB">プログラムサンプル</h2>
+<p>開発支援ツールと一緒に、最初からあるBIOSやDOSなどのasmファイルをサンプルプログラムとして同封しています。お好きなように改造してください。</p>
+<h2 id="%E3%82%A2%E3%82%BB%E3%83%B3%E3%83%96%E3%83%A9">アセンブラ</h2>
+<p>asm.exeでasmファイルのアセンブルができます。asm.exeを実行し、asmファイルを開き、アセンブルボタンをクリックするだけでアセンブルができます。サイズの大きいasmファイルだと、処理に時間がかかるので注意してください。
+アセンブルが完了すると、「Complete」とダイアログが表示されます。表示されない場合はラベル未定義などの構文エラーの可能性があるので、画面に表示されているデバッグ情報を確認してください。
+アセンブルが正常に完了しても、#UD2例外などでエミュレータの動作が停止することがあります。十中八九、オペランドの記述ミスや、存在しない命令へのアクセスが原因なので、エミュレータのスタックトレース機能を有効にしてデバッグしてください。</p>
+<h2 id="%E3%83%87%E3%82%A3%E3%82%B9%E3%82%AF%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B8%E7%94%9F%E6%88%90">ディスクイメージ生成</h2>
+<p>diskmake.exeでディスクイメージの生成ができます。同じフォルダに &quot;create&quot; ファイルを配置し、アセンブリ済のブートローダのバイナリファイル、格納するファイル（種類問わず）、出力するファイル名を記載し、diskmake.exeを実行してください。勝手にやってくれます。
+構文は以下の通りです。</p>
+<pre><code>?sector=512 ...1セクタあたりのバイト数を指定します。
+?truck=18 ...1トラックあたりのセクタ数を指定します。
+?cyls=80 ...1シリンダあたりのトラック数を指定します。
+?head=2 ...ディスクヘッドの数を指定します。
+?clst=2 ...1クラスタあたりのセクタ数を指定します。
+?fat-cnt=2 ...FATの数を指定します。
+?fat-pos=1 ...1つ目のFATを何セクタ目に配置するか指定します。fat-cntで指定したセクタ数が2以上の場合は、以降のセクタにそれぞれ配置します。（0から始まります）
+?fat-size=1 ...FATのサイズを指定します。単位はクラスタです。
+?init ...ディスク情報を決定します。ここからファイルの追加が可能になります。上記の値はできるだけ変更しないことを推奨します。基本的に2HDのフロッピーディスクと同じです。
+!boot.bin ...1セクタ目に配置するブートローダに使用するファイルを指定します。ファイルサイズは1セクタ以内を推奨します。
++system.sys ...ファイルを追加します。FATにファイル名や更新日時が書き込まれます。ファイルサイズは問いませんが、ファイル名は8.3形式でなければなりません。
++jpnkey16.sys
++start.dat
++exit.com
++dir.com
++cls.com
++version.com
+=fdisk0.img ...ファイル名を指定して出力します。
+</code></pre>
+<p>注意点として、FAT12やFAT32、NTFSなどのファイルシステムではなく、ASFATという独自のファイルシステムで保存されます。ASFATの技術的仕様は &quot;テキストファイル\ディスクフォーマット情報とAFAT16.txt&quot; を参照してください。</p>
+
+</body>
+</html>
