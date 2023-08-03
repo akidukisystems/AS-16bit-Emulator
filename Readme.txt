@@ -33,18 +33,18 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 開発環境
-OS			: Windows 11 Pro 22H2 (Build 22621.1992)
-ｿﾌﾄｳｪｱ		: Microsoft VS Code, knowbug, hspc.exe, hsp3.6beta1
-CPU			: AMD Ryzen 5 4500
-Graphic		: NVIDIA GeForce RTX 3060
-RAM 		: DDR4-3200 PC4-25600 16GBx2
+OS      : Windows 11 Pro 22H2 (Build 22621.1992)
+ｿﾌﾄｳｪｱ  : Microsoft VS Code, knowbug, hspc.exe, hsp3.6beta1
+CPU     : AMD Ryzen 5 4500
+Graphic : NVIDIA GeForce RTX 3060
+RAM     : DDR4-3200 PC4-25600 16GBx2
 
 最低動作環境
-OS       : AMD64アーキテクチャで動作する　Windows Vista 以上の Windows NT系 OS
-CPU      : OSが動作する物
-Graphic  : 映れば何でもいい！
-Display  : 800x600
-RAM      : 512 MB
+OS      : AMD64アーキテクチャで動作する　Windows Vista 以上の Windows NT系 OS
+CPU     : OSが動作する物
+Graphic : 映れば何でもいい！
+Display : 800x600
+RAM     : 512 MB
 空き容量 : 2048 KB
 
 
