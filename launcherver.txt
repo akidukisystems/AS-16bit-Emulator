@@ -1,0 +1,8 @@
+_FILEVERSION=0.1.0
+_PRODUCTVERSION=0.1.0
+CompanyName=AkidukiSystems
+FileDescription=AS mulator Launcher
+FileVersion=0.1.0
+OriginalFilename=launcher.exe
+ProductName=AS Emulator Launcher
+ProductVersion=0.1.0

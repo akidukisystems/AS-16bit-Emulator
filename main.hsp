@@ -160,6 +160,33 @@
 
     logmes strf("%x",__hspver__)
 
+    vint_isEnableStacktrace = 0
+
+    mes "ss"
+
+    if ( dir_cmdline != "" ) {
+
+    mes "ss1"
+
+        sdim vstr_temp_array
+        vstr_temp = dir_cmdline
+        splitEx vstr_temp, vstr_temp_array, ' '
+
+        foreach vstr_temp_array
+
+            mes "ss2"
+
+            if ( ( vstr_temp_array.cnt == "--enablestacktrace" ) or ( vstr_temp_array.cnt == "-s" ) ) {
+
+                vint_isEnableStacktrace = 1
+                mes "ss3"
+
+            }
+
+        loop
+
+    }
+
 
     init_msglib SCREEN_DEBUGLOG_ID, 0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y
     screen SCREEN_DISPLAY_ID, SCREEN_SIZE_X, SCREEN_SIZE_Y, 4
@@ -290,6 +317,7 @@
     emu_vbin_needReboot = 0
     sdim vstr_DisplayString, 4800
     initiation_stack
+    if ( vint_isEnableStacktrace ) : setTrace 1
 
     emu_vbin_Memory_Index = vint_Ram_BIOS_MainCode.StartAddr
 
@@ -354,6 +382,7 @@
     vsave_end "dump_res.bin"
     sdim vint_temp
     vint_temp = putstacltrace()
+    if ( vint_temp == "" ) : return
     bsave "stacktrace.txt", vint_temp
 
     return
