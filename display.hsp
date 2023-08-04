@@ -5,7 +5,7 @@
     if ( vint_VRAM_Format == 1 ) {
 
         ; 256bit high-color teretype
-        /*
+        
         repeat 80*30
 
             vint_CPUtmp = peek( emu_vbin_Memory, cnt *2 +vint_Ram_Vram_main.StartAddr )
@@ -18,14 +18,14 @@
 
         softinitscr
         mes vstr_DisplayString
-        */
+        
     }
 
     if ( vint_VRAM_Format == 2 ) {
 
         ;2bit grayscale teretype
 
-        memcpy vstr_DisplayString, emu_vbin_Memory, 80*30, 0, vint_Ram_Vram_main.StartAddr
+        memcpy vstr_DisplayString, emu_vbin_Memory, 80*30, 0, $C6D40
         memexpand vstr_DisplayString, strlen(vstr_DisplayString)
 
         color : boxf
@@ -38,6 +38,20 @@
 
         ; VRAM direct addressing
 
+        sdim vstr_DisplayString, 640*480
+        sdim vstr_DisplayString_fixed, 640*480
+        memcpy vstr_DisplayString, emu_vbin_Memory, 640*480, 0, $7D000
+
+        ; reverse y
+
+        repeat 480
+
+            memcpy vstr_DisplayString_fixed, vstr_DisplayString, 640, (480-cnt-1)*640, cnt*640
+        
+        loop
+
+        poke emu_vbin_VRAM, 0, vstr_DisplayString
+        
     }
 
     redraw 1
