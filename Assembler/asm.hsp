@@ -437,7 +437,7 @@
 
                                 if ( int( vtable_enum.1.cnt ) > 0xFF ) {
 
-                                    putmes_msglib "Error: invaild value.\n"
+                                    putmes_msglib "Error: &DB invaild value.\n"
                                     stop
 
                                 }
@@ -468,7 +468,7 @@
 
                         if ( vint_temp > 0xFF ) {
 
-                            putmes_msglib "Error: invaild value.\n"
+                            putmes_msglib "Error: &DB invaild value.\n"
                             stop
 
                         }
@@ -527,7 +527,7 @@
 
                         if ( vint_temp > 0xFFFF ) {
 
-                            putmes_msglib "Error: invaild value.\n"
+                            putmes_msglib "Error: &DW invaild value.\n"
                             stop
 
                         }
