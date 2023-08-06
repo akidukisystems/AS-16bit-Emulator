@@ -68,6 +68,7 @@
     asm.exe cls.asm
     asm.exe exit.asm
     asm.exe version.asm
+    asm.exe type.asm
     cd ..\
     exit /b
 
