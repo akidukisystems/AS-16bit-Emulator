@@ -270,11 +270,40 @@
     cfgAS_read "BIOS.MemoryTable.EndAddr.SubCodeArea"  , vint_Ram_BIOS_SubCode.EndAddr
     vint_Ram_BIOS_SubCode.SizeAddr = vint_Ram_BIOS_SubCode.EndAddr - vint_Ram_BIOS_SubCode.StartAddr +1
 
-    cfgAS_read "Graphic.MemoryTable.StartAddr.main", vint_Ram_Vram_main.StartAddr
-    cfgAS_read "Graphic.MemoryTable.EndAddr.main", vint_Ram_Vram_main.EndAddr
-    vint_Ram_Vram_main.SizeAddr  = vint_Ram_Vram_main.EndAddr - vint_Ram_Vram_main.StartAddr +1
     cfgAS_read "Graphic.Format", vint_VRAM_Format
     cfgAS_read "Graphic.Font", vstr_FontName
+
+    vint_isEnablePutTrace_JMP = 1
+    vint_isEnablePutTrace_HLT = 1
+    vint_isEnablePutTrace_INT = 1
+    vint_isEnablePutTrace_INT3 = 1
+    vint_isEnablePutTrace_INTO = 1
+    vint_isEnablePutTrace_CALL = 1
+    vint_isEnablePutTrace_RET = 1
+    vint_isEnablePutTrace_CALLF = 1
+    vint_isEnablePutTrace_FRET = 1
+    vint_isEnablePutTrace_IRET = 1
+    vint_isEnablePutTrace_UD2 = 1
+    vint_isEnablePutTrace_CCS = 1
+    vint_isEnablePutTraceError_UD2 = 1
+    vint_isEnablePutTrace_HardwareInterrupt = 1
+
+    cfgAS_read "StackTrace.putTrace.JMP", vint_isEnablePutTrace_JMP
+    cfgAS_read "StackTrace.putTrace.HLT", vint_isEnablePutTrace_HLT
+    cfgAS_read "StackTrace.putTrace.INT", vint_isEnablePutTrace_INT
+    cfgAS_read "StackTrace.putTrace.INT3", vint_isEnablePutTrace_INT3
+    cfgAS_read "StackTrace.putTrace.INTO", vint_isEnablePutTrace_INTO
+    cfgAS_read "StackTrace.putTrace.CALL", vint_isEnablePutTrace_CALL
+    cfgAS_read "StackTrace.putTrace.RET", vint_isEnablePutTrace_RET
+    cfgAS_read "StackTrace.putTrace.CALLF", vint_isEnablePutTrace_CALLF
+    cfgAS_read "StackTrace.putTrace.FRET", vint_isEnablePutTrace_FRET
+    cfgAS_read "StackTrace.putTrace.IRET", vint_isEnablePutTrace_IRET
+    cfgAS_read "StackTrace.putTrace.UD2", vint_isEnablePutTrace_UD2
+    cfgAS_read "StackTrace.putTrace.CCS", vint_isEnablePutTrace_CCS
+
+    cfgAS_read "StackTrace.putTrace.#UD2", vint_isEnablePutTraceError_UD2
+
+    cfgAS_read "StackTrace.putTrace.HardwareInterrupt", vint_isEnablePutTrace_HardwareInterrupt
 
     winsel SCREEN_DISPLAY_ID, SCRnone
     font vstr_FontName, 16
@@ -378,10 +407,10 @@
     vsave_put vbin_CPUresistorS
     vsave_put vbin_CPUresistorE
     vsave_end "dump_res.bin"
-    sdim vint_temp
-    vint_temp = putstacltrace()
-    if ( vint_temp == "" ) : return
-    bsave "stacktrace.txt", vint_temp
+
+    vstr_temp = putstacltrace()
+    if ( vstr_temp == "" ) : return
+    bsave "stacktrace.txt", vstr_temp, strlen(vstr_temp)
 
     return
 

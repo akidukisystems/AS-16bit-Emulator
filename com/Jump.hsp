@@ -42,7 +42,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -94,7 +94,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -146,7 +146,7 @@
         swbreak
         swend
         
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -198,7 +198,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -250,7 +250,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -302,7 +302,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -354,7 +354,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -406,7 +406,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -458,7 +458,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -510,7 +510,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -562,7 +562,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -614,7 +614,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -672,7 +672,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -730,7 +730,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -788,7 +788,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -846,7 +846,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -898,7 +898,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -950,7 +950,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -1002,7 +1002,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 4
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 4, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -1049,7 +1049,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), vbin_CPUtmp.0, 0, 1
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), vbin_CPUtmp.0, 0, 1, emu_vint_executedCmd, gettick(0)
 
         writeResistorWs rCS, vbin_CPUtmp.0
         writeResistorWe rIP, 0
@@ -1095,7 +1095,7 @@
         swbreak
         swend
 
-        jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 2
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 2, emu_vint_executedCmd, gettick(0)
 
         writeResistorWe rIP, vbin_CPUtmp.0
 
@@ -1147,7 +1147,7 @@
 
         if ( vbin_CPUtmp.1 != 0 ) {
 
-            jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 5
+            if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 5, emu_vint_executedCmd, gettick(0)
             writeResistorWe rIP, vbin_CPUtmp.0
 
         }
@@ -1201,7 +1201,7 @@
 
         if ( ( vbin_CPUtmp.1 ) != 0 and ( TestFlag( fZF ) == fZF ) ) {
 
-            jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 6
+            if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 6, emu_vint_executedCmd, gettick(0)
             writeResistorWe rIP, vbin_CPUtmp.0
 
         }
@@ -1255,7 +1255,7 @@
 
         if ( ( vbin_CPUtmp.1 ) != 0 and ( TestFlag( fZF ) != fZF ) ) {
 
-            jumping fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 7
+            if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 7, emu_vint_executedCmd, gettick(0)
             writeResistorWe rIP, vbin_CPUtmp.0
 
         }

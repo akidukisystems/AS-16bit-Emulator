@@ -4,7 +4,7 @@
     #deffunc initiation_stack
 
         vint_isGetTrace = 0
-        vstr_stackstring = ""
+        sdim vstr_stackstring, 16384
 
     return
 
@@ -20,11 +20,11 @@
 
     #deffunc clearTrace
 
-        vstr_stackstring = ""
+        sdim vstr_stackstring, 16384
 
     return
 
-    #deffunc calling int from_segment, int from_offset, int to_segment, int to_offset, int type
+    #deffunc calling int from_segment, int from_offset, int to_segment, int to_offset, int type, int tick, int time
 
         if ( vint_isGetTrace == 0 ) : return
 
@@ -52,13 +52,16 @@
         case 7
             vstr_type = "#UD2"
         swbreak
+        case 8
+            vstr_type = "HDW-INT"
+        swbreak
         swend
 
-        vstr_stackstring += "CALL: "+ strf( "[%8s]", vstr_type ) +""+ strf( "%04X", from_segment ) +":"+ strf( "%04X", from_offset ) +" -> "+ strf( "%04X", to_segment ) +":"+ strf( "%04X", to_offset ) +"\n"
+        vstr_stackstring += "CALL  : "+ strf( "[%-8s]", vstr_type ) +""+ strf( "%04X", from_segment ) +":"+ strf( "%04X", from_offset ) +" -> "+ strf( "%04X", to_segment ) +":"+ strf( "%04X", to_offset ) +" "+ strf( "%08d", tick ) +" "+ strf( "%08d", time ) +"\n"
 
     return
 
-    #deffunc jumping int from_segment, int from_offset, int to_segment, int to_offset, int type
+    #deffunc jumping int from_segment, int from_offset, int to_segment, int to_offset, int type, int tick, int time
 
         if ( vint_isGetTrace == 0 ) : return
 
@@ -88,11 +91,11 @@
         swbreak
         swend
 
-        vstr_stackstring += "JUMP: "+ strf( "[%8s]", vstr_type ) +""+ strf( "%04X", from_segment ) +":"+ strf( "%04X", from_offset ) +" -> "+ strf( "%04X", to_segment ) +":"+ strf( "%04X", to_offset ) +"\n"
+        vstr_stackstring += "JUMP  : "+ strf( "[%-8s]", vstr_type ) +""+ strf( "%04X", from_segment ) +":"+ strf( "%04X", from_offset ) +" -> "+ strf( "%04X", to_segment ) +":"+ strf( "%04X", to_offset ) +" "+ strf( "%08d", tick ) +" "+ strf( "%08d", time ) +"\n"
 
     return
 
-    #deffunc returned int from_segment, int from_offset, int to_segment, int to_offset, int type
+    #deffunc returned int from_segment, int from_offset, int to_segment, int to_offset, int type, int tick, int time
 
         if ( vint_isGetTrace == 0 ) : return
 
@@ -110,11 +113,11 @@
         swbreak
         swend
 
-        vstr_stackstring += "RET : "+ strf( "[%8s]", vstr_type ) +""+ strf( "%04X", from_segment ) +":"+ strf( "%04X", from_offset ) +" -> "+ strf( "%04X", to_segment ) +":"+ strf( "%04X", to_offset ) +"\n"
+        vstr_stackstring += "RET   : "+ strf( "[%-8s]", vstr_type ) +""+ strf( "%04X", from_segment ) +":"+ strf( "%04X", from_offset ) +" -> "+ strf( "%04X", to_segment ) +":"+ strf( "%04X", to_offset ) +" "+ strf( "%08d", tick ) +" "+ strf( "%08d", time ) +"\n"
 
     return
 
-    #deffunc halted int from_segment, int from_offset, int type
+    #deffunc halted int from_segment, int from_offset, int type, int tick, int time
 
         if ( vint_isGetTrace == 0 ) : return
 
@@ -126,7 +129,23 @@
         swbreak
         swend
 
-        vstr_stackstring += "HALT: "+ strf( "[%8s]", vstr_type ) +""+ strf( "%04X", from_segment ) +":"+ strf( "%04X", from_offset ) +"\n"
+        vstr_stackstring += "HALT  : "+ strf( "[%-8s]", vstr_type ) +""+ strf( "%04X", from_segment ) +":"+ strf( "%04X", from_offset ) +" "+ strf( "%08d", tick ) +" "+ strf( "%08d", time ) +"\n"
+
+    return
+
+    #deffunc changed int from_segment, int from_offset, int to_segment, int to_offset, int type, int tick, int time
+
+        if ( vint_isGetTrace == 0 ) : return
+
+        vstr_type = ""
+
+        switch type
+        case 1
+            vstr_type = "CCS"
+        swbreak
+        swend
+
+        vstr_stackstring += "CHANGE: "+ strf( "[%-8s]", vstr_type ) +""+ strf( "%04X", from_segment ) +":"+ strf( "%04X", from_offset ) +" -> "+ strf( "%04X", to_segment ) +":"+ strf( "%04X", to_offset ) +" "+ strf( "%08d", tick ) +" "+ strf( "%08d", time ) +"\n"
 
     return
 
