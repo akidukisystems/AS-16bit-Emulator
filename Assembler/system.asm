@@ -1,16 +1,21 @@
 
-    #config codesize 2048
+    #config codesize 4096
     #config filename "system.sys"
     #origin addr 8800h
     #enum   @CRLF       0A0Dh
 
-    DBG
-    
+    CLI
+
     XOR     AX, AX
     MOV     SS, AX
     MOV     SP, 7C00h
     MOV     DS, AX
     MOV     ES, AX
+
+    MOV     WORD[84h], systemInternalInterrupt:
+    MOV     WORD[86h], 0                ; 21h ソフトウェア割り込みサービス
+
+    STI
 
     MOV     WORD[8200h], AX
     MOV     AX, return_only:
@@ -23,21 +28,29 @@
     INT     10h                         ; ビデオ割り込み
 
     MOV     SI, start.dat:              ; SI...検索対象のファイル名
-    CALL    searchFile:
-    JC      notfound_start.dat:
-    CALL    fileEntry2Addr:
+    MOV     AL, 1
+    INT     21h
+    OR      AL, AL
+    JNZ     notfound_start.dat:
+    MOV     AL, 2
+    INT     21h
 
     MOV     SI, AX                      ; SI...検索対象のファイル名
-    CALL    searchFile:
-    CALL    fileEntry2Addr:
+    MOV     AL, 1
+    INT     21h
+    MOV     AL, 2
+    INT     21h
     MOV     BX, 10h
     DIV     BX
     MOV     WORD[7AF4h], AX
 
     MOV     SI, version.com:
-    CALL    searchFile:
-    JC      notfound_version.com:
-    CALL    fileEntry2Addr:
+    MOV     AL, 1
+    INT     21h
+    OR      AL, AL
+    JNZ     notfound_version.com:
+    MOV     AL, 2
+    INT     21h
 
     CALL    callfile:
 
@@ -130,10 +143,13 @@ splitcommand.split:
 
 splitcommand.end:
     MOV     SI, 7AE0h                   ; SI...検索対象のファイル名
-    CALL    searchFile:
-    JC      doCommand_Fail:
+    MOV     AL, 1
+    INT     21h
+    OR      AL, AL
+    JNZ     doCommand_Fail:
 
-    CALL    fileEntry2Addr:
+    MOV     AL, 2
+    INT     21h
 
     PUSH    AX
 
@@ -211,8 +227,6 @@ doCommand_kakutyoushi.dat:              ; 実行可能な拡張子一覧
     &DB     "COM"
     &DB     0
 
-
-
 callfile:
     CMP     [AX], 40AFh
     JNE     callfile.notexec:
@@ -263,12 +277,53 @@ callfile.notexec:
     STC
     RET
 
+systemInternalInterrupt:
+    CMP     AL, 1
+    JE      searchFile:                 ; ファイルを探す
+    CMP     AL, 2
+    JE      fileEntry2Addr:             ; ファイルのエントリからアドレスを計算する
+    CMP     AL, 3
+    JE      getFileInfo:                ; ファイル情報を取得
+    IRET
+
+editFlag:
+    CMP     AL, 0
+    JE      editFlag_Set:
+    CMP     AL, 1
+    JE      editFlag_del:
+    RET
+
+editFlag_Set:
+    PUSH    AX                          ; フラグ編集
+    PUSH    BX
+    MOV     AX, SP
+    ADD     AX, 10
+    MOV     BX, [AX]
+    OR      BX, DX
+    MOV     [AX], BX
+    POP     BX
+    POP     AX
+    RET
+
+editFlag_del:
+    PUSH    AX                          ; フラグ編集
+    PUSH    BX
+    MOV     AX, SP
+    ADD     AX, 10
+    MOV     BX, [AX]
+    NOT     DX
+    AND     BX, DX
+    MOV     [AX], BX
+    POP     BX
+    POP     AX
+    RET
+
 ; searchfile
 ; in
 ;   SI...ファイル名があるアドレス
 ; out
 ;   FLAGS...
-;     CF... 0: ファイルあり
+;     AL... 0: ファイルあり
 ;           1: ファイルなし
 ;   CX...ファイルエントリ
 searchFile:
@@ -276,8 +331,10 @@ searchFile:
     PUSH    BX
     PUSH    DX
     PUSH    DI
+    PUSH    DS
     PUSH    SI
     XOR     CX, CX
+    MOV     DS, CX
 
 searchFile_fileentry:
     MOV     DI, 8000h
@@ -403,26 +460,31 @@ searchFile_not:
 
 searchFile_Fail:
     POP     SI
+    POP     DS
     POP     DI
     POP     DX
     POP     BX
     POP     AX
     XOR     CX, CX
-    STC
-    RET
+    MOV     AL, 1
+    IRET
 
 searchFile_filenameEqual:
     POP     SI
+    POP     DS
     POP     DI
     POP     DX
     POP     BX
     POP     AX
-    CLC
-    RET
+    MOV     AL, 0
+    IRET
 
 fileEntry2Addr:
     PUSH    BX
     PUSH    DI
+    PUSH    DS
+    MOV     AX, 0
+    MOV     DS, AX
     MOV     AX, CX                      ; ファイルエントリの番号 * ファイルエントリのサイズ + 先頭クラスタ番号 + FATがある位置
     MOV     BX, 20h                     ; これでクラスタ番号が格納されているところがわかる
     MUL     BX
@@ -436,9 +498,89 @@ fileEntry2Addr:
     MOV     BX, 512                     ; クラスタ番号 * クラスタあたりのセクタ数 * セクタあたりのサイズ + 7C00h
     MUL     BX                          ; これでファイルの場所がわかる
     ADD     AX, 7C00h
+    POP     DS
     POP     DI
     POP     BX
-    RET
+    IRET
+
+getFileInfo:
+    PUSH    DI
+    PUSH    DS
+    PUSH    BX
+    MOV     AX, 0
+    MOV     DS, AX
+    MOV     AX, CX
+    MOV     BX, 20h
+    MUL     BX
+    MOV     DI, 8000h
+    ADD     DI, AX
+    POP     BX
+
+    CMP     BL, 1
+    JE      getFileInfo_attr:           ; 属性
+    CMP     BL, 1
+    JE      getFileInfo_createTime:     ; 作成時刻
+    CMP     BL, 1
+    JE      getFileInfo_createDate:     ; 作成日付
+    CMP     BL, 1
+    JE      getFileInfo_accessDate:     ; アクセス日付
+    CMP     BL, 1
+    JE      getFileInfo_updateTime:     ; 更新時刻
+    CMP     BL, 1
+    JE      getFileInfo_updateDate:     ; 更新日時
+    CMP     BL, 1
+    JE      getFileInfo_clst:           ; クラスタ位置
+    CMP     BL, 1
+    JE      getFileInfo_filesize:       ; ファイルサイズ
+
+    JMP     getFileInfo_ret:
+
+getFileInfo_attr:
+    ADD     DI, 0Bh
+    MOV     AX, [DI]
+    MOV     AH, 0
+    JMP     getFileInfo_ret:
+
+getFileInfo_createTime:
+    ADD     DI, 0Ch
+    MOV     AX, [DI]
+    JMP     getFileInfo_ret:
+
+getFileInfo_createDate:
+    ADD     DI, 0Eh
+    MOV     AX, [DI]
+    JMP     getFileInfo_ret:
+
+getFileInfo_accessDate:
+    ADD     DI, 10h
+    MOV     AX, [DI]
+    JMP     getFileInfo_ret:
+
+getFileInfo_updateTime:
+    ADD     DI, 12h
+    MOV     AX, [DI]
+    JMP     getFileInfo_ret:
+
+getFileInfo_updateDate:
+    ADD     DI, 14h
+    MOV     AX, [DI]
+    JMP     getFileInfo_ret:
+
+getFileInfo_clst:
+    ADD     DI, 16h
+    MOV     AX, [DI]
+    JMP     getFileInfo_ret:
+
+getFileInfo_filesize:
+    ADD     DI, 18h
+    MOV     AX, [DI]
+    ADD     DI, 2
+    MOV     DX, [DI]
+
+getFileInfo_ret:
+    POP     DS
+    POP     DI
+    IRET
 
 
 
@@ -448,6 +590,8 @@ notfound_start.dat:
     INT     10h
     MOV     SI, messageNotFound:
     INT     10h
+
+    JMP     halt:
 
 notfound_version.com:
     MOV     SI, version.com:
