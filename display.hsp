@@ -8,7 +8,7 @@
         
         repeat 80*30
 
-            vint_CPUtmp = peek( emu_vbin_Memory, cnt *2 +vint_Ram_Vram_main.StartAddr )
+            vint_CPUtmp = peek( emu_vbin_Memory, cnt *2 + $C5A80 )
 
             if ( vint_CPUtmp == 0x00 ) : break
 
