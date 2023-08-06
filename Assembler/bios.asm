@@ -111,7 +111,7 @@ editFlag_Set:
     MOV     AX, SP
     ADD     AX, 10
     MOV     BX, [AX]
-    AND     BX, DX
+    OR      BX, DX
     MOV     [AX], BX
     POP     BX
     POP     AX
