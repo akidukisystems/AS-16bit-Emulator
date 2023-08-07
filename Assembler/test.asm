@@ -4,9 +4,6 @@
     #origin addr        0
     #enum   @CRLF       0A0Dh
 
-    JMP     100h
-    &RESBSF 100h
-
     MOV     SI, message:
     MOV     AH, 0Eh
     INT     10h

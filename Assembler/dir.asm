@@ -3,9 +3,6 @@
     #config filename    "dir.com"
     #origin addr        0
     #enum   @CRLF       0A0Dh
-
-    JMP     100h
-    &RESBSF 100h
     
     XOR     CX, CX          ; データセグメントをいじるので0にする
     MOV     DS, CX

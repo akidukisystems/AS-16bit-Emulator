@@ -28,30 +28,36 @@
     INT     10h                         ; ビデオ割り込み
 
     MOV     SI, start.dat:              ; SI...検索対象のファイル名
-    MOV     AL, 1
-    INT     21h
-    OR      AL, AL
-    JNZ     notfound_start.dat:
-    MOV     AL, 2
-    INT     21h
+    MOV     BX, 0510h                   ; ES:BX...読み込み先アドレス
+    MOV     ES, BX
+    XOR     BX, BX
+    CALL    readfile:
+    JC      notfound_start.dat:
 
-    MOV     SI, AX                      ; SI...検索対象のファイル名
-    MOV     AL, 1
-    INT     21h
-    MOV     AL, 2
-    INT     21h
+    MOV     AX, ES                      ; SI=ES*10h 検索対象
+    XOR     DX, DX
     MOV     BX, 10h
-    DIV     BX
+    MUL     BX
+    MOV     SI, AX
+    MOV     BX, 0610h
+    MOV     ES, BX                      ; ES=0610h 読み込み先
+    XOR     BX, BX                      ; BX=0
+    CALL    readfile:
+
+    MOV     AX, ES
     MOV     WORD[7AF4h], AX
 
-    MOV     SI, version.com:
-    MOV     AL, 1
-    INT     21h
-    OR      AL, AL
-    JNZ     notfound_version.com:
-    MOV     AL, 2
-    INT     21h
-
+    MOV     SI, version.com:            ; SI...検索対象のファイル名
+    MOV     BX, 0110h                   ; ES:BX...読み込み先アドレス
+    MOV     ES, BX
+    XOR     BX, BX
+    CALL    readfile:
+    JC      notfound_version.com:
+  
+    MOV     AX, ES                      ; AX...アドレス
+    MOV     BX, 10h
+    XOR     DX, DX
+    MUL     BX
     CALL    callfile:
 
     MOV     SI, message1:               ; 文字列のあるオフセット
@@ -143,22 +149,17 @@ splitcommand.split:
 
 splitcommand.end:
     MOV     SI, 7AE0h                   ; SI...検索対象のファイル名
-    MOV     AL, 1
-    INT     21h
-    OR      AL, AL
-    JNZ     doCommand_Fail:
-
-    MOV     AL, 2
-    INT     21h
-
-    PUSH    AX
+    MOV     BX, 0110h                   ; ES:BX...読み込み先アドレス
+    MOV     ES, BX
+    XOR     BX, BX
+    CALL    readfile:
+    JC      doCommand_Fail:
 
     MOV     SI, messageCRLF:
     MOV     AH, 0Eh
     INT     10h
 
-    POP     AX
-
+    MOV     AX, 1100h
     CALL    callfile:                   ; ファイルを実行
 
     MOV     SI, messageRet:             ; 文字列のあるオフセット
@@ -227,10 +228,9 @@ doCommand_kakutyoushi.dat:              ; 実行可能な拡張子一覧
     &DB     "COM"
     &DB     0
 
+    ; AX...アドレス
+    ; 戻り値 CF=0
 callfile:
-    CMP     [AX], 40AFh
-    JNE     callfile.notexec:
-
     MOV     BX, 10h                     ; ファイルの先頭アドレスを10で割り、CSレジスタで使えるようにする
     XOR     DX, DX
     DIV     BX
@@ -270,12 +270,58 @@ callfile:
 
     RET
 
-callfile.notexec:
-    MOV     SI, message.notexecutable:
-    MOV     AH, 0Eh
-    INT     10h
+    ; SI...ファイル名
+    ; ES:BX...格納先アドレス
+    ; 戻り値 CF
+    ;           =0...成功
+    ;           =1...失敗　ファイルがありません
+readfile:
+    PUSH    BX
+
+    MOV     AL, 1
+    INT     21h
+    OR      AL, AL
+    JNZ     readfile.notfound:
+
+    MOV     AL, 4                       ; ファイルのクラスタ番号を取得
+    INT     21h
+
+    XOR     DX, DX                       ; クラスタ番号からセクタ位置を取得
+    MOV     BX, 2
+    MUL     BX
+    INC     AL
+    MOV     CL, AL
+
+    MOV     AL, 3                       ; ファイルサイズを取得
+    MOV     BL, 1
+    INT     21h
+
+    MOV     BX, 512
+    DIV     BX
+
+    MOV     AH, 0                       ; ディスク初期化
+    INT     13h
+
+    JC      halt:                        ; エラーだったらおわり
+
+    MOV     AH, 2                       ; セクタ読み込み
+                                        ; 読み込むセクタ数
+    MOV     CH, 0                       ; トラック番号 下位8bit
+                                        ; トラック番号 上位2bit + セクタ番号 6bit (セクタ番号のみ1から、それ以外は0から)
+    MOV     DH, 0                       ; ヘッド番号
+    MOV     DL, 0                       ; ディスク番号
+    POP     BX
+    INT     13h
+
+    CLC
+
+    RET
+
+readfile.notfound:
     STC
     RET
+
+
 
 systemInternalInterrupt:
     CMP     AL, 1
@@ -284,8 +330,12 @@ systemInternalInterrupt:
     JE      fileEntry2Addr:             ; ファイルのエントリからアドレスを計算する
     CMP     AL, 3
     JE      getFileInfo:                ; ファイル情報を取得
+    CMP     AL, 4
+    JE      fileEntry2Clst:             ; クラスタ番号を取得
     IRET
 
+    ; AL...セット/リセット
+    ; DX...編集するフラグ
 editFlag:
     CMP     AL, 0
     JE      editFlag_Set:
@@ -318,14 +368,14 @@ editFlag_del:
     POP     AX
     RET
 
-; searchfile
-; in
-;   SI...ファイル名があるアドレス
-; out
-;   FLAGS...
-;     AL... 0: ファイルあり
-;           1: ファイルなし
-;   CX...ファイルエントリ
+    ; searchfile
+    ; in
+    ;   SI...ファイル名があるアドレス
+    ; out
+    ;   FLAGS...
+    ;     AL... 0: ファイルあり
+    ;           1: ファイルなし
+    ;   CX...ファイルエントリ
 searchFile:
     PUSH    AX
     PUSH    BX
@@ -498,6 +548,25 @@ fileEntry2Addr:
     MOV     BX, 512                     ; クラスタ番号 * クラスタあたりのセクタ数 * セクタあたりのサイズ + 7C00h
     MUL     BX                          ; これでファイルの場所がわかる
     ADD     AX, 7C00h
+    POP     DS
+    POP     DI
+    POP     BX
+    IRET
+
+fileEntry2Clst:
+    PUSH    BX
+    PUSH    DI
+    PUSH    DS
+    MOV     AX, 0
+    MOV     DS, AX
+    MOV     AX, CX                      ; ファイルエントリの番号 * ファイルエントリのサイズ + 先頭クラスタ番号 + FATがある位置
+    MOV     BX, 20h                     ; これでクラスタ番号が格納されているところがわかる
+    MUL     BX
+    MOV     DI, 8000h
+    ADD     DI, AX
+    ADD     DI, 16h
+
+    MOV     AX, [DI]                    ; ファイルがあるクラスタの番号を読む
     POP     DS
     POP     DI
     POP     BX

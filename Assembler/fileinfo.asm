@@ -4,9 +4,6 @@
     #origin addr        0
     #enum   @CRLF       0A0Dh
 
-    JMP     100h
-    &RESBSF 100h
-
     MOV     AL, 1
     MOV     SI, 7AD0h
     INT     21h
