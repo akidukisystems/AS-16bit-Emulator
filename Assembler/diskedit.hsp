@@ -28,15 +28,14 @@
     cfgAS_read "fatPosClst", vc_fatPosClst
     cfgAS_read "fatSizeClst", vc_fatSizeClst
 
+    screen 0, 320, 240
+
     init_msglib 1, 0, 0
     gsel 0, 1
 
     putmes_msglib "Loaded config\n", 1
 
     title "ディスクイメージ 編集ソフトウェア"
-
-    vs_line = ""
-    mesbox vs_line, 640, 128, 0, 0
 
     vs_fileNameList = "ファイルを選択"
     vi_fileNameIndex = 0
@@ -52,11 +51,11 @@
     pos 128, ginfo_cy -24
     button goto "書出", *l_out
 
-    pos 0, 480-24
+    pos 0, 240-24
     button goto "読込", *l_load
-    pos 64, 480-24
+    pos 64, 240-24
     button goto "書込", *l_save
-    pos 192, 480-24
+    pos 192, 240-24
     button goto "ヘルプ", *l_help
 
     stop
