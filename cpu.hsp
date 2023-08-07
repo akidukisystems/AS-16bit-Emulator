@@ -72,7 +72,7 @@
         if ( vint_CPUinvaildcmd ) : {
 
             saveError "#UD excption"
-            vint_CPUinvaildcmd = 0
+            vint_CPUinvaildcmd = false
 
             vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, 6 * 4 )
             vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, 6 * 4 +2 )
