@@ -595,4 +595,63 @@
         poke vbin_CPUresistorG.resistorBglIDw, 0x00, dataBglw
     return
 
+    #deffunc saveError str saverr_type
+
+        vstr_temp = ""
+        notesel vstr_temp
+        noteadd "==Emulator Error Dump=="
+        noteadd "Emulator compile date: "+ __date__ +" "+ __time__ +""
+        noteadd "Compiler version: "+ __hspver__ +""
+        noteadd strf("Error occured date: %04d/%02d/%02d %02d:%02d:%02d.%03d", gettime(0), gettime(1), gettime(3), gettime(4), gettime(5), gettime(6), gettime(7) )
+        noteadd "Type: "+ saverr_type
+        noteadd "+Resistor"
+
+        vbin_CPUtmp = fetchResistorWe(rFL)
+        vbin_CPUtmpS = ""
+        repeat 16
+            
+            switch cnt
+            case 0
+                if ( vbin_CPUtmp && fCF ) : vbin_CPUtmpS.0 += "C" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 2
+                if ( vbin_CPUtmp && fPF ) : vbin_CPUtmpS.0 += "P" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 4
+                if ( vbin_CPUtmp && fAF ) : vbin_CPUtmpS.0 += "A" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 6
+                if ( vbin_CPUtmp && fZF ) : vbin_CPUtmpS.0 += "Z" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 7
+                if ( vbin_CPUtmp && fSF ) : vbin_CPUtmpS.0 += "S" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 8
+                if ( vbin_CPUtmp && fTF ) : vbin_CPUtmpS.0 += "T" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 9
+                if ( vbin_CPUtmp && fIF ) : vbin_CPUtmpS.0 += "I" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 10
+                if ( vbin_CPUtmp && fDF ) : vbin_CPUtmpS.0 += "D" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            case 11
+                if ( vbin_CPUtmp && fOF ) : vbin_CPUtmpS.0 += "O" : else : vbin_CPUtmpS.0 += "-"
+            swbreak
+            swend
+
+        loop
+
+        noteadd "AX="+ strf("%04X", fetchResistorWg(rAX)) +" BX="+ strf("%04X", fetchResistorWg(rBX)) +" CX="+ strf("%04X", fetchResistorWg(rCX)) +" DX="+ strf("%04X", fetchResistorWg(rDX)) +" SI="+ strf("%04X", fetchResistorWg(rSI)) +" DI="+ strf("%04X", fetchResistorWg(rDI)) +" BP="+ strf("%04X", fetchResistorWg(rBP)) +" SP="+ strf("%04X", fetchResistorWg(rSP)) +""
+        noteadd "CS="+ strf("%04X", fetchResistorWs(rCS)) +" DS="+ strf("%04X", fetchResistorWs(rDS)) +" ES="+ strf("%04X", fetchResistorWs(rES)) +" SS="+ strf("%04X", fetchResistorWs(rSS)) +" IP="+ strf("%04X", fetchResistorWe(rIP)) +" "+ vbin_CPUtmpS.0 +""
+        noteadd ""
+        noteadd "+Other infomation"
+        noteadd "TIME="+ gettick(0) +" ms"
+        noteadd "TICK="+ emu_vint_executedCmd@ +""
+
+        notesave "error.txt"
+        noteunsel
+
+    return
+
 #global
