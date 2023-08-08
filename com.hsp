@@ -5,8 +5,8 @@
     #addition "com/Calc.hsp"    
     #addition "com/Logical.hsp" 
     #addition "com/IO.hsp"      // done!
-    #addition "com/Stack.hsp"   
+    #addition "com/Stack.hsp"   // done!
     #addition "com/Sys.hsp"     // done!
-    #addition "com/Jump.hsp"    
-    #addition "com/Flag.hsp"
+    #addition "com/Jump.hsp"    // done!
+    #addition "com/Flag.hsp"    // done!
     
