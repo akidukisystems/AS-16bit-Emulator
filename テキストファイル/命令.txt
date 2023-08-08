@@ -90,10 +90,10 @@ OR		b		32	2	OK
 		w		33		OK
 XOR		b		34	2	OK
 		w		35		OK
-NEG		b		36	1
-		w		37
-NOT		b		38	1
-		w		39
+NEG		b		36	1	OK
+		w		37		OK
+NOT		b		38	1	OK
+		w		39		OK
 ROL		b		3A	2
 		w		3B
 ROR		b		3C	2
