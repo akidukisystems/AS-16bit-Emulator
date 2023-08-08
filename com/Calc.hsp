@@ -157,8 +157,6 @@
 
     }
 
-
-    
     if ( vbin_CPUmeirei_Main == 0x22 ) : { // DEC(B)
 
         // パラメータの種類
@@ -314,8 +312,6 @@
         return
 
     }
-
-
 
     if ( vbin_CPUmeirei_Main == 0x24 ) : { // ADD (B)
 
@@ -514,8 +510,6 @@
 
     }
 
-
-
     if ( vbin_CPUmeirei_Main == 0x26 ) : { // SUB (B)
 
         // パラメータの種類
@@ -712,8 +706,6 @@
 
     }
 
-
-
     if ( vbin_CPUmeirei_Main == 0x28 ) : { // MUL (B)
 
         // パラメータの種類
@@ -796,8 +788,6 @@
         return
 
     }
-
-
 
     if ( vbin_CPUmeirei_Main == 0x2A ) : { // DIV (B)
 
@@ -915,8 +905,6 @@
         return
 
     }
-
-
 
     if ( vbin_CPUmeirei_Main == 0x50 ) : { // CMP (B)
 

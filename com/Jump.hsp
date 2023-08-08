@@ -1,3 +1,4 @@
+    
     if ( vbin_CPUmeirei_Main == 0x90 ) : { // JO    OF=true
 
         if ( TestFlag(fOF) != fOF ) : {
@@ -1009,8 +1010,6 @@
         return
 
     }
-
-
 
     if ( vbin_CPUmeirei_Main == 0xAE ) : { // JF
 

@@ -1,5 +1,4 @@
 
-    // フラグへの影響: no
     if ( vbin_CPUmeirei_Main == 0x10 ) : { // MOV(B)
 
         vbin_CPUmeirei_Prm.1 = RBS ( vbin_CPUmeirei_Prm.0 && 0xF0, 4 )
@@ -75,7 +74,6 @@
 
     }
 
-    // フラグへの影響: no
     if ( vbin_CPUmeirei_Main == 0x11 ) : { // MOV(W)
 
         // パラメータの種類
@@ -192,7 +190,6 @@
 
     }
 
-    // フラグへの影響: no
     if ( vbin_CPUmeirei_Main == 0x13 ) : { // XCHG(W)
 
         // パラメータの種類
@@ -287,6 +284,3 @@
         return
 
     }
-
-
-    
