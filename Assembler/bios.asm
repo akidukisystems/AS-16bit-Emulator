@@ -87,7 +87,10 @@ waitBiosMenu_timeout:
     CMP     BX, AA55h
     JNE     fin:                        ; ブータブルでなかったらおわり
 
-    JF      07C0h
+
+    XOR     AX, AX                      ; 0000:7C00 にジャンプ
+    MOV     ES, AX    
+    JF      7C00h
 
     MOV     DS, F000h                   ; 文字列のあるセグメント
     MOV     SI, message_osnotfound:     ; 文字列のあるオフセット
