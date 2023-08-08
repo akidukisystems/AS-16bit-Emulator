@@ -1048,10 +1048,10 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), vbin_CPUtmp.0, 0, 1, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rES), vbin_CPUtmp.0, 1, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWs rCS, vbin_CPUtmp.0
-        writeResistorWe rIP, 0
+        writeResistorWs rCS, fetchResistorWs(rES)
+        writeResistorWe rIP, vbin_CPUtmp.0
 
         return
 
