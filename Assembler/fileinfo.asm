@@ -4,14 +4,18 @@
     #origin addr        0
     #enum   @CRLF       0A0Dh
 
-    MOV     AL, 1
+    MOV     AH, 1
     MOV     SI, 7AD0h
     INT     21h
-    OR      AL, AL
+    OR      AH, AH
     JNZ     notfound:
 
-    MOV     AL, 3
-    MOV     BL, 1
+    MOV     SI, message_attr:
+    MOV     AH, 10h
+    INT     21h
+
+    MOV     AH, 3
+    MOV     BH, 1
     INT     21h
 
     TEST    AX, 01h
@@ -40,43 +44,43 @@ fileattr_dir_ret:
     JMP     fileattr_next:
 
 fileattr_readonly:
-    MOV     SI, message_readonly:
-    MOV     AH, 0Eh
-    INT     10h
+    MOV     AL, 52h
+    MOV     AH, 11h
+    INT     21h
     JMP     fileattr_readonly_ret:
 
 fileattr_hide:
-    MOV     SI, message_hide:
-    MOV     AH, 0Eh
-    INT     10h
+    MOV     AL, 48h
+    MOV     AH, 11h
+    INT     21h
     JMP     fileattr_hide_ret:
 
 fileattr_system:
-    MOV     SI, message_system:
-    MOV     AH, 0Eh
-    INT     10h
+    MOV     AL, 53h
+    MOV     AH, 11h
+    INT     21h
     JMP     fileattr_system_ret:
 
 fileattr_volume:
-    MOV     SI, message_volume:
-    MOV     AH, 0Eh
-    INT     10h
+    MOV     AL, 56h
+    MOV     AH, 11h
+    INT     21h
     JMP     fileattr_volume_ret:
 
 fileattr_dir:
-    MOV     SI, message_dir:
-    MOV     AH, 0Eh
-    INT     10h
+    MOV     AL, 44h
+    MOV     AH, 11h
+    INT     21h
     JMP     fileattr_dir_ret:
 
 fileattr_archive:
-    MOV     SI, message_archive:
-    MOV     AH, 0Eh
-    INT     10h
+    MOV     AL, 41h
+    MOV     AH, 11h
+    INT     21h
 
 fileattr_next:
-    ;MOV     AL, 3
-    ;MOV     BL, 2
+    ;MOV     AH, 3
+    ;MOV     BH, 2
     ;INT     21h
 
 
@@ -85,8 +89,8 @@ fileattr_next:
 
 notfound:
     MOV     SI, message_notfound:
-    MOV     AH, 0Eh
-    INT     10h
+    MOV     AH, 10h
+    INT     21h
 
     FRET
 
@@ -96,29 +100,5 @@ message_notfound:
     &DB     0
 
 message_attr:
-    &DB     "Attribute..."
-    &DB     0
-
-message_readonly:
-    &DB     "R "
-    &DB     0
-
-message_hide:
-    &DB     "H "
-    &DB     0
-
-message_system:
-    &DB     "S "
-    &DB     0
-
-message_volume:
-    &DB     "V "
-    &DB     0
-
-message_dir:
-    &DB     "D "
-    &DB     0
-
-message_archive:
-    &DB     "A "
+    &DB     "Attribute: "
     &DB     0

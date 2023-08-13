@@ -9,10 +9,11 @@
     XOR     AX, AX
     MOV     SS, AX
     MOV     SP, 7C00h
+    MOV     BP, SP
     MOV     DS, AX
     MOV     ES, AX
 
-    MOV     WORD[84h], systemInternalInterrupt:
+    MOV     WORD[84h], systemInternalInterrupt_21h:
     MOV     WORD[86h], 0                ; 21h ソフトウェア割り込みサービス
 
     STI
@@ -22,7 +23,7 @@
     MOV     BX, 10h
     XOR     DX, DX
     DIV     BX
-    MOV     WORD[7AF4h], AX
+    MOV     WORD[7AF6h], AX
 
     MOV     AH, 20h                     ; 初期化
     INT     10h                         ; ビデオ割り込み
@@ -45,7 +46,7 @@
     CALL    readfile:
 
     MOV     AX, ES
-    MOV     WORD[7AF4h], AX
+    MOV     WORD[7AF6h], AX
 
     MOV     SI, version.com:            ; SI...検索対象のファイル名
     MOV     BX, 0110h                   ; ES:BX...読み込み先アドレス
@@ -65,9 +66,15 @@
     INT     10h                         ; ビデオ割り込み
 
 keyloop:
+    MOV     AH, 6                       ; キー入力をON
+    MOV     AL, 1
+    MOV     BH, 1
+    INT     16h
+
+keyloop_fetch:
     MOV     AH, 1                       ; キーが押されたか確認
     INT     16h
-    JZ      keyloop:                    ; 0（押されていない）ならループに戻る
+    JZ      keyloop_fetch:              ; 0（押されていない）ならループに戻る
 
     XOR     AX, AX
     INT     16h                         ; 押されたならキーコード取得
@@ -92,9 +99,14 @@ keyloop:
     MOV     AH, 0Ah
     INT     10h
 
-    JMP     keyloop:
+    JMP     keyloop_fetch:
 
 backspace:
+    MOV     AH, 6                       ; キー入力をOFF
+    MOV     AL, 1
+    MOV     BH, 0
+    INT     16h
+
     MOV     DS, 07B0h                   ; 7B00hにある文字数を読み込む
     MOV     BH, BYTE[0000h]
     CMP     BH, 0                       ; 文字数が0の場合は終了
@@ -122,6 +134,11 @@ backspace_not:
 
 
 splitcommand:
+    MOV     AH, 6                       ; キー入力をOFF
+    MOV     AL, 1
+    MOV     BH, 0
+    INT     16h
+
     MOV     SI, 7B02h
     MOV     DI, 7AE0h
     XOR     CX, CX
@@ -196,7 +213,7 @@ doCommand_kakutyoushi:
 doCommand_kakutyoushi.loop:
     MOV     AX, [DI]                    ; 文字列読み込み
     MOV     BX, [SI]
-    CALLF   WORD[7AF4h]                 ; 小文字にする
+    CALLF   WORD[7AF6h]                 ; 小文字にする
     CMP     AL, BL                      ; 比較して違うなら、他の拡張子か調べる
     JNE     doCommand_kakutyoushi.next:
     INC     CX                          ; 次の文字へ
@@ -244,12 +261,13 @@ callfile:
     MOV     DX, BX
     MOV     SI, BX
     MOV     DI, BX
-    MOV     BP, BX
 
     MOV     DS, BX                      ; スタック状態を記録
     MOV     WORD[7AF0h], SP
     MOV     WORD[7AF2h], SS
+    MOV     WORD[7AF4h], BP
     MOV     SP, BX
+    MOV     BP, BX
 
     MOV     DS, AX                      ; セグメントレジスタをCSと同じ場所に
     MOV     ES, AX
@@ -261,6 +279,7 @@ callfile:
     MOV     DS, BX
     MOV     SP, WORD[7AF0h]
     MOV     SS, WORD[7AF2h]
+    MOV     BP, WORD[7AF4h]
 
     POP     ES                          ; POP
     POP     DS
@@ -278,22 +297,22 @@ callfile:
 readfile:
     PUSH    BX
 
-    MOV     AL, 1
+    MOV     AH, 1
     INT     21h
-    OR      AL, AL
+    OR      AH, AH
     JNZ     readfile.notfound:
 
-    MOV     AL, 4                       ; ファイルのクラスタ番号を取得
+    MOV     AH, 4                       ; ファイルのクラスタ番号を取得
     INT     21h
 
-    XOR     DX, DX                       ; クラスタ番号からセクタ位置を取得
+    XOR     DX, DX                      ; クラスタ番号からセクタ位置を取得
     MOV     BX, 2
     MUL     BX
     INC     AL
     MOV     CL, AL
 
-    MOV     AL, 3                       ; ファイルサイズを取得
-    MOV     BL, 1
+    MOV     AH, 3                       ; ファイルサイズを取得
+    MOV     BH, 1
     INT     21h
 
     MOV     BX, 512
@@ -302,7 +321,7 @@ readfile:
     MOV     AH, 0                       ; ディスク初期化
     INT     13h
 
-    JC      halt:                        ; エラーだったらおわり
+    JC      halt:                       ; エラーだったらおわり
 
     MOV     AH, 2                       ; セクタ読み込み
                                         ; 読み込むセクタ数
@@ -318,20 +337,33 @@ readfile:
     RET
 
 readfile.notfound:
+    POP     BX
     STC
     RET
 
 
 
-systemInternalInterrupt:
-    CMP     AL, 1
+; _/_/_/_/_/_/_/_/ DOS システム割込み _/_/_/_/_/_/_/_/
+
+systemInternalInterrupt_21h:
+    CMP     AH, 1
     JE      searchFile:                 ; ファイルを探す
-    CMP     AL, 2
+    CMP     AH, 2
     JE      fileEntry2Addr:             ; ファイルのエントリからアドレスを計算する
-    CMP     AL, 3
+    CMP     AH, 3
     JE      getFileInfo:                ; ファイル情報を取得
-    CMP     AL, 4
+    CMP     AH, 4
     JE      fileEntry2Clst:             ; クラスタ番号を取得
+    CMP     AH, 10h
+    JE      printstrings:
+    CMP     AH, 11h
+    JE      printstring1:
+    CMP     AH, 13h
+    JE      clearscreen:
+    ;CMP     AH, 2Ah
+    ;JE      readDate:
+    ;CMP     AH, 2Ch
+    ;JE      readTime:
     IRET
 
     ; AL...セット/リセット
@@ -408,7 +440,7 @@ searchFile_filenameCMP:
     CMP     BL, E5h                     ; 削除済エントリ
     JE      searchFile_not:
 
-    CALLF   WORD[7AF4h]                 ; 文字を小文字化
+    CALLF   WORD[7AF6h]                 ; 文字を小文字化
 
     CMP     AL, BL                      ; 文字が一緒ならループ続行
     JE      searchFile_filenameCorrect:
@@ -462,7 +494,7 @@ searchFile_filenameStrKakutyo.loop:
     CMP     BL, 20h
     JE      searchFile_filenameStrKakutyo.end:
 
-    CALLF   WORD[7AF4h]                 ; 文字を小文字化
+    CALLF   WORD[7AF6h]                 ; 文字を小文字化
 
     CMP     AL, BL                      ; 文字が一緒ならループ続行
     JE      searchFile_filenameStrKakutyoCorrect:
@@ -516,7 +548,7 @@ searchFile_Fail:
     POP     BX
     POP     AX
     XOR     CX, CX
-    MOV     AL, 1
+    MOV     AH, 1
     IRET
 
 searchFile_filenameEqual:
@@ -526,7 +558,7 @@ searchFile_filenameEqual:
     POP     DX
     POP     BX
     POP     AX
-    MOV     AL, 0
+    MOV     AH, 0
     IRET
 
 fileEntry2Addr:
@@ -585,21 +617,21 @@ getFileInfo:
     ADD     DI, AX
     POP     BX
 
-    CMP     BL, 1
+    CMP     BH, 1
     JE      getFileInfo_attr:           ; 属性
-    CMP     BL, 1
+    CMP     BH, 1
     JE      getFileInfo_createTime:     ; 作成時刻
-    CMP     BL, 1
+    CMP     BH, 1
     JE      getFileInfo_createDate:     ; 作成日付
-    CMP     BL, 1
+    CMP     BH, 1
     JE      getFileInfo_accessDate:     ; アクセス日付
-    CMP     BL, 1
+    CMP     BH, 1
     JE      getFileInfo_updateTime:     ; 更新時刻
-    CMP     BL, 1
+    CMP     BH, 1
     JE      getFileInfo_updateDate:     ; 更新日時
-    CMP     BL, 1
+    CMP     BH, 1
     JE      getFileInfo_clst:           ; クラスタ位置
-    CMP     BL, 1
+    CMP     BH, 1
     JE      getFileInfo_filesize:       ; ファイルサイズ
 
     JMP     getFileInfo_ret:
@@ -649,6 +681,21 @@ getFileInfo_filesize:
 getFileInfo_ret:
     POP     DS
     POP     DI
+    IRET
+
+printstrings:
+    MOV     AH, 0Eh
+    INT     10h
+    IRET
+
+printstring1:
+    MOV     AH, 0Ah
+    INT     10h
+    IRET
+
+clearscreen:
+    MOV     AH, 20h
+    INT     10h
     IRET
 
 

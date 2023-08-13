@@ -38,8 +38,8 @@ filenameloop:
     CMP     DL, 0
     JE      owari2:         ; 空ならおわり
     MOV     AL, DL
-    MOV     AH, 0Ah
-    INT     10h             ; 取得した文字を表示
+    MOV     AH, 11h
+    INT     21h             ; 取得した文字を表示
     INC     BX              ; 次の文字へ
     INC     CX
     CMP     CX, 8           ; 8文字進んだら拡張子へ
@@ -55,16 +55,16 @@ kakutyo_a:
 
 kakutyo:
     MOV     AL, 2Eh         ; ドットを表示
-    MOV     AH, 0Ah
-    INT     10h
+    MOV     AH, 11h
+    INT     21h
 
 kakutyoloop:
     MOV     DX, [BX]        ; 拡張子の文字取得
     CMP     DL, 20h         ; 空白なら別処理
     JE      umeru:
     MOV     AL, DL
-    MOV     AH, 0Ah         ; 表示する
-    INT     10h
+    MOV     AH, 11h         ; 表示する
+    INT     21h
     INC     BX              ; 次の文字
     INC     CX
     CMP     CX, 11
@@ -74,8 +74,8 @@ kakutyoloop:
 umeru:
     INC     CX              ; 拡張子が2文字以下なら空白で埋める
     MOV     AL, 20h
-    MOV     AH, 0Ah
-    INT     10h
+    MOV     AH, 11h
+    INT     21h
     CMP     CX, 11
     JNE     umeru:
 
@@ -83,8 +83,8 @@ owari:
     CMP     DI, 0           ; ファイル名が8文字より少なかったら、表示ずれを防ぐため埋める
     JNE     umerukakutyo:
     MOV     AL, 20h         ; ファイル名がくっつかないようスペースを入れる
-    MOV     AH, 0Ah
-    INT     10h
+    MOV     AH, 11h
+    INT     21h
 
     POP     CX              ; CXを戻す このCXはファイルエントリ番号
     INC     CX
@@ -92,8 +92,8 @@ owari:
     JNE     fileread:
     MOV     DS, ES             ; リターン
     MOV     SI, message1:
-    MOV     AH, 0Eh
-    INT     10h
+    MOV     AH, 10h
+    INT     21h
     FRET
 
 owari2:
@@ -104,8 +104,8 @@ owari2:
 umerukakutyo:
     DEC     DI              ; ファイル名の移動した量の分埋める
     MOV     AL, 20h
-    MOV     AH, 0Ah
-    INT     10h
+    MOV     AH, 11h
+    INT     21h
     CMP     DI, 0
     JNE     umerukakutyo:
     JMP     owari:
@@ -113,8 +113,8 @@ umerukakutyo:
 fileread.crlf:
     MOV     DS, ES
     MOV     SI, message1:
-    MOV     AH, 0Eh
-    INT     10h
+    MOV     AH, 10h
+    INT     21h
     XOR     AX, AX
     MOV     DS, AX
     JMP     fileread.crlf_ret:

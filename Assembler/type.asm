@@ -4,29 +4,29 @@
     #origin addr        0
     #enum   @CRLF       0A0Dh
 
-    MOV     AL, 1
+    MOV     AH, 1
     MOV     SI, 7AD0h
     INT     21h
-    OR      AL, AL
+    OR      AH, AH
     JNZ     notfound:
 
-    MOV     AL, 2
+    MOV     AH, 2
     INT     21h
 
     PUSH    DS
     XOR     BX, BX
     MOV     DS, BX
     MOV     SI, AX
-    MOV     AH, 0Eh
-    INT     10h
+    MOV     AH, 10h
+    INT     21h
     POP     DS
 
     FRET
 
 notfound:
     MOV     SI, message_notfound:
-    MOV     AH, 0Eh
-    INT     10h
+    MOV     AH, 10h
+    INT     21h
 
     FRET
 
