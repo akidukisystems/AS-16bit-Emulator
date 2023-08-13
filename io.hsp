@@ -29,6 +29,8 @@
 
 *l_CPUio_KeyBuffer
 
+    if ( ( vint_CPUio_KeybdSTAT && $0001 ) == 0 ) : return
+
     vint_CPUio_KeyBuffer_wparam = wparam
     vint_CPUio_KeyBuffer_lparam = lparam
     vint_CPUio_KeyBuffer_iparam = iparam
