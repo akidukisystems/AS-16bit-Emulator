@@ -6,7 +6,98 @@
     #packopt name "emulator"
     #packopt version "version.txt"
 
-    #include "as.header.as"
+    #define true 1
+    #define false 0
+    #define none -1
+
+    #enum KEY_ENTER     = 13
+    #enum KEY_ESC       = 27
+    #enum KEY_F1        = 112
+    #enum KEY_F2
+    #enum KEY_F3
+    #enum KEY_F4
+    #enum KEY_F5
+    #enum KEY_F6
+    #enum KEY_F7
+    #enum KEY_F8
+    #enum KEY_F9
+    #enum KEY_F10
+    #enum KEY_F11
+    #enum KEY_F12
+    #enum KEY_BS        = 8
+    #enum KEY_TAB
+    #enum KEY_SHIFT     = 16
+    #enum KEY_CTRL
+    #enum KEY_ALT
+    #enum KEY_PAUSE
+    #enum KEY_SPACE     = 32
+    #enum KEY_PGUP
+    #enum KEY_PGDN
+    #enum KEY_END
+    #enum KEY_HOME
+    #enum KEY_ALLOWL
+    #enum KEY_ALLOWU
+    #enum KEY_ALLOWR
+    #enum KEY_ALLOWD
+    #enum KEY_INSERT    = 45
+    #enum KEY_DEL
+
+    #define CLR_BLACK           0, 0, 0
+    #define CLR_BLUE            0, 0, 192
+    #define CLR_GREEN           0, 192, 0
+    #define CLR_CYAN            0, 192, 192
+    #define CLR_RED             192, 0, 0
+    #define CLR_MAGENTA         192, 0, 192
+    #define CLR_BROWN           192, 64, 64
+    #define CLR_LIGHT_GRAY      192, 192, 192
+    #define CLR_DARK_GRAY       64, 64, 64
+    #define CLR_LIGHT_BLUE      0, 0, 255
+    #define CLR_LIGHT_GREEN     0, 255, 0
+    #define CLR_LIGHT_CYAN      0, 255, 255
+    #define CLR_LIGHT_RED       255, 0, 0
+    #define CLR_LIGHT_MAGENTA   255, 0, 255
+    #define CLR_YELLOW          192, 192, 0
+    #define CLR_WHITE           255, 255, 255
+
+    #module
+
+        #deffunc initscr
+            clrobj 0, -1
+            pos 0, 0
+            color 0, 0, 0 : boxf
+            color 192, 192, 192
+        return
+
+        #deffunc softinitscr
+            pos 0, 0
+            color 0, 0, 0 : boxf
+            color 192, 192, 192
+        return
+
+        // notx
+        // 引数：   int notxIn=notxする値
+        // 戻り値： int =notxされた値
+        #defcfunc notx int notxIn
+        return  notxIn xor -1
+    
+        // 符号なし右方向ビットシフト
+        // 引数：   int p01=ビットシフトを行う値
+        // ＝＝：   int p02=シフトする回数
+        // 影響：なし
+        // 戻り値： int _p01=ビットシフトされた値
+        #defcfunc RBS int p01, int p02
+            if ( p02 > 0 ) {
+                _p01 = p01 >> p02
+                if ( p01 & 0x80000000) {
+                    _p01_2 = 0x80000000 >> ( p02 - 1 )
+                    _p01 ^= _p01_2
+                }
+            }
+            else : _p01 = p01
+        return _p01
+
+    #global
+
     #include "cfg.as"
     #include "hspda.as"
     #include "kernel32.as"
@@ -101,7 +192,7 @@
 
     logmes strf("%x",__hspver__)
 
-    vint_isEnableStacktrace = 0
+    vint_isEnableStacktrace = false
     vstr_configFileName = "emu_conf.ascfg"
 
     if ( dir_cmdline != "" ) {
@@ -114,7 +205,7 @@
 
             if ( ( vstr_temp_array.cnt == "--enablestacktrace" ) or ( vstr_temp_array.cnt == "-s" ) ) {
 
-                vint_isEnableStacktrace = 1
+                vint_isEnableStacktrace = true
 
             }
 
@@ -148,6 +239,7 @@
     button gosub "CLEAR LOG", *l_control_clearLog
     button gosub "TOGGLE TRACE", *l_control_tglTrace
     button gosub "CLEAR TRACE", *l_control_clearTrace
+    
 
 
 
@@ -171,7 +263,7 @@
 
 		noteget vstr_temp.1, cnt
 		exist vstr_temp.1
-		if ( strsize != -1 ) : {
+		if ( strsize != none ) : {
 			
 			addfont vstr_temp.1
 			putmes_msglib "Loaded font file: \""+ getpath( vstr_temp.1, 8 ) +"\"\n", SCREEN_DEBUGLOG_ID
@@ -214,33 +306,19 @@
     cfgAS_read "Graphic.Format", vint_VRAM_Format
     cfgAS_read "Graphic.Font", vstr_FontName
 
-    vint_isEnablePutTrace_JMP = 1
-    vint_isEnablePutTrace_HLT = 1
-    vint_isEnablePutTrace_INT = 1
-    vint_isEnablePutTrace_INT3 = 1
-    vint_isEnablePutTrace_INTO = 1
-    vint_isEnablePutTrace_CALL = 1
-    vint_isEnablePutTrace_RET = 1
-    vint_isEnablePutTrace_CALLF = 1
-    vint_isEnablePutTrace_FRET = 1
-    vint_isEnablePutTrace_IRET = 1
-    vint_isEnablePutTrace_UD2 = 1
-    vint_isEnablePutTrace_CCS = 1
-    vint_isEnablePutTraceError_UD2 = 1
-    vint_isEnablePutTrace_HardwareInterrupt = 1
+    vint_isEnablePutTrace_CALL   = true
+    vint_isEnablePutTrace_JUMP   = true
+    vint_isEnablePutTrace_RET    = true
+    vint_isEnablePutTrace_CHANGE = true
 
-    cfgAS_read "StackTrace.putTrace.JMP", vint_isEnablePutTrace_JMP
-    cfgAS_read "StackTrace.putTrace.HLT", vint_isEnablePutTrace_HLT
-    cfgAS_read "StackTrace.putTrace.INT", vint_isEnablePutTrace_INT
-    cfgAS_read "StackTrace.putTrace.INT3", vint_isEnablePutTrace_INT3
-    cfgAS_read "StackTrace.putTrace.INTO", vint_isEnablePutTrace_INTO
+    vint_isEnablePutTraceError_UD2 = true
+
+    vint_isEnablePutTrace_HardwareInterrupt = true
+
     cfgAS_read "StackTrace.putTrace.CALL", vint_isEnablePutTrace_CALL
+    cfgAS_read "StackTrace.putTrace.JUMP", vint_isEnablePutTrace_JUMP
     cfgAS_read "StackTrace.putTrace.RET", vint_isEnablePutTrace_RET
-    cfgAS_read "StackTrace.putTrace.CALLF", vint_isEnablePutTrace_CALLF
-    cfgAS_read "StackTrace.putTrace.FRET", vint_isEnablePutTrace_FRET
-    cfgAS_read "StackTrace.putTrace.IRET", vint_isEnablePutTrace_IRET
-    cfgAS_read "StackTrace.putTrace.UD2", vint_isEnablePutTrace_UD2
-    cfgAS_read "StackTrace.putTrace.CCS", vint_isEnablePutTrace_CCS
+    cfgAS_read "StackTrace.putTrace.CHANGE", vint_isEnablePutTrace_CHANGE
 
     cfgAS_read "StackTrace.putTrace.#UD2", vint_isEnablePutTraceError_UD2
 
@@ -277,15 +355,15 @@
     winsel SCREEN_DISPLAY_ID, SCRnone
     initscr
 
-    vint_CPU_Timer_isActive = 0
+    vint_CPU_Timer_isActive = false
     sdim emu_vbin_Memory, 1048576
     memcpy emu_vbin_Memory, vbin_BIOS, varsize(vbin_BIOS), vint_Ram_BIOS_MainCode.StartAddr
     sdim emu_vbin_IO, 0xFFFF
     emu_vbin_PIN = 0
-    emu_vbin_needReboot = 0
+    emu_vbin_needReboot = false
     sdim vstr_DisplayString, 4800
     initiation_stack
-    if ( vint_isEnableStacktrace ) : setTrace 1
+    if ( vint_isEnableStacktrace ) : setTrace true
 
     emu_vbin_Memory_Index = vint_Ram_BIOS_MainCode.StartAddr
 
@@ -413,11 +491,11 @@
 
     if ( check_isEnableTrace() ) {
 
-        setTrace 0
+        setTrace false
 
     } else {
 
-        setTrace 1
+        setTrace true
 
     }
 
