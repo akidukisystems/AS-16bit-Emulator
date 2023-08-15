@@ -19,6 +19,12 @@
 
     }
 
+    if ( ( vint_CPUio_PortNumber && 0xF0 ) == 0x90 ) : {
+
+        #addition "io/datetime.hsp"
+
+    }
+
     if ( ( vint_CPUio_PortNumber && 0xF0 ) == 0xF0 ) : {
 
         #addition "io/intcont.hsp"

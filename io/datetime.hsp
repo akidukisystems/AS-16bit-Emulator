@@ -1,0 +1,71 @@
+
+    switch vint_CPUio_PortNumber
+
+    case 0x90
+
+        if ( vint_CPUioTypeIsIN == false ) {
+
+            vint_CPUio_datetime_select = vint_CPUio_PortOutPut
+
+        }
+
+    swbreak
+
+    case 0x91
+
+        if ( vint_CPUioTypeIsIN == false ) {
+
+            if ( vint_CPUio_PortOutPut == 1 ) {
+
+                if ( vint_CPUio_datetime_select > 7 ) : swbreak
+                if ( vint_CPUio_datetime_select == 0 ) {
+
+                    vint_CPUio_datetime_result = gettime( 0 ) && 0x00ff
+
+                }
+                if ( vint_CPUio_datetime_select == 0x0a ) { // 世紀
+
+                    vint_CPUio_datetime_result = gettime( 0 ) && 0xff00
+                    vint_CPUio_datetime_result = RBS( vint_CPUio_datetime_result, 8 )
+
+                    // 世紀は xx00年 のとき以外は上2桁に1加算した値
+                    if ( vint_CPUio_datetime_result != 0 ) : vint_CPUio_datetime_result ++
+
+                }
+                if ( vint_CPUio_datetime_select == 7 ) {
+
+                    vint_CPUtmp = gettime( 7 ) / 10
+                    vint_CPUio_datetime_result.0 = vint_CPUtmp && 0x00ff
+                    vint_CPUio_datetime_result.1 = vbin_CPUtmp && 0xff00
+                    vint_CPUio_datetime_result.1 = RBS( vint_CPUio_datetime_result.1, 8 )
+
+                }
+                vint_CPUio_datetime_result = gettime( vint_CPUio_datetime_select )
+
+            }
+
+        }
+
+    swbreak
+
+    case 0x92
+
+        if ( vint_CPUioTypeIsIN == true ) {
+
+            vint_CPUio_Result = vint_CPUio_datetime_result
+
+        }
+
+    swbreak
+
+    case 0x83
+
+        if ( vint_CPUioTypeIsIN == true ) {
+
+            vint_CPUio_Result = vint_CPUio_datetime_result.1
+
+        }
+
+    swbreak
+
+    swend

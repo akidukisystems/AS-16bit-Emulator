@@ -35,6 +35,7 @@ entry:
     XOR     AX, AX
     MOV     SS, AX
     MOV     SP, 7C00h
+    MOV     BP, SP
     MOV     DS, AX
     MOV     ES, AX
 

@@ -64,28 +64,6 @@
 
     return
 
-    // notx
-    // 引数：   int notxIn=notxする値
-    // 戻り値： int =notxされた値
-    #defcfunc notx int notxIn
-    return  notxIn xor -1
-
-	// 符号なし右方向ビットシフト
-    // 引数：   int p01=ビットシフトを行う値
-    // ＝＝：   int p02=シフトする回数
-    // 影響：なし
-    // 戻り値： int _p01=ビットシフトされた値
-	#defcfunc RBS int p01, int p02
-		if ( p02 > 0 ) {
-			_p01 = p01 >> p02
-			if ( p01 & 0x80000000) {
-				_p01_2 = 0x80000000 >> ( p02 - 1 )
-				_p01 ^= _p01_2
-			}
-		}
-		else : _p01 = p01
-    return _p01
-
     #deffunc checkDataB var cdb_data    // データが8bit符号なし整数の範囲を超えているか
         if ( ( cdb_data > MAX8B ) or ( cdb_data < 0 ) ) : {
             cdb_data = MAX8B && cdb_data

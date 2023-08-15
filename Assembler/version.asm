@@ -5,8 +5,8 @@
     #enum   @CRLF       0A0Dh
 
     MOV     SI, string:
-    MOV     AH, 0Eh
-    INT     10h
+    MOV     AH, 10h
+    INT     21h
 
     FRET
 

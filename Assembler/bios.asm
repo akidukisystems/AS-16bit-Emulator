@@ -26,6 +26,7 @@
     MOV     AX, C800h
     MOV     SS, AX
     MOV     SP, 2000h
+    MOV     BP, SP
     XOR     SI, SI
 
     XOR     DS, DS                      ; 割り込みベクタテーブルの設定
@@ -954,6 +955,126 @@ int_key_ChangeGetKey.out_set:
     OUT     8Eh, AX
     IRET
 
+<<<<<<< HEAD
+=======
+
+int_datetime:
+    CMP     AH, 02h
+    JE      int_datetime_readTime:
+    CMP     AH, 04h
+    JE      int_datetime_readDate:
+    IRET
+
+int_datetime_readTime:
+    MOV     AX, 04h                 ; 時
+    OUT     90h, AX
+    MOV     AX, 01h
+    OUT     91h, AX
+    IN      AX, 92h
+    PUSH    AX
+
+    MOV     AX, 05h                 ; 分
+    OUT     90h, AX
+    MOV     AX, 01h
+    OUT     91h, AX
+    IN      AX, 92h
+    PUSH    AX
+
+    MOV     AX, 06h                 ; 秒
+    OUT     90h, AX
+    MOV     AX, 01h
+    OUT     91h, AX
+    IN      AX, 92h
+    PUSH    AX
+
+    MOV     AX, 07h                 ; 1/100秒
+    OUT     90h, AX
+    MOV     AX, 01h
+    OUT     91h, AX
+    IN      AX, 92h                 ; 下位BYTE
+    PUSH    AX
+    IN      AX, 93h                 ; 上位BYTE
+    
+    MOV     BH, AL                  ; 1/100秒
+    POP     AX
+    MOV     BL, AL
+
+    POP     AX                      ; 秒
+    MOV     DH, AL
+
+    POP     AX                      ; 分
+    MOV     CL, AL
+
+    POP     AX                      ; 時
+    MOV     CH, AL
+
+    MOV     AL, @clearFlag
+    MOV     DX, @CF
+    CALL    editFlag:
+
+    IRET
+
+int_datetime_readDate:
+    MOV     AX, 0Ah                 ; 世紀
+    OUT     90h, AX
+    MOV     AX, 01h
+    OUT     91h, AX
+    IN      AX, 92h
+
+    PUSH    AX
+
+    MOV     AX, 00h                 ; 年
+    OUT     90h, AX
+    MOV     AX, 01h
+    OUT     91h, AX
+    IN      AX, 92h
+
+    MOV     BX, AX
+
+    POP     AX                      ; AX = 世紀, BX = 年
+
+    CMP     BX, 00h                 ; 年=00hのとき以外に、世紀から1を引くことで、西暦年上2桁を求められる
+    JNE     int_datetime_readDate.dc:
+
+int_datetime_readDate.dc.ret:
+    
+    PUSH    AX
+    PUSH    BX
+
+    MOV     AX, 01h                 ; 月
+    OUT     90h, AX
+    MOV     AX, 01h
+    OUT     91h, AX
+    IN      AX, 92h
+    PUSH    AX
+
+    MOV     AX, 03h                 ; 日
+    OUT     90h, AX
+    MOV     AX, 01h
+    OUT     91h, AX
+    IN      AX, 92h
+    
+    MOV     DL, AL
+    POP     AX
+    MOV     DH, AL
+
+    POP     AX
+    MOV     CL, AL
+
+    POP     AX
+    MOV     CH, AL
+
+    MOV     AL, @clearFlag
+    MOV     DX, @CF
+    CALL    editFlag:
+
+    IRET
+    
+
+int_datetime_readDate.dc:
+    DEC     AX
+    JMP     int_datetime_readDate.dc.ret:
+>>>>>>> aab582a177035fb7eaaaaafdd5a2d88d069d9239
 
 
 int_none:
