@@ -3,7 +3,6 @@
     echo Target^> "%1"
     if "%1" == "os" (
         call :os
-        call :app
         call :makeimg
         call :copy
     )
@@ -69,6 +68,7 @@
     asm.exe exit.asm
     asm.exe version.asm
     asm.exe type.asm
+    asm.exe fileinfo.asm
     cd ..\
     exit /b
 
@@ -95,6 +95,7 @@
     del /s Assembler\*.ax
     del /s error.txt
     del /s dump_*.bin
+    del /s stacktrace.txt
     exit /b
 
 :cleanbin

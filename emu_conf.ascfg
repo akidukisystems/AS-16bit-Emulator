@@ -22,15 +22,9 @@ BIOS.binaryPath=".\bios.bin"
 Disk.FloppyImage.FileNameFormat="fdisk%02d.img"
 
 #StackTrace
-StackTrace.putTrace.JMP=0
-StackTrace.putTrace.HLT=1
-StackTrace.putTrace.INT=1
-StackTrace.putTrace.INT3=1
-StackTrace.putTrace.INTO=1
 StackTrace.putTrace.CALL=1
+StackTrace.putTrace.JUMP=0
 StackTrace.putTrace.RET=1
-StackTrace.putTrace.CALLF=1
-StackTrace.putTrace.FRET=1
-StackTrace.putTrace.IRET=1
-StackTrace.putTrace.UD2=1
-StackTrace.putTrace.CCS=1
+StackTrace.putTrace.CHANGE=1
+StackTrace.putTrace.#UD2=1
+StackTrace.putTrace.HardwareInterrupt=1

@@ -2,7 +2,7 @@
     #include "resistor.as"
 
     vint_CPUcurrentStep = 0
-    emu_vint_executedCmd = 0
+    emu_vint_executedCmd = false
     
 
     // パラメータなし
@@ -37,14 +37,14 @@
     writeResistorWe rIP, emu_vbin_Memory_Index
 
     // キーが押されたらとりあえず保存する
-    vint_CPUio_KeybdSTAT = 1
+    vint_CPUio_KeybdSTAT = 0
     onkey gosub *l_CPUio_KeyBuffer
 
     oncmd gosub *l_CPU_onTimer, WM_TIMER
     SetTimer hwnd, 1, 5, 0
     vint_CPU_Timer_isActive = 1
     vint_InterruptNumber = 0
-    vint_Interrupt = 0
+    vint_Interrupt = false
     vint_fetchCmdOffset = 0
     
     
@@ -274,7 +274,7 @@
 
     if ( emu_vbin_PIN == 1 ) : {
 
-        emu_vbin_needReboot = 1
+        emu_vbin_needReboot = true
 
     }
 
@@ -282,7 +282,7 @@
 
 *l_CPU_Send_INT1C
 
-    vint_Interrupt = 1
+    vint_Interrupt = true
     vint_InterruptNumber = 0x1C
 
     return

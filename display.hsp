@@ -1,6 +1,6 @@
 
     winsel SCREEN_DISPLAY_ID, SCRnone
-    redraw 0
+    redraw false
 
     if ( vint_VRAM_Format == 1 ) {
 
@@ -54,5 +54,5 @@
         
     }
 
-    redraw 1
+    redraw true
     winsel SCREEN_DEBUGLOG_ID, SCRnone

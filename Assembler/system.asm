@@ -65,9 +65,15 @@
     INT     10h                         ; ビデオ割り込み
 
 keyloop:
+    MOV     AH, 6                       ; キー入力をON
+    MOV     AL, 1
+    MOV     BH, 1
+    INT     16h
+
+keyloop_fetch:
     MOV     AH, 1                       ; キーが押されたか確認
     INT     16h
-    JZ      keyloop:                    ; 0（押されていない）ならループに戻る
+    JZ      keyloop_fetch:              ; 0（押されていない）ならループに戻る
 
     XOR     AX, AX
     INT     16h                         ; 押されたならキーコード取得
@@ -92,9 +98,14 @@ keyloop:
     MOV     AH, 0Ah
     INT     10h
 
-    JMP     keyloop:
+    JMP     keyloop_fetch:
 
 backspace:
+    MOV     AH, 6                       ; キー入力をOFF
+    MOV     AL, 1
+    MOV     BH, 0
+    INT     16h
+
     MOV     DS, 07B0h                   ; 7B00hにある文字数を読み込む
     MOV     BH, BYTE[0000h]
     CMP     BH, 0                       ; 文字数が0の場合は終了
@@ -122,6 +133,11 @@ backspace_not:
 
 
 splitcommand:
+    MOV     AH, 6                       ; キー入力をOFF
+    MOV     AL, 1
+    MOV     BH, 0
+    INT     16h
+
     MOV     SI, 7B02h
     MOV     DI, 7AE0h
     XOR     CX, CX
@@ -318,6 +334,7 @@ readfile:
     RET
 
 readfile.notfound:
+    POP     BX
     STC
     RET
 

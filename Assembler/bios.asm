@@ -3,6 +3,18 @@
     #config filename    "bios.bin"
     #origin addr        0000h
     #enum   @CRLF       0A0Dh
+
+    #enum   @setFlag    00h
+    #enum   @clearFlag  01h
+    #enum   @CF 0001h
+    #enum   @PF 0002h
+    #enum   @AF 0008h
+    #enum   @ZF 0020h
+    #enum   @SF 0040h
+    #enum   @TF 0080h
+    #enum   @IF 0100h
+    #enum   @DF 0200h
+    #enum   @OF 0400h
     
     #enum   @addr_ramSegment                CA00h   ; 変数領域のセグメント
     #enum   @addr_int_video_VRAMlastWrite   0000h   ; WORD 最後にVRAMに書いたアドレス
@@ -41,6 +53,11 @@
     MOV     AH, 0Eh                     ; テレタイプモード
     INT     10h                         ; ビデオ割り込み
 
+    MOV     AH, 6                       ; キー入力をON
+    MOV     AL, 1
+    MOV     BH, 1
+    INT     16h
+
     MOV     CX, 100                     ; 100*10ms待つ
 
 waitBiosMenu_wait:
@@ -63,6 +80,13 @@ waitBiosMenu_wait:
     JMP     BiosMenu_Entry:
 
 waitBiosMenu_timeout:
+    MOV     AH, 6                       ; キー入力をOFF
+    MOV     AL, 1
+    MOV     BH, 0
+    INT     16h
+
+    XOR     AX, AX
+
     MOV     AH, 0                       ; ディスク初期化
     INT     13h
 
@@ -90,6 +114,7 @@ waitBiosMenu_timeout:
 
     XOR     AX, AX                      ; 0000:7C00 にジャンプ
     MOV     ES, AX    
+
     JF      7C00h
 
     MOV     DS, F000h                   ; 文字列のあるセグメント
@@ -143,6 +168,11 @@ BiosMenu_Entry:
     MOV     SI, message_BiosMenu:       ; 文字列のあるオフセット
     MOV     AH, 0Eh                     ; テレタイプモード
     INT     10h                         ; ビデオ割り込み
+
+    MOV     AH, 6                       ; キー入力をON
+    MOV     AL, 1
+    MOV     BH, 1
+    INT     16h
 
 BiosMenu_Keywait:
 
@@ -348,15 +378,15 @@ int_disk_init:
     CMP     AH, 0
     JNZ     int_disk_init_err:          ; エラーあったらおわり
 
-    MOV     AL, 1                       ; CFクリア
-    MOV     DX, 0001h
+    MOV     AL, @clearFlag              ; CFクリア
+    MOV     DX, @CF
     CALL    editFlag:
 
     IRET
 
 int_disk_init_err:
-    MOV     AL, 0                       ; CFセット
-    MOV     DX, 0001h
+    MOV     AL, @setFlag                ; CFセット
+    MOV     DX, @CF
     CALL    editFlag:
 
     IRET
@@ -406,21 +436,21 @@ int_disk_read_loop:
 
 int_disk_read_diskerr:
     POP     BX
-    MOV     AL, 0                       ; CFセット
-    MOV     DX, 0001h
+    MOV     AL, @setFlag                ; CFセット
+    MOV     DX, @CF
     CALL    editFlag:
     IRET
 
 int_disk_read_readerr:
     POP     DX
-    MOV     AL, 0                       ; CFセット
-    MOV     DX, 0001h
+    MOV     AL, @setFlag                ; CFセット
+    MOV     DX, @CF
     CALL    editFlag:
     IRET
 
 int_disk_read_fin:
-    MOV     AL, 1                       ; CFクリア
-    MOV     DX, 0001h
+    MOV     AL, @clearFlag              ; CFクリア
+    MOV     DX, @CF
     CALL    editFlag:
     IRET
 
@@ -469,23 +499,23 @@ int_disk_write_loop:
 
 int_disk_write_diskerr:
     POP     BX
-    MOV     AL, 0                       ; CFセット
-    MOV     DX, 0001h
+    MOV     AL, @setFlag                ; CFセット
+    MOV     DX, @CF
     CALL    editFlag:
     IRET
 
 int_disk_write_writeerr:
     POP     DX
-    MOV     AL, 0                       ; CFセット
-    MOV     DX, 0001h
+    MOV     AL, @setFlag                ; CFセット
+    MOV     DX, @CF
     CALL    editFlag:
     IRET
 
 int_disk_write_fin:
     MOV     DX, 8
     OUT     28h, DX
-    MOV     AL, 1                       ; CFクリア
-    MOV     DX, 0001h
+    MOV     AL, @clearFlag              ; CFクリア
+    MOV     DX, @CF
     CALL    editFlag:
     IRET
 
@@ -500,6 +530,8 @@ int_key:
     ;JE      int_key_ReadShiftFlag:
     ;CMP     AH, 05h
     ;JE      int_key_WriteData:
+    CMP     AH, 06h
+    JE      int_key_ChangeGetKey:
 
     IRET
 
@@ -689,8 +721,8 @@ int_key_ReadStatus_Raw:
     IRET
 
 int_key_ReadStatus_NoData:
-    MOV     AL, 0
-    MOV     DX, 0020h
+    MOV     AL, @setFlag
+    MOV     DX, @ZF
     CALL    editFlag:
     IRET
 
@@ -879,6 +911,47 @@ int_key_ReadInput_DownScale_Back:
 
 int_key_ReadInput_Raw:
     MOV     AH, AL
+    IRET
+
+int_key_ChangeGetKey:
+    CMP     AL, 0
+    JE      int_key_ChangeGetKey.in:
+    CMP     AL, 1
+    JE      int_key_ChangeGetKey.out:
+    IRET
+
+int_key_ChangeGetKey.in:
+    IN      AX, 8Eh
+    TEST    AX, 1
+    JNZ     int_key_ChangeGetKey.in_Enable:
+    MOV     AL, @clearFlag
+    MOV     DX, @CF
+    CALL    editFlag:
+    IRET
+
+int_key_ChangeGetKey.in_Enable:
+    MOV     AL, @setFlag
+    MOV     DX, @CF
+    CALL    editFlag:
+    IRET
+
+int_key_ChangeGetKey.out:
+    CMP     BH, 0
+    JE      int_key_ChangeGetKey.out_clear:
+    CMP     BH, 1
+    JE      int_key_ChangeGetKey.out_set:
+    IRET
+
+int_key_ChangeGetKey.out_clear:
+    IN      AX, 8Eh
+    AND     AX, FFFEh
+    OUT     8Eh, AX
+    IRET
+
+int_key_ChangeGetKey.out_set:
+    IN      AX, 8Eh
+    OR      AX, 1
+    OUT     8Eh, AX
     IRET
 
 

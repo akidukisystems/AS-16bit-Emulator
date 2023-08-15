@@ -4,8 +4,8 @@
     #origin addr 7C00h
     #enum   @CRLF       0A0Dh
 
-    CCS
     JMP     entry:
+    NOP
 
     &DB     "AS16EMLT"
 BPB_SectorSize:
@@ -78,9 +78,6 @@ message_err:
     &DB     "Could not read floppy disk."
     &DW     @CRLF
     &DB     0
-
-diskerr:
-    &DB     
-
+    
     &RESBSF 510
     &DW     AA55h
