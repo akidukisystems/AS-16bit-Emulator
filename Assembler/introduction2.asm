@@ -24,15 +24,15 @@ Repeat:
 
 Error:
     MOV     SI, message1:               ; エラーメッセージを出力します。
-    MOV     AH, 0Eh
-    INT     10h
+    MOV     AH, 10h
+    INT     21h
 
     FRET                                ; プログラムを終了します。
 
 Done:
     MOV     SI, message2:               ; 完了メッセージを出力します。
-    MOV     AH, 0Eh
-    INT     10h
+    MOV     AH, 10h
+    INT     21h
 
     FRET                                ; プログラムを終了します。
 
