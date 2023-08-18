@@ -3,6 +3,7 @@
 
     vint_CPUcurrentStep = 0
     emu_vint_executedCmd = false
+    vint_CPUio_Display_isRefreshDisplay = true
     
 
     // パラメータなし
