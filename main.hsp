@@ -10,6 +10,8 @@
     #define false 0
     #define none -1
 
+   ; #define DEF_FORCESTACKTRACE
+
     #enum KEY_ENTER     = 13
     #enum KEY_ESC       = 27
     #enum KEY_F1        = 112
@@ -74,8 +76,6 @@
             color 192, 192, 192
         return
 
-<<<<<<< HEAD
-=======
         // notx
         // 引数：   int notxIn=notxする値
         // 戻り値： int =notxされた値
@@ -98,7 +98,6 @@
             else : _p01 = p01
         return _p01
 
->>>>>>> aab582a177035fb7eaaaaafdd5a2d88d069d9239
     #global
 
     #include "cfg.as"
@@ -215,6 +214,12 @@
         loop
 
     }
+
+    #ifdef  DEF_FORCESTACKTRACE
+
+        vint_isEnableStacktrace = true
+
+    #endif
 
 
     init_msglib SCREEN_DEBUGLOG_ID, 0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y
