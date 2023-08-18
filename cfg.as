@@ -26,6 +26,7 @@
     arrayNum = 0
     index = 0
     flag_spell = 0
+
     sdim out, strlen ( inV ) +1, length ( out )
 
     repeat strlen ( inV )

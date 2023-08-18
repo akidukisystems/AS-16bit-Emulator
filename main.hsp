@@ -286,7 +286,7 @@
     putmes_msglib "Applied fonts\n", SCREEN_DEBUGLOG_ID
 
     cfgAS_init vstr_configFileName
-    
+
     vstr_ProcessorName = "(none)"
     vstr_ProcessorArchName = "(none)"
     vstr_ProcessorVendor = "(none)"
