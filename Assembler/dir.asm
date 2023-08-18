@@ -1,5 +1,5 @@
 
-    #config codesize    2048
+    #config codesize    auto
     #config filename    "dir.com"
     #origin addr        0
     #enum   @CRLF       0A0Dh

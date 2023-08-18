@@ -1,5 +1,5 @@
     
-    #config codesize    8192
+    #config codesize    auto
     #config filename    "bios.bin"
     #origin addr        0000h
     #enum   @CRLF       0A0Dh

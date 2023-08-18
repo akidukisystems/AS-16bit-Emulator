@@ -29,7 +29,7 @@ BPB_FATpos:
 BPB_FATsize:
     &DW     1
     &DB     "AFAT16  "
-    &RESBSF 40h
+    &RESBSF 30h
 
 entry:
     XOR     AX, AX

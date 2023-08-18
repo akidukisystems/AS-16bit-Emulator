@@ -1,6 +1,6 @@
     ; AS-16 アセンブリ言語 入門 基本・条件分岐・メモリ操作編
 
-    #config codesize    512
+    #config codesize    auto
     #config filename    "memtest.com"
     #origin addr        0
     #enum   @CRLF       0A0Dh

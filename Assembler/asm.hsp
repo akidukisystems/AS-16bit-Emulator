@@ -126,7 +126,7 @@
 
     putmes_msglib "Assembler: Cleaning Code...\n"
 
-    // code cleaning.
+    // code cleaning
     repeat notemax
 
         noteget vstr_loadline, cnt
@@ -245,6 +245,8 @@
     vint_originaddr = 0
     vint_originaddr_tmp = 0
 
+    vint_isAutoSize = 0
+
     vstr_filename = ""
 
     notesel vstr_fixedData
@@ -265,8 +267,17 @@
             
                 if ( vstr_code.2 == "codesize" ) {
 
-                    sdim vbin_assembledData, intdh( vstr_code.3 )
-                    putmes_msglib "Assembler: Codesize:"+ intdh( vstr_code.3 ) +" Bytes\n"      
+                    if ( vstr_code.3 == "auto" ) {
+
+                        sdim vbin_assembledData, 65535
+                        vint_isAutoSize = 1
+
+                    } else {
+
+                        sdim vbin_assembledData, intdh( vstr_code.3 )
+                        putmes_msglib "Assembler: Codesize:"+ intdh( vstr_code.3 ) +" Bytes\n"
+
+                    }
 
                 }
 
@@ -1500,7 +1511,7 @@
     // finish
     putmes_msglib "Assemble has competed. Saved binary file at \""+ vstr_filename +"\".\n"
 
-    bsave vstr_filename, vbin_assembledData
+    bsave vstr_filename, vbin_assembledData, vint_currentaddress
 
     if ( vint_cmdmode ) {
 

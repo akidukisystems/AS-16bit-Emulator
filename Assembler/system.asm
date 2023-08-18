@@ -1,5 +1,5 @@
 
-    #config codesize 4096
+    #config codesize auto
     #config filename "system.sys"
     #origin addr 8800h
     #enum   @CRLF       0A0Dh

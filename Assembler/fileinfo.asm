@@ -1,5 +1,5 @@
 
-    #config codesize    1024
+    #config codesize    auto
     #config filename    "fileinfo.com"
     #origin addr        0
     #enum   @CRLF       0A0Dh

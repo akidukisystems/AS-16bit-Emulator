@@ -1,5 +1,5 @@
 
-    #config codesize    512
+    #config codesize    auto
     #config filename    "type.com"
     #origin addr        0
     #enum   @CRLF       0A0Dh
