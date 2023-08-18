@@ -4,6 +4,12 @@
     #origin addr 8800h
     #enum   @CRLF       0A0Dh
 
+    #enum   @addr_beforeCall_SP             7AF0h
+    #enum   @addr_beforeCall_SS             7AF2h
+    #enum   @addr_beforeCall_BP             7AF4h
+    #enum   @addr_keyboardDriver            7AF6h
+    #enum   @addr_keyboardInterruptHandler  7AF8h
+
     CLI
 
     XOR     AX, AX
@@ -14,16 +20,18 @@
     MOV     ES, AX
 
     MOV     WORD[84h], systemInternalInterrupt_21h:
-    MOV     WORD[86h], 0                ; 21h ソフトウェア割り込みサービス
+    MOV     WORD[86h], 0                            ; 21h ソフトウェア割り込みサービス
+    MOV     WORD[104h], keyboardInterrupt:
+    MOV     WORD[106h], 0                           ; キーボード割込み
+    MOV     WORD[@addr_keyboardInterruptHandler], 0 ; 割込み無効
 
     STI
 
-    MOV     WORD[8200h], AX
     MOV     AX, return_only:
     MOV     BX, 10h
     XOR     DX, DX
     DIV     BX
-    MOV     WORD[7AF6h], AX
+    MOV     WORD[@addr_keyboardDriver], AX
 
     MOV     AH, 20h                     ; 初期化
     INT     10h                         ; ビデオ割り込み
@@ -46,7 +54,7 @@
     CALL    readfile:
 
     MOV     AX, ES
-    MOV     WORD[7AF6h], AX
+    MOV     WORD[@addr_keyboardDriver], AX
 
     MOV     SI, version.com:            ; SI...検索対象のファイル名
     MOV     BX, 0110h                   ; ES:BX...読み込み先アドレス
@@ -213,7 +221,7 @@ doCommand_kakutyoushi:
 doCommand_kakutyoushi.loop:
     MOV     AX, [DI]                    ; 文字列読み込み
     MOV     BX, [SI]
-    CALLF   WORD[7AF6h]                 ; 小文字にする
+    CALLF   WORD[@addr_keyboardDriver]                 ; 小文字にする
     CMP     AL, BL                      ; 比較して違うなら、他の拡張子か調べる
     JNE     doCommand_kakutyoushi.next:
     INC     CX                          ; 次の文字へ
@@ -263,9 +271,9 @@ callfile:
     MOV     DI, BX
 
     MOV     DS, BX                      ; スタック状態を記録
-    MOV     WORD[7AF0h], SP
-    MOV     WORD[7AF2h], SS
-    MOV     WORD[7AF4h], BP
+    MOV     WORD[@addr_beforeCall_SP], SP
+    MOV     WORD[@addr_beforeCall_SS], SS
+    MOV     WORD[@addr_beforeCall_BP], BP
     MOV     SP, BX
     MOV     BP, BX
 
@@ -277,9 +285,9 @@ callfile:
 
     XOR     BX, BX                      ; スタック状態を復帰
     MOV     DS, BX
-    MOV     SP, WORD[7AF0h]
-    MOV     SS, WORD[7AF2h]
-    MOV     BP, WORD[7AF4h]
+    MOV     SP, WORD[@addr_beforeCall_SP]
+    MOV     SS, WORD[@addr_beforeCall_SS]
+    MOV     BP, WORD[@addr_beforeCall_BP]
 
     POP     ES                          ; POP
     POP     DS
@@ -440,7 +448,7 @@ searchFile_filenameCMP:
     CMP     BL, E5h                     ; 削除済エントリ
     JE      searchFile_not:
 
-    CALLF   WORD[7AF6h]                 ; 文字を小文字化
+    CALLF   WORD[@addr_keyboardDriver]                 ; 文字を小文字化
 
     CMP     AL, BL                      ; 文字が一緒ならループ続行
     JE      searchFile_filenameCorrect:
@@ -494,7 +502,7 @@ searchFile_filenameStrKakutyo.loop:
     CMP     BL, 20h
     JE      searchFile_filenameStrKakutyo.end:
 
-    CALLF   WORD[7AF6h]                 ; 文字を小文字化
+    CALLF   WORD[@addr_keyboardDriver]                 ; 文字を小文字化
 
     CMP     AL, BL                      ; 文字が一緒ならループ続行
     JE      searchFile_filenameStrKakutyoCorrect:
@@ -700,6 +708,11 @@ clearscreen:
 
 
 
+keyboardInterrupt:
+    IRET
+
+
+
 notfound_start.dat:
     MOV     SI, start.dat:
     MOV     AH, 0Eh
@@ -722,6 +735,7 @@ halt:
     JMP     halt:
 
     &RESB0
+
 return_only:
     FRET
 
