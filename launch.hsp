@@ -4,7 +4,7 @@
     #packopt name "launcher"
     #packopt version "launcherver.txt"
 
-    #include "as.header.as"
+    ;#include "as.header.as"
     #include "cfg.as"
 
     mes "エ ミ ュ レ ー タ   ラ ン チ ャ ー"
