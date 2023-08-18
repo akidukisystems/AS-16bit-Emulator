@@ -7,6 +7,12 @@
 
     }
 
+    if ( ( vint_CPUio_PortNumber && 0xF0 ) == 0x30 ) : {
+
+        #addition "io/video.hsp"
+
+    }
+
     if ( ( vint_CPUio_PortNumber && 0xF0 ) == 0x60 ) : {
 
         #addition "io/sound.hsp"
@@ -42,5 +48,8 @@
     vint_CPUio_KeyBuffer_iparam = iparam
 
     vint_CPUio_KeyBuffer_LT = 1
+
+    vint_Interrupt = true
+    vint_InterruptNumber = vint_CPUio_keyInterrupt
 
     return

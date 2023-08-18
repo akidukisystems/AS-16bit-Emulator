@@ -1,5 +1,5 @@
     
-    #config codesize    4096
+    #config codesize    8192
     #config filename    "bios.bin"
     #origin addr        0000h
     #enum   @CRLF       0A0Dh
@@ -42,10 +42,17 @@
     MOV     WORD[4Eh], F000h
     MOV     WORD[58h], int_key:         ; キーボード割り込み (16h)
     MOV     WORD[5Ah], F000h
+    MOV     WORD[68h], int_datetime:    ; 日付時刻割り込み（1Ah）
+    MOV     WORD[6Ah], F000h
     MOV     WORD[70h], int_none:        ; ユーザタイマ割り込み (1Ch)
     MOV     WORD[72h], F000h
-    MOV     WORD[1C0h], int_none:        ; RTC割り込み (70h)
+    MOV     WORD[104h], int_none:
+    MOV     WORD[106h], F000h
+    MOV     WORD[1C0h], int_none:       ; RTC割り込み (70h)
     MOV     WORD[1C2h], F000h
+
+    MOV     AX, 41h
+    OUT     85h, AX
 
     STI
 
@@ -53,6 +60,14 @@
     MOV     SI, message1:               ; 文字列のあるオフセット
     MOV     AH, 0Eh                     ; テレタイプモード
     INT     10h                         ; ビデオ割り込み
+
+    MOV     AH, 02h
+    INT     1Ah
+    DBG
+
+    MOV     AH, 04h
+    INT     1Ah
+    DBG
 
     MOV     AH, 6                       ; キー入力をON
     MOV     AL, 1
@@ -159,6 +174,139 @@ editFlag_del:
     POP     AX
     RET
 
+    ; AH...変換種類
+    ; BL...変換する値（raw）
+    ; BX...変換する値（asciiまたはbcd）
+    ; DL...変換された値（raw）
+    ; DX...変換された値（asciiまたはbcd）
+converts:
+    CMP     AH, 00h
+    JE      converts_hex2bcd:
+    CMP     AH, 01h
+    JE      converts_bcd2hex:
+    CMP     AH, 02h
+    JE      converts_bcd2ascii:
+    CMP     AH, 03h
+    JE      converts_ascii2bcd:
+
+    RET
+
+converts_hex2bcd:
+    XOR     CX, CX
+    MOV     CL, 0
+
+converts_hex2bcd.loop:
+    MOV     BH, 0Ah                     ; 10で割ると、余りがBCDの1桁に相当する
+    MOV     AX, BL
+    DIV     BH
+    MOV     CH, AH                      ; 余りをCHに移し、リピート時にpushする
+
+    PUSH    CX
+
+    CMP     AL, 0                       ; 商が0になったらおしまい
+    JE      converts_hex2bcd.done:
+
+    INC     CL                          ; CLは桁数 CHから戻すときに使う
+    MOV     BL, AL
+
+    JMP     converts_hex2bcd.loop:
+
+converts_hex2bcd.done:
+    XOR     DX, DX
+
+converts_hex2bcd.done.loop:
+    POP     CX
+    XOR     AX, AX
+    
+    PUSH    DX                          ; 何桁目か計算し、CLにかける
+    MOV     AH, CL
+    MOV     AL, 10h
+    CALL    pow:
+    MOV     BX, DX
+
+    XOR     DX, DX
+    XOR     AX, AX
+    MOV     AL, CH
+    MUL     BX
+    POP     DX
+    ADD     DX, AX                      ; かけたもの同士で加算していくと、BCDコードになる
+
+    CMP     CL, 0
+    JNE     converts_hex2bcd.done.loop:
+
+    RET
+
+    ; AH...乗数
+    ; AL...基数
+pow:
+    CMP     AH, 0
+    JE      pow_1:
+
+    PUSH    BX
+    PUSH    CX
+    XOR     BX, BX
+    MOV     BL, AH
+    MOV     AH, 0
+    MOV     DX, AX
+    MOV     CX, 1
+
+pow.loop:
+    CMP     CX, BX
+    JE      pow_fin:
+    MUL     DX
+    INC     CX
+    JMP     pow.loop:
+
+pow_1:
+    MOV     DX, 1
+    RET
+
+pow_fin:
+    POP     CX
+    POP     BX
+    MOV     DX, AX
+    RET
+
+
+
+
+
+converts_bcd2hex:
+converts_bcd2ascii:
+
+    MOV     AX, BX
+    AND     AL, 0Fh
+    ADD     AL, 30h
+    MOV     AH, 0
+    PUSH    AX
+
+    MOV     AX, BX
+    AND     AL, F0h
+    SHR     AL, 4
+    ADD     AL, 30h
+    MOV     AH, 0
+    PUSH    AX
+
+    MOV     AX, BX
+    AND     AH, 0Fh
+    ADD     AH, 30h
+
+    XOR     CX, CX
+    MOV     CL, AH
+
+    POP     AX
+    MOV     DH, AL
+
+    POP     AX
+    MOV     DL, AL
+
+    RET
+
+
+converts_ascii2bcd:
+
+    RET
+
 ;   _/_/_/_/  BIOS Menu  _/_/_/_/
 
 BiosMenu_Entry:
@@ -177,8 +325,151 @@ BiosMenu_Entry:
 
 BiosMenu_Keywait:
 
+    MOV     AX, 100                     ; 100ms待つ
+    OUT     F0h, AX
+
+    MOV     AX, 0                       ; 画面リフレッシュ無効
+    OUT     30h, AX
+
+    MOV     AH, 04h                     ; 時刻取得
+    INT     1Ah
+
+    PUSH    DX
+    PUSH    CX
+
+    XOR     BX, BX                      ; BCD値で年月日が渡されるので、ASCIIに変換
+    MOV     BL, CH                      ; CH（年上2桁）をASCIIに
+    MOV     AH, 02h
+    CALL    converts:
+
+    MOV     AL, DH                      ; 1桁目を出力
+    MOV     AH, 0Ah
+    INT     10h
+    MOV     AL, DL                      ; 2桁目を出力
+    MOV     AH, 0Ah
+    INT     10h
+
+    POP     CX
+
+    XOR     BX, BX                      ; CL(年下2桁)
+    MOV     BL, CL
+    MOV     AH, 02h
+    CALL    converts:
+
+    MOV     AL, DH                      ; 1桁目を出力
+    MOV     AH, 0Ah
+    INT     10h
+    MOV     AL, DL                      ; 2桁目を出力
+    MOV     AH, 0Ah
+    INT     10h
+
+    MOV     AL, 2Fh                     ; スラッシュを表示"/"
+    MOV     AH, 0Ah
+    INT     10h
+
+    POP     DX
+    PUSH    DX
+
+    XOR     BX, BX                      ; DH（月）
+    MOV     BL, DH
+    MOV     AH, 02h
+    CALL    converts:
+
+    MOV     AL, DH                      ; 1桁目を出力
+    MOV     AH, 0Ah
+    INT     10h
+    MOV     AL, DL                      ; 2桁目を出力
+    MOV     AH, 0Ah
+    INT     10h
+
+    MOV     AL, 2Fh                     ; "/"
+    MOV     AH, 0Ah
+    INT     10h
+
+    POP     DX
+
+    XOR     BX, BX                      ; DL（日）
+    MOV     BL, DL
+    MOV     AH, 02h
+    CALL    converts:
+
+    MOV     AL, DH                      ; 1桁目を出力
+    MOV     AH, 0Ah
+    INT     10h
+    MOV     AL, DL                      ; 2桁目を出力
+    MOV     AH, 0Ah
+    INT     10h
+
+    MOV     AL, 20h                     ; " "
+    MOV     AH, 0Ah
+    INT     10h
+
+    MOV     AH, 02h                     ; 時刻を取得
+    INT     1Ah
+
+    PUSH    DX
+    PUSH    CX
+
+    XOR     BX, BX                      ; CH（時）
+    MOV     BL, CH
+    MOV     AH, 02h
+    CALL    converts:
+
+    MOV     AL, DH                      ; 1桁目を出力
+    MOV     AH, 0Ah
+    INT     10h
+    MOV     AL, DL                      ; 2桁目を出力
+    MOV     AH, 0Ah
+    INT     10h
+
+    MOV     AL, 3Ah                     ; ":"
+    MOV     AH, 0Ah
+    INT     10h
+
+    POP     CX
+
+    XOR     BX, BX                      ; CL（分）
+    MOV     BL, CL
+    MOV     AH, 02h
+    CALL    converts:
+
+    MOV     AL, DH                      ; 1桁目を出力
+    MOV     AH, 0Ah
+    INT     10h
+    MOV     AL, DL                      ; 2桁目を出力
+    MOV     AH, 0Ah
+    INT     10h
+
+    MOV     AL, 3Ah                     ; ":"
+    MOV     AH, 0Ah
+    INT     10h
+
+    POP     DX
+
+    XOR     BX, BX                      ; DH（秒）
+    MOV     BL, DH
+    MOV     AH, 02h
+    CALL    converts:
+
+    MOV     AL, DH                      ; 1桁目を出力
+    MOV     AH, 0Ah
+    INT     10h
+    MOV     AL, DL                      ; 2桁目を出力
+    MOV     AH, 0Ah
+    INT     10h
+                                        ; 画面更新時に同じ位置に日付時刻を表示するため、カーソル位置をもとに戻す
+    MOV     AH, 03h                     ; カーソル位置を取得
+    INT     10h
+    SUB     BX, 13h                     ; BXにカーソル位置が格納されるので、13hを引く（日付時刻の表示）
+    MOV     AH, 02h                     ; カーソル位置を設定
+    INT     10h
+
+    MOV     AX, 1                       ; 画面更新を開始
+    OUT     30h, AX
+
     IN      AX, 80h                     ; キーが押されたか確認
     CMP     AX, 0                       ; 0（押されていない）なら戻る
+    
     JE      BiosMenu_Keywait:
 
     IN      AX, 81h                     ; 押されたならキーコード取得
@@ -200,7 +491,7 @@ fin:
 message1:
     &DB "AkidukiSystems 16bit Emulator  Version 0.11 Debug"
     &DW @CRLF
-    &DB "AkidukiSystems BIOS Version 0.2"
+    &DB "AkidukiSystems BIOS Version 0.3"
     &DW @CRLF
     &DB "Press [F12] to Setup Utility"
     &DW @CRLF
@@ -215,12 +506,13 @@ message_BiosMenu:
     &DB "AkidukiSystems BIOS Setup Utility"
     &DW @CRLF
     &DW @CRLF
-    &DB "BIOS Version: 0.2"
+    &DB "BIOS Version: 0.3"
     &DW @CRLF
-    &DB "BIOS Date: 2023/08/02 18:08"
+    &DB "BIOS Date: 2023/08/18 7:36"
     &DW @CRLF
     &DB "Vendor: AkidukiSystems"
     &DW @CRLF
+    &DB "Current DateTime: "
     &DB 0
 
 ;   _/_/_/_/  Interrupt Routine  _/_/_/_/
@@ -251,6 +543,26 @@ int_video:                              ; ビデオ割り込み (10h)
     JE      int_video_teretype:
     CMP     AH, 20h                     ; 画面クリア
     JE      int_video_clear:
+    CMP     AH, 02h                     ; 画面クリア
+    JE      int_video_setcursor:
+    CMP     AH, 03h                     ; 画面クリア
+    JE      int_video_getcursor:
+
+    IRET
+
+int_video_setcursor:
+    PUSH    DS
+    MOV     DS, @addr_ramSegment        ; 最後にVRAMに書いたアドレスを見つける
+    MOV     WORD[@addr_int_video_VRAMlastWrite], BX
+    POP     DS
+
+    IRET
+
+int_video_getcursor:
+    PUSH    DS
+    MOV     DS, @addr_ramSegment        ; 最後にVRAMに書いたアドレスを見つける
+    MOV     BX, WORD[@addr_int_video_VRAMlastWrite]
+    POP     DS
 
     IRET
 
@@ -955,8 +1267,6 @@ int_key_ChangeGetKey.out_set:
     OUT     8Eh, AX
     IRET
 
-<<<<<<< HEAD
-=======
 
 int_datetime:
     CMP     AH, 02h
@@ -971,35 +1281,33 @@ int_datetime_readTime:
     MOV     AX, 01h
     OUT     91h, AX
     IN      AX, 92h
-    PUSH    AX
+    XOR     BX, BX
+    MOV     BL, AL
+    MOV     AH, 0
+    CALL    converts:
+    PUSH    DX
 
     MOV     AX, 05h                 ; 分
     OUT     90h, AX
     MOV     AX, 01h
     OUT     91h, AX
     IN      AX, 92h
-    PUSH    AX
+    XOR     BX, BX
+    MOV     BL, AL
+    MOV     AH, 0
+    CALL    converts:
+    PUSH    DX
 
     MOV     AX, 06h                 ; 秒
     OUT     90h, AX
     MOV     AX, 01h
     OUT     91h, AX
     IN      AX, 92h
-    PUSH    AX
-
-    MOV     AX, 07h                 ; 1/100秒
-    OUT     90h, AX
-    MOV     AX, 01h
-    OUT     91h, AX
-    IN      AX, 92h                 ; 下位BYTE
-    PUSH    AX
-    IN      AX, 93h                 ; 上位BYTE
-    
-    MOV     BH, AL                  ; 1/100秒
-    POP     AX
+    XOR     BX, BX
     MOV     BL, AL
-
-    POP     AX                      ; 秒
+    MOV     AH, 0
+    CALL    converts:
+    MOV     AX, DX
     MOV     DH, AL
 
     POP     AX                      ; 分
@@ -1008,9 +1316,13 @@ int_datetime_readTime:
     POP     AX                      ; 時
     MOV     CH, AL
 
+    MOV     DL, 0
+
+    PUSH    DX
     MOV     AL, @clearFlag
     MOV     DX, @CF
     CALL    editFlag:
+    POP     DX
 
     IRET
 
@@ -1020,25 +1332,31 @@ int_datetime_readDate:
     MOV     AX, 01h
     OUT     91h, AX
     IN      AX, 92h
-
-    PUSH    AX
+    XOR     BX, BX
+    MOV     BL, AL
+    MOV     AH, 0
+    CALL    converts:
+    PUSH    DX
 
     MOV     AX, 00h                 ; 年
     OUT     90h, AX
     MOV     AX, 01h
     OUT     91h, AX
     IN      AX, 92h
+    XOR     BX, BX
+    MOV     BL, AL
+    MOV     AH, 0
+    CALL    converts:
 
-    MOV     BX, AX
+    MOV     BX, DX
 
-    POP     AX                      ; AX = 世紀, BX = 年
+    POP     DX                      ; DX = 世紀, BX = 年
 
     CMP     BX, 00h                 ; 年=00hのとき以外に、世紀から1を引くことで、西暦年上2桁を求められる
     JNE     int_datetime_readDate.dc:
 
 int_datetime_readDate.dc.ret:
-    
-    PUSH    AX
+    PUSH    DX
     PUSH    BX
 
     MOV     AX, 01h                 ; 月
@@ -1046,13 +1364,22 @@ int_datetime_readDate.dc.ret:
     MOV     AX, 01h
     OUT     91h, AX
     IN      AX, 92h
-    PUSH    AX
+    XOR     BX, BX
+    MOV     BL, AL
+    MOV     AH, 0
+    CALL    converts:
+    PUSH    DX
 
     MOV     AX, 03h                 ; 日
     OUT     90h, AX
     MOV     AX, 01h
     OUT     91h, AX
     IN      AX, 92h
+    XOR     BX, BX
+    MOV     BL, AL
+    MOV     AH, 0
+    CALL    converts:
+    MOV     AX, DX
     
     MOV     DL, AL
     POP     AX
@@ -1064,17 +1391,20 @@ int_datetime_readDate.dc.ret:
     POP     AX
     MOV     CH, AL
 
+    MOV     AH, 0
+
+    PUSH    DX
     MOV     AL, @clearFlag
     MOV     DX, @CF
     CALL    editFlag:
+    POP     DX
 
     IRET
     
 
 int_datetime_readDate.dc:
-    DEC     AX
+    DEC     DX
     JMP     int_datetime_readDate.dc.ret:
->>>>>>> aab582a177035fb7eaaaaafdd5a2d88d069d9239
 
 
 int_none:

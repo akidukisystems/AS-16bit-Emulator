@@ -1,0 +1,18 @@
+
+    switch vint_CPUio_PortNumber
+
+    case 0x30
+
+        if ( vint_CPUioTypeIsIN ) {
+
+            vint_CPUio_Result = vint_CPUio_Display_isRefreshDisplay
+
+        } else {
+
+            vint_CPUio_Display_isRefreshDisplay = vint_CPUio_PortOutPut
+
+        }
+
+    swbreak
+
+    swend

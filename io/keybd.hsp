@@ -121,6 +121,22 @@
 
     swbreak
 
+    case 0x85
+
+        if ( vint_CPUioTypeIsIN ) {
+
+            vint_CPUio_Result = vint_CPUio_keyInterrupt
+
+        } else {
+
+            vint_CPUio_keyInterrupt = vint_CPUio_PortOutPut
+
+        }
+
+        return
+
+    swbreak
+
     case 0x8E
 
         if ( vint_CPUioTypeIsIN ) : { // in
