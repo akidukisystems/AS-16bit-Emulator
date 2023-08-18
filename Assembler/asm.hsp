@@ -43,7 +43,8 @@
     #enum PRM_POINTER
     #enum PRM_VALUE
 
-    #define WAITMS 2
+    #define WAITMS      1
+    #define WAITCNT     10
 
     vstr_cfg_ArchName = ""
 
@@ -221,7 +222,7 @@
 
         loop
 
-        await WAITMS
+        if ( cnt \ WAITCNT ) : await WAITMS
 
     loop
 
@@ -299,7 +300,7 @@
 
         }
 
-        await WAITMS
+        if ( cnt \ WAITCNT ) : await WAITMS
         
     loop
 
@@ -885,13 +886,13 @@
 
                         }
 
-                        if ( instr( vstr_code.2, 0, "@" ) == 0 ) {
+                        if ( instr( vstr_code.2, 0, "@" ) == 5 ) {
 
                             repeat length2( vtable_enum )
 
                                 if ( vtable_enum.0.cnt == strmid( vstr_code.2, 5, strlen(vstr_code.2) -6 ) ) {
 
-                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, vtable_enum.1.cnt
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, int( vtable_enum.1.cnt )
                                     break
 
                                 }
@@ -1068,7 +1069,7 @@
 
                         }
 
-                        if ( instr( vstr_code.3, 0, "@" ) == 0 ) {
+                        if ( instr( vstr_code.3, 0, "@" ) == 5 ) {
 
                             repeat length2( vtable_enum )
 
@@ -1235,13 +1236,13 @@
 
                         }
 
-                        if ( instr( vstr_code.2, 0, "@" ) == 0 ) {
+                        if ( instr( vstr_code.2, 0, "@" ) == 5 ) {
 
                             repeat length2( vtable_enum )
 
                                 if ( vtable_enum.0.cnt == strmid( vstr_code.2, 5, strlen(vstr_code.2) -6 ) ) {
 
-                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, vtable_enum.1.cnt
+                                    wpoke vbin_assembledData, vint_assembledDataNextIndex, int( vtable_enum.1.cnt )
                                     break
 
                                 }
@@ -1382,7 +1383,7 @@
 
                         }
 
-                        if ( instr( vstr_code.3, 0, "@" ) == 0 ) {
+                        if ( instr( vstr_code.3, 0, "@" ) == 5 ) {
 
                             repeat length2( vtable_enum )
 
@@ -1492,7 +1493,7 @@
 
         loop
 
-        await WAITMS
+        if ( cnt \ WAITCNT ) : await WAITMS
 
     loop
 
