@@ -297,6 +297,39 @@ callfile:
 
     RET
 
+
+    ; AH...乗数
+    ; AL...基数
+pow:
+    CMP     AH, 0
+    JE      pow_1:
+
+    PUSH    BX
+    PUSH    CX
+    XOR     BX, BX
+    MOV     BL, AH
+    MOV     AH, 0
+    MOV     DX, AX
+    MOV     CX, 1
+
+pow.loop:
+    CMP     CX, BX
+    JE      pow_fin:
+    MUL     DX
+    INC     CX
+    JMP     pow.loop:
+
+pow_1:
+    MOV     DX, 1
+    RET
+
+pow_fin:
+    POP     CX
+    POP     BX
+    MOV     DX, AX
+    RET
+
+
     ; SI...ファイル名
     ; ES:BX...格納先アドレス
     ; 戻り値 CF
@@ -368,6 +401,8 @@ systemInternalInterrupt_21h:
     JE      printstring1:
     CMP     AH, 13h
     JE      clearscreen:
+    CMP     AH, 80h
+    JE      converts:
     ;CMP     AH, 2Ah
     ;JE      readDate:
     ;CMP     AH, 2Ch
@@ -627,19 +662,19 @@ getFileInfo:
 
     CMP     BH, 1
     JE      getFileInfo_attr:           ; 属性
-    CMP     BH, 1
+    CMP     BH, 2
     JE      getFileInfo_createTime:     ; 作成時刻
-    CMP     BH, 1
+    CMP     BH, 3
     JE      getFileInfo_createDate:     ; 作成日付
-    CMP     BH, 1
+    CMP     BH, 4
     JE      getFileInfo_accessDate:     ; アクセス日付
-    CMP     BH, 1
+    CMP     BH, 5
     JE      getFileInfo_updateTime:     ; 更新時刻
-    CMP     BH, 1
-    JE      getFileInfo_updateDate:     ; 更新日時
-    CMP     BH, 1
+    CMP     BH, 6
+    JE      getFileInfo_updateDate:     ; 更新日付
+    CMP     BH, 7
     JE      getFileInfo_clst:           ; クラスタ位置
-    CMP     BH, 1
+    CMP     BH, 8
     JE      getFileInfo_filesize:       ; ファイルサイズ
 
     JMP     getFileInfo_ret:
@@ -704,6 +739,104 @@ printstring1:
 clearscreen:
     MOV     AH, 20h
     INT     10h
+    IRET
+
+    ; AL...変換種類
+    ; BL...変換する値（raw）
+    ; BX...変換する値（asciiまたはbcd）
+    ; DL...変換された値（raw）
+    ; DX...変換された値（asciiまたはbcd）
+converts:
+    CMP     AL, 00h
+    JE      converts_hex2bcd:
+    CMP     AL, 01h
+    JE      converts_bcd2hex:
+    CMP     AL, 02h
+    JE      converts_bcd2ascii:
+    CMP     AL, 03h
+    JE      converts_ascii2bcd:
+
+    IRET
+
+converts_hex2bcd:
+    XOR     CX, CX
+    MOV     CL, 0
+
+converts_hex2bcd.loop:
+    MOV     BH, 0Ah                     ; 10で割ると、余りがBCDの1桁に相当する
+    MOV     AX, BL
+    DIV     BH
+    MOV     CH, AH                      ; 余りをCHに移し、リピート時にpushする
+
+    PUSH    CX
+
+    CMP     AL, 0                       ; 商が0になったらおしまい
+    JE      converts_hex2bcd.done:
+
+    INC     CL                          ; CLは桁数 CHから戻すときに使う
+    MOV     BL, AL
+
+    JMP     converts_hex2bcd.loop:
+
+converts_hex2bcd.done:
+    XOR     DX, DX
+
+converts_hex2bcd.done.loop:
+    POP     CX
+    XOR     AX, AX
+    
+    PUSH    DX                          ; 何桁目か計算し、CLにかける
+    MOV     AH, CL
+    MOV     AL, 10h
+    CALL    pow:
+    MOV     BX, DX
+
+    XOR     DX, DX
+    XOR     AX, AX
+    MOV     AL, CH
+    MUL     BX
+    POP     DX
+    ADD     DX, AX                      ; かけたもの同士で加算していくと、BCDコードになる
+
+    CMP     CL, 0
+    JNE     converts_hex2bcd.done.loop:
+
+    IRET
+
+converts_bcd2hex:
+converts_bcd2ascii:
+
+    MOV     AX, BX
+    AND     AL, 0Fh
+    ADD     AL, 30h
+    MOV     AH, 0
+    PUSH    AX
+
+    MOV     AX, BX
+    AND     AL, F0h
+    SHR     AL, 4
+    ADD     AL, 30h
+    MOV     AH, 0
+    PUSH    AX
+
+    MOV     AX, BX
+    AND     AH, 0Fh
+    ADD     AH, 30h
+
+    XOR     CX, CX
+    MOV     CL, AH
+
+    POP     AX
+    MOV     DH, AL
+
+    POP     AX
+    MOV     DL, AL
+
+    IRET
+
+
+converts_ascii2bcd:
+
     IRET
 
 
