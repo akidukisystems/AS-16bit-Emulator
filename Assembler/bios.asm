@@ -15,6 +15,15 @@
     #enum   @IF 0100h
     #enum   @DF 0200h
     #enum   @OF 0400h
+
+    #enum   @_date.yy_upper
+    #enum   @_date.yy_lower
+    #enum   @_date.MM
+    #enum   @_date.dd
+
+    #enum   @_time.hh
+    #enum   @_time.mm
+    #enum   @_time.ss
     
     #enum   @addr_ramSegment                CA00h   ; 変数領域のセグメント
     #enum   @addr_int_video_VRAMlastWrite   0000h   ; WORD 最後にVRAMに書いたアドレス
@@ -508,7 +517,19 @@ message_BiosMenu:
     &DW @CRLF
     &DB "BIOS Version: 0.3"
     &DW @CRLF
-    &DB "BIOS Date: 2023/08/18 7:36"
+    &DB "BIOS Date: "
+    &DW @_date.yy_upper
+    &DW @_date.yy_lower
+    &DB "/"
+    &DW @_date.MM
+    &DB "/"
+    &DW @_date.dd
+    &DB " "
+    &DW @_time.hh
+    &DB ":"
+    &DW @_time.mm
+    &DB ":"
+    &DW @_time.ss
     &DW @CRLF
     &DB "Vendor: AkidukiSystems"
     &DW @CRLF

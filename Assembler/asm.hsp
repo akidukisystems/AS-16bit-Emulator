@@ -23,6 +23,38 @@
 
     return int ( intdh_p1 )
 
+    #defcfunc num2ascii str n2a
+
+        sdim dat
+        v = strf( "%02d", n2a )
+
+        repeat 2
+
+            poke tmp, 0, peek( v, cnt )
+
+            tmp.1 = tmp & $00F0
+            tmp.1 /= $10
+            tmp.2 = tmp & $000F
+
+
+            if ( cnt == 0 ) {
+
+                poke dat, 2, tmp.1 + $30
+                poke dat, 3, tmp.2 + $30
+
+            }
+
+            if ( cnt == 1) {
+
+                poke dat, 0, tmp.1 + $30
+                poke dat, 1, tmp.2 + $30
+
+            }
+
+        loop
+
+    return str( int( "$"+ dat ) )
+
     #global
 
     #include "as.header.as"
@@ -290,6 +322,107 @@
 
             swbreak
             case "#enum"
+
+                if ( instr( vstr_code.2, 0, "@_date" ) == 0 ) {
+
+                    if ( vstr_code.2 == "@_date.yy_upper" ) {
+
+                        vtable_enum.0.vint_enumIndex = vstr_code.2
+                        vi_tmp = gettime( 0 ) \ 100
+                        vtable_enum.1.vint_enumIndex = str( gettime( 0 ) - vi_tmp )
+                        vtable_enum.1.vint_enumIndex = num2ascii( str( int( vtable_enum.1.vint_enumIndex ) / 100 ) )
+
+                        putmes_msglib "Assembler: Defined value. (Name:"+ vstr_code.2 +" Value:"+ strf( "%04Xh", vtable_enum.1.vint_enumIndex  ) +")\n"
+
+                        vint_enumIndex ++
+
+                        swbreak
+
+                    }
+
+                    if ( vstr_code.2 == "@_date.yy_lower" ) {
+
+                        vtable_enum.0.vint_enumIndex = vstr_code.2
+                        vtable_enum.1.vint_enumIndex = num2ascii( str( gettime(0) \ 100 ) )
+
+                        putmes_msglib "Assembler: Defined value. (Name:"+ vstr_code.2 +" Value:"+ strf( "%04Xh", vtable_enum.1.vint_enumIndex  ) +")\n"
+
+                        vint_enumIndex ++
+
+                        swbreak
+
+                    }
+
+                    if ( vstr_code.2 == "@_date.MM" ) {
+
+                        vtable_enum.0.vint_enumIndex = vstr_code.2
+                        vtable_enum.1.vint_enumIndex = num2ascii( str( gettime(1) ) )
+
+                        putmes_msglib "Assembler: Defined value. (Name:"+ vstr_code.2 +" Value:"+ strf( "%04Xh", vtable_enum.1.vint_enumIndex  ) +")\n"
+
+                        vint_enumIndex ++
+
+                        swbreak
+
+                    }
+
+                    if ( vstr_code.2 == "@_date.dd" ) {
+
+                        vtable_enum.0.vint_enumIndex = vstr_code.2
+                        vtable_enum.1.vint_enumIndex = num2ascii( str( gettime(3) ) )
+
+                        putmes_msglib "Assembler: Defined value. (Name:"+ vstr_code.2 +" Value:"+ strf( "%04Xh", vtable_enum.1.vint_enumIndex  ) +")\n"
+
+                        vint_enumIndex ++
+
+                        swbreak
+
+                    }
+
+                }
+
+                if ( instr( vstr_code.2, 0, "@_time" ) == 0 ) {
+
+                    if ( vstr_code.2 == "@_time.hh" ) {
+
+                        vtable_enum.0.vint_enumIndex = vstr_code.2
+                        vtable_enum.1.vint_enumIndex = num2ascii( str( gettime(4) ) )
+
+                        putmes_msglib "Assembler: Defined value. (Name:"+ vstr_code.2 +" Value:"+ strf( "%04Xh", vtable_enum.1.vint_enumIndex  ) +")\n"
+
+                        vint_enumIndex ++
+
+                        swbreak
+
+                    }
+
+                    if ( vstr_code.2 == "@_time.mm" ) {
+
+                        vtable_enum.0.vint_enumIndex = vstr_code.2
+                        vtable_enum.1.vint_enumIndex = num2ascii( str( gettime(5) ) )
+
+                        putmes_msglib "Assembler: Defined value. (Name:"+ vstr_code.2 +" Value:"+ strf( "%04Xh", vtable_enum.1.vint_enumIndex  ) +")\n"
+
+                        vint_enumIndex ++
+
+                        swbreak
+
+                    }
+
+                    if ( vstr_code.2 == "@_time.ss" ) {
+
+                        vtable_enum.0.vint_enumIndex = vstr_code.2
+                        vtable_enum.1.vint_enumIndex = num2ascii( str( gettime(6) ) )
+
+                        putmes_msglib "Assembler: Defined value. (Name:"+ vstr_code.2 +" Value:"+ strf( "%04Xh", vtable_enum.1.vint_enumIndex  ) +")\n"
+
+                        vint_enumIndex ++
+
+                        swbreak
+
+                    }
+
+                }
 
                 vtable_enum.0.vint_enumIndex = vstr_code.2
                 vtable_enum.1.vint_enumIndex = str( intdh( vstr_code.3 ) )
