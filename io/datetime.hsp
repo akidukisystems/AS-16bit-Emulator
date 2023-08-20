@@ -20,7 +20,6 @@
                 if ( vint_CPUio_datetime_select == 0 ) {
 
                     vint_CPUio_datetime_result = gettime( 0 ) \ 100
-                    logmes "R: "+ vint_CPUio_datetime_result
 
                     swbreak
 
@@ -28,12 +27,8 @@
                 if ( vint_CPUio_datetime_select == 0x0a ) { // 世紀
 
                     vbin_CPUtmp.0 = gettime( 0 ) \ 100
-                    logmes "A: "+ vbin_CPUtmp.0
                     vint_CPUio_datetime_result = gettime( 0 ) - vbin_CPUtmp.0
-                    logmes "V: "+ vint_CPUio_datetime_result
                     vint_CPUio_datetime_result /= 100
-                    logmes "S: "+ vint_CPUio_datetime_result
-
                     // 世紀は xx00年 のとき以外は上2桁に1加算した値
                     if ( vint_CPUio_datetime_result != 0 ) : vint_CPUio_datetime_result ++
 
