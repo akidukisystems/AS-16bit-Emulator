@@ -1,5 +1,6 @@
 
     #include "resistor.as"
+    #include "intcont.hsp"
 
     vint_CPUcurrentStep = 0
     emu_vint_executedCmd = false
@@ -45,8 +46,9 @@
     SetTimer hwnd, 1, 5, 0
     vint_CPU_Timer_isActive = 1
     vint_InterruptNumber = 0
-    vint_Interrupt = false
     vint_fetchCmdOffset = 0
+
+    initInterrupt
     
     
 
@@ -143,9 +145,9 @@
 
             emu_vint_executedCmd ++
 
-            if ( ( vint_Interrupt ) and ( ( fetchResistorWe(rFL) && fIF ) == fIF ) ) {
+            if ( isSetInterrupt() and ( ( fetchResistorWe(rFL) && fIF ) == fIF ) ) {
 
-                vint_Interrupt = 0
+                vint_InterruptNumber = getInterrupt()
                 
                 vint_fetchCmdOffset = 0
                 vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, vint_InterruptNumber * 4 )         // オフセット
@@ -209,9 +211,9 @@
 
             emu_vint_executedCmd ++
 
-            if ( ( vint_Interrupt ) and ( ( fetchResistorWe(rFL) && fIF ) == fIF ) ) {
+            if ( isSetInterrupt() and ( ( fetchResistorWe(rFL) && fIF ) == fIF ) ) {
 
-                vint_Interrupt = 0
+                vint_InterruptNumber = getInterrupt()
                 
                 vint_fetchCmdOffset = 0
                 vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, vint_InterruptNumber * 4 )         // オフセット
@@ -283,8 +285,7 @@
 
 *l_CPU_Send_INT1C
 
-    vint_Interrupt = true
-    vint_InterruptNumber = 0x1C
+    setInterrupt 0x1C
 
     return
 

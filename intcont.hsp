@@ -1,0 +1,61 @@
+
+    #module interrupt_controller
+
+        #deffunc initInterrupt
+
+            dim vint_InterruptQueue
+            vint_InterruptQueue = -1
+            vint_nextInterrupt = 0
+
+        return
+
+        #deffunc setInterrupt int number
+
+            vint_InterruptQueue.vint_nextInterrupt = number
+            vint_nextInterrupt ++
+
+        return
+
+        #deffunc setNMInterrupt int number
+
+            vint_counter = length(vint_InterruptQueue)
+
+            repeat -1
+
+                vint_InterruptQueue(vint_counter +1) = vint_InterruptQueue.vint_counter
+                if ( vint_counter == 0 ) : break
+
+                vint_counter --
+
+            loop
+
+            vint_InterruptQueue.0 = number
+            vint_nextInterrupt ++
+            
+        return
+
+        #defcfunc isSetInterrupt
+
+            if ( vint_InterruptQueue.0 != -1 ) : return 1
+
+        return 0
+
+        #defcfunc getInterrupt
+
+            if ( vint_InterruptQueue.0 == -1 ) : return -1
+
+            vint_temp = vint_InterruptQueue.0
+            vint_nextInterrupt --
+
+            foreach vint_InterruptQueue
+
+                if ( cnt == length(vint_InterruptQueue) -1 ) : break
+                vint_InterruptQueue(cnt) = vint_InterruptQueue(cnt +1)
+
+            loop
+
+            vint_InterruptQueue.vint_nextInterrupt = -1
+
+        return vint_temp
+
+    #global

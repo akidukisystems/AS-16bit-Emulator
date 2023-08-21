@@ -7,7 +7,7 @@
 
             if ( ( cnt \ CPU_CLOCK_CYCLE  ) == 0 ) : await CPU_CLOCK_WAIT
 
-            if ( ( vint_Interrupt ) and ( ( fetchResistorWe(rFL) && fIF ) == fIF ) ) {
+            if ( isSetInterrupt() and ( ( fetchResistorWe(rFL) && fIF ) == fIF ) ) {
 
                 break
 
