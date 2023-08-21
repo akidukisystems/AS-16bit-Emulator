@@ -78,6 +78,7 @@ keyloop:
     MOV     AL, 1
     MOV     BH, 1
     INT     16h
+    MOV     WORD[@addr_keyboardInterruptHandler], keyInterrupt:
 
 keyloop_fetch:
     MOV     AH, 1                       ; キーが押されたか確認
@@ -114,6 +115,7 @@ backspace:
     MOV     AL, 1
     MOV     BH, 0
     INT     16h
+    MOV     WORD[@addr_keyboardInterruptHandler], 0
 
     MOV     DS, 07B0h                   ; 7B00hにある文字数を読み込む
     MOV     BH, BYTE[0000h]
@@ -139,6 +141,10 @@ backspace_not:
     MOV     DS, BX                      ; データセグメントをもどす
     JMP     keyloop:
 
+keyInterrupt:
+    DBG
+    RET
+
 
 
 splitcommand:
@@ -146,6 +152,7 @@ splitcommand:
     MOV     AL, 1
     MOV     BH, 0
     INT     16h
+    MOV     WORD[@addr_keyboardInterruptHandler], 0
 
     MOV     SI, 7B02h
     MOV     DI, 7AE0h
@@ -195,6 +202,8 @@ splitcommand.end:
 
     JMP     keyloop:
     
+
+
 doCommand_Fail:
     MOV     SI, messageCRLF:
     MOV     AH, 0Eh
@@ -746,6 +755,7 @@ clearscreen:
     ; BX...変換する値（asciiまたはbcd）
     ; DL...変換された値（raw）
     ; DX...変換された値（asciiまたはbcd）
+    ; CX...変換された値（asciiまたはbcd）
 converts:
     CMP     AL, 00h
     JE      converts_hex2bcd:
@@ -759,6 +769,7 @@ converts:
     IRET
 
 converts_hex2bcd:
+    PUSH    CX
     XOR     CX, CX
     MOV     CL, 0
 
@@ -801,6 +812,7 @@ converts_hex2bcd.done.loop:
     CMP     CL, 0
     JNE     converts_hex2bcd.done.loop:
 
+    POP     CX
     IRET
 
 converts_bcd2hex:
@@ -840,6 +852,14 @@ converts_ascii2bcd:
     IRET
 
 
+
+keyboardInterrupt:
+    CMP     WORD[@addr_keyboardInterruptHandler], 0
+    JE      keyboardInterrupt:
+
+    CALL    WORD[@addr_keyboardInterruptHandler]
+
+    IRET
 
 keyboardInterrupt:
     IRET
