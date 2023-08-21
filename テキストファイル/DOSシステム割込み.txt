@@ -34,7 +34,7 @@ INT     AH  AL  BH  BL  CX  DX  SI  DI  説明
             00      BL      DX          BL に格納されているバイナリを BCD に変換し、DX に格納します。
                                         BL は 00 ～ FF の範囲でなければなりません。
             01
-            02    BX        DX          BX に格納されている BCD を ASCII に変換し、DX に格納します。
+            02    BX        DX          BX に格納されている BCD を ASCII に変換し、CX:DX に格納します。
                                         BX は 0000 ～ 0099 の範囲でなければなりません。
             03
 
