@@ -76,7 +76,7 @@
     #enum PRM_VALUE
 
     #define WAITMS      1
-    #define WAITCNT     10
+    #define WAITCNT     100
 
     vstr_cfg_ArchName = ""
 
