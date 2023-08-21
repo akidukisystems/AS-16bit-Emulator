@@ -185,7 +185,19 @@ splitcommand.end:
     MOV     ES, BX
     XOR     BX, BX
     CALL    readfile:
-    JC      doCommand_Fail:
+    JC      doCommand_Fail.notfound:
+
+    MOV     AH, 1
+    MOV     SI, 7AE0h
+    INT     21h
+    MOV     AX, 20h
+    MUL     CX
+    ADD     AX, 8000h
+    MOV     DI, AX
+    DBG
+    CALL    checkExecutable:
+    CMP     AX, 1
+    JE      doCommand_Fail.notexec:
 
     MOV     SI, messageCRLF:
     MOV     AH, 0Eh
@@ -204,7 +216,7 @@ splitcommand.end:
     
 
 
-doCommand_Fail:
+doCommand_Fail.notfound:
     MOV     SI, messageCRLF:
     MOV     AH, 0Eh
     INT     10h
@@ -219,45 +231,60 @@ doCommand_Fail:
 
     JMP     keyloop:
 
-doCommand_kakutyoushi:
+doCommand_Fail.notexec:
+    MOV     SI, messageCRLF:
+    MOV     AH, 0Eh
+    INT     10h
+    MOV     SI, message.notexecutable:
+    INT     10h
+
+    MOV     SI, messageRet:             ; 文字列のあるオフセット
+    MOV     AH, 0Eh
+    INT     10h                         ; ビデオ割り込み
+
+    MOV     BYTE[7B00h], 0              ; 入力文字数リセット
+
+    JMP     keyloop:
+
+checkExecutable:
     PUSHA
     PUSHF
     XOR     CX, CX
     ADD     DI, 8                       ; エントリ先頭から9バイトが拡張子
     MOV     DX, DI                      ; 拡張子の位置を記録しとく
-    MOV     SI, doCommand_kakutyoushi.dat:
+    MOV     SI, checkExecutable.dat:
 
-doCommand_kakutyoushi.loop:
+checkExecutable.loop:
     MOV     AX, [DI]                    ; 文字列読み込み
     MOV     BX, [SI]
     CALLF   WORD[@addr_keyboardDriver]                 ; 小文字にする
     CMP     AL, BL                      ; 比較して違うなら、他の拡張子か調べる
-    JNE     doCommand_kakutyoushi.next:
+    JNE     checkExecutable.next:
     INC     CX                          ; 次の文字へ
     INC     DI
     INC     SI
     CMP     CX, 3                       ; 拡張子を比較し終えて、すべて一致なら続行（リターン）
-    JNE     doCommand_kakutyoushi.loop:
+    JNE     checkExecutable.loop:
     
     POPF
     POPA
     XOR     AX, AX                      ; 終了コード（AX）は0
     RET
 
-doCommand_kakutyoushi.next:
+checkExecutable.next:
     XOR     CX, CX
     MOV     DI, DX                      ; 記録しといた拡張子の位置を復元
     INC     SI                          ; お次の拡張子
     MOV     AX, [SI]                    ; 終端ならおしまい
     CMP     AL, 0
-    JNE     doCommand_kakutyoushi.loop:
+    JNE     checkExecutable.loop:
 
     POPF
     POPA
     MOV     AX, 1
     RET
     
-doCommand_kakutyoushi.dat:              ; 実行可能な拡張子一覧
+checkExecutable.dat:              ; 実行可能な拡張子一覧
     &DB     "SYS"
     &DB     "COM"
     &DB     0
@@ -374,7 +401,7 @@ readfile:
     JC      halt:                       ; エラーだったらおわり
 
     MOV     AH, 2                       ; セクタ読み込み
-                                        ; 読み込むセクタ数
+    INC     AL                          ; 読み込むセクタ数
     MOV     CH, 0                       ; トラック番号 下位8bit
                                         ; トラック番号 上位2bit + セクタ番号 6bit (セクタ番号のみ1から、それ以外は0から)
     MOV     DH, 0                       ; ヘッド番号
