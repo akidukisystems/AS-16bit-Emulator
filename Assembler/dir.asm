@@ -3,6 +3,9 @@
     #config filename    "dir.com"
     #origin addr        0
     #enum   @CRLF       0A0Dh
+    #num    @filecnt    0400h
+
+    MOV     WORD[@filecnt], 0
     
     XOR     CX, CX          ; データセグメントをいじるので0にする
     MOV     DS, CX
@@ -15,6 +18,15 @@ fileread:
     ADD     AX, 8000h
     MOV     BX, AX
 
+    MOV     DX, [BX]        ; ファイル名先頭読み込み BXはポインタ
+    CMP     DL, E5h
+    JE      deletedfile:    ; 削除済エントリ
+    XOR     DX, DX
+
+    MOV     DS, ES
+    PUSH    CX
+    MOV     CX, WORD[@filecnt]
+
     PUSH    AX
     PUSH    BX
     MOV     AX, CX          ; 6ファイルごとに改行する
@@ -24,9 +36,15 @@ fileread:
     DIV     BX
     CMP     DX, 0
     JE      fileread.crlf:
+
 fileread.crlf_ret:
+    INC     WORD[@filecnt]
+    XOR     BX, BX
+    MOV     DS, BX
+
     POP     BX
     POP     AX
+    POP     CX
 
     PUSH    CX              ; CXはこの後使うのでpush
     XOR     CX, CX
@@ -79,6 +97,16 @@ umeru:
     CMP     CX, 11
     JNE     umeru:
 
+deletedfile:
+    INC     CX
+    CMP     CX, 16          ; 次のファイルエントリへ、16個見たらおわり
+    JNE     fileread:
+    MOV     DS, ES             ; リターン
+    MOV     SI, message1:
+    MOV     AH, 10h
+    INT     21h
+    FRET
+
 owari:
     CMP     DI, 0           ; ファイル名が8文字より少なかったら、表示ずれを防ぐため埋める
     JNE     umerukakutyo:
@@ -111,12 +139,12 @@ umerukakutyo:
     JMP     owari:
 
 fileread.crlf:
-    MOV     DS, ES
+DBG
     MOV     SI, message1:
+    DBG
     MOV     AH, 10h
+    DBG
     INT     21h
-    XOR     AX, AX
-    MOV     DS, AX
     JMP     fileread.crlf_ret:
 
 message1:
