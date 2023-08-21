@@ -151,6 +151,8 @@
     vtable_com_transform = ""
     #addition "arch\\com\\transform.hsp"
 
+    sdim vstr_debugtxt
+
     notesel vstr_inputfileData
     exist vstr_inputfileName
     if ( strsize == -1 ) : stop
@@ -534,7 +536,7 @@
 
                 vint_currentaddress += intdh( vstr_code.2 )
                 vint_assembledDataNextIndex += intdh( vstr_code.2 )
-
+                
                 continue cnt+1
 
             }
@@ -588,6 +590,12 @@
                                 }
 
                                 poke vbin_assembledData, vint_assembledDataNextIndex, int( vtable_enum.1.cnt )
+
+                                vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
+                                vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_assembledDataNextIndex )
+                                vstr_debugtxt.vint_debugindex += int( vtable_enum.1.cnt )
+                                vint_debugindex ++
+
                                 break
 
                             }
@@ -603,6 +611,11 @@
                     if ( instr( vstr_code.cnt, 0, "\"" ) == 0 ) {
 
                         poke vbin_assembledData, vint_assembledDataNextIndex, strtrim( vstr_code.cnt, 0, '\"' )
+                        vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
+                        vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_assembledDataNextIndex )
+                        vstr_debugtxt.vint_debugindex += strtrim( vstr_code.cnt, 0, '\"' )
+                        vint_debugindex ++
+
                         vint_assembledDataNextIndex += strsize
                         vint_currentaddress += strsize
                         continue cnt+1
@@ -619,6 +632,12 @@
                         }
 
                         poke vbin_assembledData, vint_assembledDataNextIndex, vint_temp
+
+                        vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
+                        vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_assembledDataNextIndex )
+                        vstr_debugtxt.vint_debugindex += vint_temp
+                        vint_debugindex ++
+
                         vint_assembledDataNextIndex ++
                         vint_currentaddress ++
                         continue cnt+1
@@ -647,6 +666,12 @@
                             if ( vtable_enum.0.cnt == vstr_code.vint_temp ) {
 
                                 wpoke vbin_assembledData, vint_assembledDataNextIndex, int( vtable_enum.1.cnt )
+
+                                vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
+                                vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_assembledDataNextIndex )
+                                vstr_debugtxt.vint_debugindex += int( vtable_enum.1.cnt )
+                                vint_debugindex ++
+
                                 break
 
                             }
@@ -662,6 +687,10 @@
                     if ( instr( vstr_code.cnt, 0, "\"" ) == 0 ) {
 
                         wpoke vbin_assembledData, vint_assembledDataNextIndex, strtrim( vstr_code.cnt, 0, '\"' )
+                        vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
+                        vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_assembledDataNextIndex )
+                        vstr_debugtxt.vint_debugindex += strtrim( vstr_code.cnt, 0, '\"' )
+                        vint_debugindex ++
                         vint_assembledDataNextIndex += strsize
                         vint_currentaddress += strsize
                         continue cnt+1
@@ -678,6 +707,11 @@
                         }
 
                         wpoke vbin_assembledData, vint_assembledDataNextIndex, vint_temp
+                        vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
+                        vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_assembledDataNextIndex )
+                        vstr_debugtxt.vint_debugindex += vint_temp
+                        vint_debugindex ++
+
                         vint_assembledDataNextIndex += 2
                         vint_currentaddress += 2
                         continue cnt+1
@@ -697,6 +731,12 @@
 
             vtable_label.0.vint_labelIndex = vstr_code.1
             vtable_label.1.vint_labelIndex = str( vint_currentaddress + vint_originaddr )
+
+            vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
+            vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_currentaddress )
+            vstr_debugtxt.vint_debugindex += vstr_code.1
+            vint_debugindex += 2
+
             vint_labelIndex ++
 
             continue cnt+1
@@ -716,6 +756,33 @@
         vtable_type.1.cnt = PRM_VALUE
         vtable_type.2.cnt = PRM_VALUE
         vint_this2ndprmIsByte = 0
+
+        vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
+        vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_assembledDataNextIndex )
+
+        if ( ( vstr_code.2 == "" ) or ( vstr_code.2 == ";" ) ) {
+
+            vstr_debugtxt.vint_debugindex += vstr_code.1
+
+        } else {
+
+            if ( ( vstr_code.3 == "" ) or ( vstr_code.3 == ";" ) ) {
+
+                vstr_debugtxt.vint_debugindex += ""+ vstr_code.1 +" "+ vstr_code.2
+
+            } else {
+
+                if ( ( vstr_code.4 == "" ) or ( vstr_code.4 == ";" ) ) {
+
+                    vstr_debugtxt.vint_debugindex += ""+ vstr_code.1 +" "+ vstr_code.2 +", "+ vstr_code.3
+
+                }
+
+            }
+
+        }
+        
+        vint_debugindex ++
 
         // no parameter
         if ( ( vstr_code.2 == "" ) or ( vstr_code.2 == ";" ) ) {
@@ -1645,6 +1712,17 @@
     putmes_msglib "Assemble has competed. Saved binary file at \""+ vstr_filename +"\".\n"
 
     bsave vstr_filename, vbin_assembledData, vint_currentaddress
+
+    vstr_debugtxt_output = ""
+
+    foreach vstr_debugtxt
+
+        vstr_debugtxt_output += vstr_debugtxt.cnt +"\n"
+
+    loop
+
+    notesel vstr_debugtxt_output
+    notesave getpath( vstr_filename, 1 ) +".dbg"
 
     if ( vint_cmdmode ) {
 
