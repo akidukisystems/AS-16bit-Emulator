@@ -693,7 +693,7 @@ int_disk:
     JE      int_disk_init:
     CMP     AH, 2                       ; 読み込み
     JE      int_disk_read:
-    CMP     AH, 3                       ; 読み込み
+    CMP     AH, 3                       ; 書き込み
     JE      int_disk_write:
 
 
