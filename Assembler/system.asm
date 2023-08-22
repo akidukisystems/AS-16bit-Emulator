@@ -1,7 +1,7 @@
 
     #config codesize auto
     #config filename "system.sys"
-    #origin addr 8800h
+    #origin addr        1100h
     #enum   @CRLF       0A0Dh
 
     #enum   @addr_beforeCall_SP             7AF0h
@@ -40,8 +40,10 @@
     MOV     BX, 0510h                   ; ES:BX...読み込み先アドレス
     MOV     ES, BX
     XOR     BX, BX
-    CALL    readfile:
-    JC      notfound_start.dat:
+    MOV     AH, 20h
+    INT     21h
+    OR      AH, AH
+    JNZ     notfound_start.dat:
 
     MOV     AX, ES                      ; SI=ES*10h 検索対象
     XOR     DX, DX
@@ -51,22 +53,22 @@
     MOV     BX, 0610h
     MOV     ES, BX                      ; ES=0610h 読み込み先
     XOR     BX, BX                      ; BX=0
-    CALL    readfile:
+    MOV     AH, 20h
+    INT     21h
 
     MOV     AX, ES
     MOV     WORD[@addr_keyboardDriver], AX
 
     MOV     SI, version.com:            ; SI...検索対象のファイル名
-    MOV     BX, 0110h                   ; ES:BX...読み込み先アドレス
+    MOV     BX, 1500h                   ; ES:BX...読み込み先アドレス
     MOV     ES, BX
     XOR     BX, BX
-    CALL    readfile:
-    JC      notfound_version.com:
+    MOV     AH, 20h
+    INT     21h
+    OR      AH, AH
+    JNZ     notfound_version.com:
   
     MOV     AX, ES                      ; AX...アドレス
-    MOV     BX, 10h
-    XOR     DX, DX
-    MUL     BX
     CALL    callfile:
 
     MOV     SI, message1:               ; 文字列のあるオフセット
@@ -181,11 +183,13 @@ splitcommand.split:
 
 splitcommand.end:
     MOV     SI, 7AE0h                   ; SI...検索対象のファイル名
-    MOV     BX, 0110h                   ; ES:BX...読み込み先アドレス
+    MOV     BX, 1500h                   ; ES:BX...読み込み先アドレス
     MOV     ES, BX
     XOR     BX, BX
-    CALL    readfile:
-    JC      doCommand_Fail.notfound:
+    MOV     AH, 20h
+    INT     21h
+    OR      AH, AH
+    JNZ     doCommand_Fail.notfound:
 
     MOV     AH, 1
     MOV     SI, 7AE0h
@@ -194,7 +198,7 @@ splitcommand.end:
     MUL     CX
     ADD     AX, 8000h
     MOV     DI, AX
-    DBG
+
     CALL    checkExecutable:
     CMP     AX, 1
     JE      doCommand_Fail.notexec:
@@ -203,7 +207,7 @@ splitcommand.end:
     MOV     AH, 0Eh
     INT     10h
 
-    MOV     AX, 1100h
+    MOV     AX, 1500h
     CALL    callfile:                   ; ファイルを実行
 
     MOV     SI, messageRet:             ; 文字列のあるオフセット
@@ -289,13 +293,9 @@ checkExecutable.dat:              ; 実行可能な拡張子一覧
     &DB     "COM"
     &DB     0
 
-    ; AX...アドレス
+    ; AX...アドレス（セグメント）
     ; 戻り値 CF=0
 callfile:
-    MOV     BX, 10h                     ; ファイルの先頭アドレスを10で割り、CSレジスタで使えるようにする
-    XOR     DX, DX
-    DIV     BX
-
     PUSHA                               ; PUSH
     PUSH    DS
     PUSH    ES
@@ -366,59 +366,6 @@ pow_fin:
     RET
 
 
-    ; SI...ファイル名
-    ; ES:BX...格納先アドレス
-    ; 戻り値 CF
-    ;           =0...成功
-    ;           =1...失敗　ファイルがありません
-readfile:
-    PUSH    BX
-
-    MOV     AH, 1
-    INT     21h
-    OR      AH, AH
-    JNZ     readfile.notfound:
-
-    MOV     AH, 4                       ; ファイルのクラスタ番号を取得
-    INT     21h
-
-    XOR     DX, DX                      ; クラスタ番号からセクタ位置を取得
-    MOV     BX, 2
-    MUL     BX
-    INC     AL
-    MOV     CL, AL
-
-    MOV     AH, 3                       ; ファイルサイズを取得
-    MOV     BH, 1
-    INT     21h
-
-    MOV     BX, 512
-    DIV     BX
-
-    MOV     AH, 0                       ; ディスク初期化
-    INT     13h
-
-    JC      halt:                       ; エラーだったらおわり
-
-    MOV     AH, 2                       ; セクタ読み込み
-    INC     AL                          ; 読み込むセクタ数
-    MOV     CH, 0                       ; トラック番号 下位8bit
-                                        ; トラック番号 上位2bit + セクタ番号 6bit (セクタ番号のみ1から、それ以外は0から)
-    MOV     DH, 0                       ; ヘッド番号
-    MOV     DL, 0                       ; ディスク番号
-    POP     BX
-    INT     13h
-
-    CLC
-
-    RET
-
-readfile.notfound:
-    POP     BX
-    STC
-    RET
-
-
 
 ; _/_/_/_/_/_/_/_/ DOS システム割込み _/_/_/_/_/_/_/_/
 
@@ -437,6 +384,8 @@ systemInternalInterrupt_21h:
     JE      printstring1:
     CMP     AH, 13h
     JE      clearscreen:
+    CMP     AH, 20h
+    JE      readfile:
     CMP     AH, 80h
     JE      converts:
     ;CMP     AH, 2Ah
@@ -775,6 +724,62 @@ printstring1:
 clearscreen:
     MOV     AH, 20h
     INT     10h
+    IRET
+
+
+    ; SI...ファイル名
+    ; ES:BX...格納先アドレス
+    ; 戻り値 CF
+    ;           =0...成功
+    ;           =1...失敗　ファイルがありません
+readfile:
+    PUSH    BX
+
+    MOV     AH, 1
+    INT     21h
+    OR      AH, AH
+    JNZ     readfile.notfound:
+
+    MOV     AH, 3                       ; ファイルサイズを取得
+    MOV     BH, 8
+    INT     21h
+    MOV     BX, 512
+    XOR     DX, DX
+    DIV     BX
+
+    PUSH    AX
+
+    MOV     AH, 4                       ; ファイルのクラスタ番号を取得
+    INT     21h
+    XOR     DX, DX                      ; クラスタ番号からセクタ位置を取得
+    MOV     BX, 2
+    MUL     BX
+    INC     AL
+    MOV     CL, AL
+
+    MOV     AH, 0                       ; ディスク初期化
+    INT     13h
+
+    POP     AX
+
+    JC      halt:                        ; エラーだったらおわり
+
+    MOV     AH, 2                       ; セクタ読み込み
+    INC     AL                          ; 読み込むセクタ数
+    MOV     CH, 0                       ; トラック番号 下位8bit
+                                        ; トラック番号 上位2bit + セクタ番号 6bit (セクタ番号のみ1から、それ以外は0から)
+    MOV     DH, 0                       ; ヘッド番号
+    MOV     DL, 0                       ; ディスク番号
+    POP     BX
+
+    INT     13h
+
+    MOV     AH, 0
+    IRET
+
+readfile.notfound:
+    POP     BX
+    MOV     AH, 1
     IRET
 
     ; AL...変換種類

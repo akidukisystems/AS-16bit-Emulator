@@ -55,6 +55,7 @@
     echo make^> os
     cd Assembler\
     asm.exe boot.asm
+    asm.exe loader.asm
     asm.exe system.asm
     asm.exe jpnkey16.asm
     cd ..\
@@ -93,6 +94,7 @@
     del /s Assembler\obj
     del /s Assembler\packfile
     del /s Assembler\*.ax
+    del /s Assembler\*.dbg
     del /s error.txt
     del /s dump_*.bin
     del /s stacktrace.txt
