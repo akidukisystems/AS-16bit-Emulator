@@ -5,228 +5,6 @@
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 
 <style>
-/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
-body {
-	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
-	font-size: var(--vscode-markdown-font-size, 14px);
-	padding: 0 26px;
-	line-height: var(--vscode-markdown-line-height, 22px);
-	word-wrap: break-word;
-}
-
-#code-csp-warning {
-	position: fixed;
-	top: 0;
-	right: 0;
-	color: white;
-	margin: 16px;
-	text-align: center;
-	font-size: 12px;
-	font-family: sans-serif;
-	background-color:#444444;
-	cursor: pointer;
-	padding: 6px;
-	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
-}
-
-#code-csp-warning:hover {
-	text-decoration: none;
-	background-color:#007acc;
-	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
-}
-
-body.scrollBeyondLastLine {
-	margin-bottom: calc(100vh - 22px);
-}
-
-body.showEditorSelection .code-line {
-	position: relative;
-}
-
-body.showEditorSelection .code-active-line:before,
-body.showEditorSelection .code-line:hover:before {
-	content: "";
-	display: block;
-	position: absolute;
-	top: 0;
-	left: -12px;
-	height: 100%;
-}
-
-body.showEditorSelection li.code-active-line:before,
-body.showEditorSelection li.code-line:hover:before {
-	left: -30px;
-}
-
-.vscode-light.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(0, 0, 0, 0.15);
-}
-
-.vscode-light.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(0, 0, 0, 0.40);
-}
-
-.vscode-light.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-.vscode-dark.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(255, 255, 255, 0.4);
-}
-
-.vscode-dark.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(255, 255, 255, 0.60);
-}
-
-.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-.vscode-high-contrast.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(255, 160, 0, 0.7);
-}
-
-.vscode-high-contrast.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(255, 160, 0, 1);
-}
-
-.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-img {
-	max-width: 100%;
-	max-height: 100%;
-}
-
-a {
-	text-decoration: none;
-}
-
-a:hover {
-	text-decoration: underline;
-}
-
-a:focus,
-input:focus,
-select:focus,
-textarea:focus {
-	outline: 1px solid -webkit-focus-ring-color;
-	outline-offset: -1px;
-}
-
-hr {
-	border: 0;
-	height: 2px;
-	border-bottom: 2px solid;
-}
-
-h1 {
-	padding-bottom: 0.3em;
-	line-height: 1.2;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-}
-
-h1, h2, h3 {
-	font-weight: normal;
-}
-
-table {
-	border-collapse: collapse;
-}
-
-table > thead > tr > th {
-	text-align: left;
-	border-bottom: 1px solid;
-}
-
-table > thead > tr > th,
-table > thead > tr > td,
-table > tbody > tr > th,
-table > tbody > tr > td {
-	padding: 5px 10px;
-}
-
-table > tbody > tr + tr > td {
-	border-top: 1px solid;
-}
-
-blockquote {
-	margin: 0 7px 0 5px;
-	padding: 0 16px 0 10px;
-	border-left-width: 5px;
-	border-left-style: solid;
-}
-
-code {
-	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
-	font-size: 1em;
-	line-height: 1.357em;
-}
-
-body.wordWrap pre {
-	white-space: pre-wrap;
-}
-
-pre:not(.hljs),
-pre.hljs code > div {
-	padding: 16px;
-	border-radius: 3px;
-	overflow: auto;
-}
-
-pre code {
-	color: var(--vscode-editor-foreground);
-	tab-size: 4;
-}
-
-/** Theming */
-
-.vscode-light pre {
-	background-color: rgba(220, 220, 220, 0.4);
-}
-
-.vscode-dark pre {
-	background-color: rgba(10, 10, 10, 0.4);
-}
-
-.vscode-high-contrast pre {
-	background-color: rgb(0, 0, 0);
-}
-
-.vscode-high-contrast h1 {
-	border-color: rgb(0, 0, 0);
-}
-
-.vscode-light table > thead > tr > th {
-	border-color: rgba(0, 0, 0, 0.69);
-}
-
-.vscode-dark table > thead > tr > th {
-	border-color: rgba(255, 255, 255, 0.69);
-}
-
-.vscode-light h1,
-.vscode-light hr,
-.vscode-light table > tbody > tr + tr > td {
-	border-color: rgba(0, 0, 0, 0.18);
-}
-
-.vscode-dark h1,
-.vscode-dark hr,
-.vscode-dark table > tbody > tr + tr > td {
-	border-color: rgba(255, 255, 255, 0.18);
-}
-
-</style>
-
-<style>
 /* Tomorrow Theme */
 /* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
 /* Original theme - https://github.com/chriskempson/tomorrow-theme */
@@ -302,58 +80,6 @@ pre code {
 }
 </style>
 
-<style>
-/*
- * Markdown PDF CSS
- */
-
- body {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
-	padding: 0 12px;
-}
-
-pre {
-	background-color: #f8f8f8;
-	border: 1px solid #cccccc;
-	border-radius: 3px;
-	overflow-x: auto;
-	white-space: pre-wrap;
-	overflow-wrap: break-word;
-}
-
-pre:not(.hljs) {
-	padding: 23px;
-	line-height: 19px;
-}
-
-blockquote {
-	background: rgba(127, 127, 127, 0.1);
-	border-color: rgba(0, 122, 204, 0.5);
-}
-
-.emoji {
-	height: 1.4em;
-}
-
-code {
-	font-size: 14px;
-	line-height: 19px;
-}
-
-/* for inline code */
-:not(pre):not(.hljs) > code {
-	color: #C9AE75; /* Change the old color so it seems less like an error */
-	font-size: inherit;
-}
-
-/* Page Break : use <div class="page"/> to insert page break
--------------------------------------------------------- */
-.page {
-	page-break-after: always;
-}
-
-</style>
-
 <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
@@ -410,6 +136,7 @@ code {
 ※1	双方のオペランドが[r/m8]の場合を除く</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>(なし)</p>
+<hr>
 <h2 id="xchg">XCHG</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -419,6 +146,7 @@ code {
 <p>第一オペランドと第二オペランドの値を交換します。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>(なし)</p>
+<hr>
 <h2 id="inc">INC</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -429,6 +157,7 @@ code {
 <p>オペランドの値をインクリメントします。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>OF, SF, ZF, PF...結果に応じてセットされます</p>
+<hr>
 <h2 id="dec">DEC</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -439,6 +168,7 @@ code {
 <p>オペランドの値をデクリメントします。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>OF, SF, ZF, PF...結果に応じてセットされます</p>
+<hr>
 <h2 id="add">ADD</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -449,6 +179,7 @@ code {
 <p>第一オペランドに第二オペランドを加算し、第一オペランドに格納します。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>OF, SF, ZF, AF, PF, CF...結果に応じてセットされます</p>
+<hr>
 <h2 id="sub">SUB</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -459,6 +190,7 @@ code {
 <p>第一オペランドに第二オペランドを減算し、第一オペランドに格納します。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>OF, SF, ZF, AF, PF, CF...結果に応じてセットされます</p>
+<hr>
 <h2 id="mul">MUL</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -469,6 +201,7 @@ code {
 <p>オペランドとAX（オペランドのサイズがBYTEの場合はAL）を乗算し、DX:AX（オペランドのサイズがBYTEの場合はAX）に格納します。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>(なし)</p>
+<hr>
 <h2 id="div">DIV</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -480,6 +213,29 @@ code {
 オペランドが0の場合は#DE ゼロ除算例外を発生させます。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>(なし)</p>
+<hr>
+<h2 id="in">IN</h2>
+<h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0x49...in x[r16], y[r16,imm16]</li>
+</ul>
+<h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
+<p>第二オペランドのアドレスの値を第一オペランドにロードします。
+※このエミュレータでは、I/Oポートの動作を擬似的に再現するため、実際には第二オペランドの値に対応する機能を実行し、第一オペランドに結果をロードします。</p>
+<h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
+<p>(なし)</p>
+<hr>
+<h2 id="out">OUT</h2>
+<h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0x4B...in x[r16,imm16], y[r16]</li>
+</ul>
+<h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
+<p>第一オペランドのアドレスに第二オペランドの値をストアします。
+※このエミュレータでは、I/Oポートの動作を擬似的に再現するため、実際には第二オペランドの値を引数に、第一オペランドの値に対応する機能を実行します。</p>
+<h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
+<p>(なし)</p>
+<hr>
 <h2 id="cmp">CMP</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -491,26 +247,7 @@ code {
 演算結果は破棄されます。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>OF, SF, ZF, AF, PF, CF...結果に応じてセットされます</p>
-<h2 id="in">IN</h2>
-<h3 id="%E6%A7%8B%E6%96%87">構文</h3>
-<ul>
-<li>0x49...in x[r16], y[r16,imm16]</li>
-</ul>
-<h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
-<p>第二オペランドのアドレスの値を第一オペランドにロードします。
-※このエミュレータでは、I/Oポートの動作を擬似的に再現するため、実際には第二オペランドの値に対応する機能を実行し、第一オペランドに結果をロードします。</p>
-<h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
-<p>(なし)</p>
-<h2 id="out">OUT</h2>
-<h3 id="%E6%A7%8B%E6%96%87">構文</h3>
-<ul>
-<li>0x4B...in x[r16,imm16], y[r16]</li>
-</ul>
-<h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
-<p>第一オペランドのアドレスに第二オペランドの値をストアします。
-※このエミュレータでは、I/Oポートの動作を擬似的に再現するため、実際には第二オペランドの値を引数に、第一オペランドの値に対応する機能を実行します。</p>
-<h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
-<p>(なし)</p>
+<hr>
 <h2 id="push">PUSH</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -520,6 +257,7 @@ code {
 <p>スタックポインタから2を減算し、スタックポインタが指すアドレスに第一オペランドをストアします。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>(なし)</p>
+<hr>
 <h2 id="pop">POP</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -529,6 +267,7 @@ code {
 <p>スタックポインタが指すアドレスから第一オペランドにロードし、スタックポインタを2加算します。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>(なし)</p>
+<hr>
 <h2 id="push">PUSH</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -539,6 +278,7 @@ code {
 順番は AX, CX, DX, BX, SP, BP, SI, DI の順番です。結果的にスタックポインタは8減算されます。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>(なし)</p>
+<hr>
 <h2 id="popa">POPA</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -549,6 +289,7 @@ code {
 順番は DI, SI, BP, SP, BX, DX, CX, AX の順番です。結果的にスタックポインタは8加算されます。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>(なし)</p>
+<hr>
 <h2 id="pushf">PUSHF</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -558,6 +299,7 @@ code {
 <p>フラグレジスタをスタックにプッシュします。結果的にスタックポインタは2減算されます。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>(なし)</p>
+<hr>
 <h2 id="popf">POPF</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -567,6 +309,7 @@ code {
 <p>フラグレジスタにスタックからポップします。結果的にスタックポインタは2加算されます。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>ポップされた値がフラグレジスタの内容になります。</p>
+<hr>
 <h2 id="hlt">HLT</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -576,6 +319,7 @@ code {
 <p>プロセッサを停止します。割り込みがあるか、リブートが要求される（emu_vbin_needReboot が 1 になる）まで停止します。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>(なし)</p>
+<hr>
 <h2 id="int">INT</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -585,6 +329,7 @@ code {
 <p>ソフトウェア割込みを発生させます。第一オペランドの値と対応する割り込みベクタテーブルの内容を探し、フラグレジスタ、コードセグメント、インストラクションポインタをスタックにプッシュして、指定されたアドレスにジャンプします。結果的にスタックポインタは6減少します。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>(なし)</p>
+<hr>
 <h2 id="int3">INT3</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -594,6 +339,7 @@ code {
 <p>ソフトウェア割込みで、デバッグ例外ハンドラを呼び出します。ブレークポイントとして利用できます。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>(なし)</p>
+<hr>
 <h2 id="into">INTO</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
 <ul>
@@ -603,46 +349,162 @@ code {
 <p>ソフトウェア割込みで、オーバーフローフラグがセットされている場合、#OF オーバーフロー例外（割込み番号4）を呼び出します。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
 <p>(なし)</p>
-<h2 id="call-w">CALL	w</h2>
+<hr>
+<h2 id="call">CALL</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0x7A...call addr[r/m16, imm16]</li>
+</ul>
 <h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
-<h3 id="%E6%93%8D%E4%BD%9C">操作</h3>
+<p>現在のインストラクションポインタをスタックにプッシュし、第一オペランドのアドレスをインストラクションポインタに設定します。コードセグメントは変更されません。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
+<p>（なし）</p>
+<hr>
 <h2 id="ret">RET</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0x7B...ret</li>
+</ul>
 <h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
-<h3 id="%E6%93%8D%E4%BD%9C">操作</h3>
+<p>スタックからインストラクションポインタに内容をポップします。コードセグメントは変更されません。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
-<h2 id="callf-w">CALLF	w</h2>
+<p>（なし）</p>
+<hr>
+<h2 id="callf">CALLF</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0x7C...callf addr[r/m16, imm16]</li>
+</ul>
 <h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
-<h3 id="%E6%93%8D%E4%BD%9C">操作</h3>
+<p>現在のコードセグメント、インストラクションポインタをスタックにプッシュし、コードセグメントを第一オペランドに、インストラクションポインタを0に設定します。
+コードセグメント、インストラクションポインタの順にプッシュします。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
-<h2 id="retf">RETF</h2>
+<p>（なし）</p>
+<hr>
+<h2 id="fret">FRET</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0x7D...fret</li>
+</ul>
 <h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
-<h3 id="%E6%93%8D%E4%BD%9C">操作</h3>
+<p>スタックからインストラクションポインタ、コードセグメントに内容をポップします。
+インストラクションポインタ、コードセグメントの順にポップします。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
-<h2 id="dbg">DBG</h2>
+<p>（なし）</p>
+<hr>
+<h2 id="iret">IRET</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0x7E...iret</li>
+</ul>
 <h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
-<h3 id="%E6%93%8D%E4%BD%9C">操作</h3>
+<p>スタックからインストラクションポインタ、コードセグメント、フラグレジスタに内容をポップします。
+インストラクションポインタ、コードセグメント、フラグレジスタの順にポップします。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
-<h2 id="jmp-w">JMP		w</h2>
+<p>スタック内容に基づいて変更されます</p>
+<hr>
+<h2 id="ccs%E9%9D%9E%E6%8E%A8%E5%A5%A8%E5%91%BD%E4%BB%A4%E7%8B%AC%E8%87%AA%E5%91%BD%E4%BB%A4">CCS（非推奨命令）（独自命令）</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0x7F...ccs</li>
+</ul>
 <h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
-<h3 id="%E6%93%8D%E4%BD%9C">操作</h3>
+<p>インストラクションポインタを、インストラクションポインタ + コードセグメント *0x10 した値に変更し、コードセグメントを0にします。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
-<h2 id="jcc-w">Jcc      w</h2>
+<p>（なし）</p>
+<hr>
+<h2 id="jcc">Jcc</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0x9X
+<ul>
+<li>0x90...jo   addr[r/m16, imm16]</li>
+<li>0x91...jno  addr[r/m16, imm16]</li>
+<li>0x92...jb   addr[r/m16, imm16]</li>
+<li>0x93...jnb  addr[r/m16, imm16]</li>
+<li>0x94...je   addr[r/m16, imm16]</li>
+<li>0x95...jne  addr[r/m16, imm16]</li>
+<li>0x96...jbe  addr[r/m16, imm16]</li>
+<li>0x97...jnbe addr[r/m16, imm16]</li>
+<li>0x98...js   addr[r/m16, imm16]</li>
+<li>0x99...jns  addr[r/m16, imm16]</li>
+<li>0x9A...jp   addr[r/m16, imm16]</li>
+<li>0x9B...jnp  addr[r/m16, imm16]</li>
+<li>0x9C...jl   addr[r/m16, imm16]</li>
+<li>0x9D...jnl  addr[r/m16, imm16]</li>
+<li>0x9E...jle  addr[r/m16, imm16]</li>
+<li>0x9F...jnle addr[r/m16, imm16]</li>
+</ul>
+</li>
+</ul>
 <h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
-<h3 id="%E6%93%8D%E4%BD%9C">操作</h3>
+<p>各フラグをテストし、条件が一致する場合は、インストラクションポインタを第一オペランドに変更します。
+コードセグメントは変更されません。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
-<h2 id="jf-w">JF       w</h2>
+<p>（なし）</p>
+<hr>
+<h2 id="jc">JC</h2>
 <h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0xA0...jc addr[r/16, imm16]</li>
+</ul>
 <h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
-<h3 id="%E6%93%8D%E4%BD%9C">操作</h3>
+<p>キャリーフラグをテストし、セットされている場合は、インストラクションポインタを第一オペランドに変更します。
+コードセグメントは変更されません。</p>
 <h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
+<p>（なし）</p>
+<hr>
+<h2 id="jnc">JNC</h2>
+<h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0xA1...jnc addr[r/16, imm16]</li>
+</ul>
+<h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
+<p>キャリーフラグをテストし、セットされていない場合は、インストラクションポインタを第一オペランドに変更します。
+コードセグメントは変更されません。</p>
+<h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
+<p>（なし）</p>
+<hr>
+<h2 id="jcxz">JCXZ</h2>
+<h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0xA2...jcxz addr[r/16, imm16]</li>
+</ul>
+<h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
+<p>CX レジスタが0の場合のみ、インストラクションポインタを第一オペランドに変更します。
+コードセグメントは変更されません。</p>
+<h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
+<p>（なし）</p>
+<hr>
+<h2 id="jf%E7%8B%AC%E8%87%AA%E5%91%BD%E4%BB%A4">JF（独自命令）</h2>
+<h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0xAE...jf addr[r/m16, imm16]</li>
+</ul>
+<h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
+<p>セグメントレジスタ ES をコードセグメントに、第一オペランドをインストラクションポインタに変更します。</p>
+<h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
+<p>（なし）</p>
+<hr>
+<h2 id="jmp">JMP</h2>
+<h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0xAF...jmp addr[r/m16, imm16]</li>
+</ul>
+<h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
+<p>インストラクションポインタを第一オペランドの内容に変更します。コードセグメントは変更されません。</p>
+<h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
+<p>（なし）</p>
+<hr>
+<h2 id="dbg%E7%8B%AC%E8%87%AA%E5%91%BD%E4%BB%A4">DBG（独自命令）</h2>
+<h3 id="%E6%A7%8B%E6%96%87">構文</h3>
+<ul>
+<li>0xFD...dbg</li>
+</ul>
+<h3 id="%E8%AA%AC%E6%98%8E">説明</h3>
+<p>現在の全てのレジスタの内容、起動からの経過時間とCPUサイクル数をデバッグログに出力します。エミュレータのデバッグ画面に内容が表示されます。</p>
+<h3 id="%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%82%8B%E3%83%95%E3%83%A9%E3%82%B0">変更されるフラグ</h3>
+<p>（なし）</p>
 
 </body>
 </html>
