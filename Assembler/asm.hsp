@@ -152,6 +152,9 @@
     #addition "arch\\com\\transform.hsp"
 
     sdim vstr_debugtxt
+    vint_debugindex = 1
+
+    vstr_debugtxt.0 = "ORG     :ADDR    "
 
     notesel vstr_inputfileData
     exist vstr_inputfileName
