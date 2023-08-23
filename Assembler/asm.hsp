@@ -593,6 +593,7 @@
 
                                 vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
                                 vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_assembledDataNextIndex )
+                                vstr_debugtxt.vint_debugindex += strf( "%-8s", "&DB" )
                                 vstr_debugtxt.vint_debugindex += int( vtable_enum.1.cnt )
                                 vint_debugindex ++
 
@@ -610,10 +611,11 @@
 
                     if ( instr( vstr_code.cnt, 0, "\"" ) == 0 ) {
 
-                        poke vbin_assembledData, vint_assembledDataNextIndex, strtrim( vstr_code.cnt, 0, '\"' )
+                        poke vbin_assembledData, vint_assembledDataNextIndex, strmid( vstr_code.cnt, 1, strlen( vstr_code.cnt ) -2 )
                         vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
                         vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_assembledDataNextIndex )
-                        vstr_debugtxt.vint_debugindex += strtrim( vstr_code.cnt, 0, '\"' )
+                        vstr_debugtxt.vint_debugindex += strf( "%-8s", "&DB" )
+                        vstr_debugtxt.vint_debugindex += vstr_code.cnt
                         vint_debugindex ++
 
                         vint_assembledDataNextIndex += strsize
@@ -635,6 +637,7 @@
 
                         vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
                         vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_assembledDataNextIndex )
+                        vstr_debugtxt.vint_debugindex += strf( "%-8s", "&DB" )
                         vstr_debugtxt.vint_debugindex += vint_temp
                         vint_debugindex ++
 
@@ -669,6 +672,7 @@
 
                                 vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
                                 vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_assembledDataNextIndex )
+                                vstr_debugtxt.vint_debugindex += strf( "%-8s", "&DW" )
                                 vstr_debugtxt.vint_debugindex += int( vtable_enum.1.cnt )
                                 vint_debugindex ++
 
@@ -686,10 +690,11 @@
 
                     if ( instr( vstr_code.cnt, 0, "\"" ) == 0 ) {
 
-                        wpoke vbin_assembledData, vint_assembledDataNextIndex, strtrim( vstr_code.cnt, 0, '\"' )
+                        wpoke vbin_assembledData, vint_assembledDataNextIndex, strmid( vstr_code.cnt, 1, strlen( vstr_code.cnt ) -2 )
                         vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
                         vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_assembledDataNextIndex )
-                        vstr_debugtxt.vint_debugindex += strtrim( vstr_code.cnt, 0, '\"' )
+                        vstr_debugtxt.vint_debugindex += strf( "%-8s", "&DW" )
+                        vstr_debugtxt.vint_debugindex += vstr_code.cnt
                         vint_debugindex ++
                         vint_assembledDataNextIndex += strsize
                         vint_currentaddress += strsize
@@ -709,6 +714,7 @@
                         wpoke vbin_assembledData, vint_assembledDataNextIndex, vint_temp
                         vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
                         vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_assembledDataNextIndex )
+                        vstr_debugtxt.vint_debugindex += strf( "%-8s", "&DW" )
                         vstr_debugtxt.vint_debugindex += vint_temp
                         vint_debugindex ++
 
@@ -732,10 +738,11 @@
             vtable_label.0.vint_labelIndex = vstr_code.1
             vtable_label.1.vint_labelIndex = str( vint_currentaddress + vint_originaddr )
 
+            vint_debugindex ++
             vstr_debugtxt.vint_debugindex += strf( "%08X:", vint_originaddr )
             vstr_debugtxt.vint_debugindex += strf( "%08X    ", vint_currentaddress )
             vstr_debugtxt.vint_debugindex += vstr_code.1
-            vint_debugindex += 2
+            vint_debugindex ++
 
             vint_labelIndex ++
 
@@ -768,13 +775,13 @@
 
             if ( ( vstr_code.3 == "" ) or ( vstr_code.3 == ";" ) ) {
 
-                vstr_debugtxt.vint_debugindex += ""+ vstr_code.1 +" "+ vstr_code.2
+                vstr_debugtxt.vint_debugindex += ""+ strf( "%-8s", vstr_code.1 ) +" "+ vstr_code.2
 
             } else {
 
                 if ( ( vstr_code.4 == "" ) or ( vstr_code.4 == ";" ) ) {
 
-                    vstr_debugtxt.vint_debugindex += ""+ vstr_code.1 +" "+ vstr_code.2 +", "+ vstr_code.3
+                    vstr_debugtxt.vint_debugindex += ""+ strf( "%-8s", vstr_code.1 ) +" "+ vstr_code.2 +", "+ vstr_code.3
 
                 }
 
