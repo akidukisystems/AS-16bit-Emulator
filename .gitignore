@@ -20,4 +20,4 @@ Assembler/bios(vram).asm
 Assembler/*.dbg
 
 #VSCode system file
-.vscode
+.vscode/
