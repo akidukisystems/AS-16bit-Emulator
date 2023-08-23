@@ -18,3 +18,6 @@ Assembler/*.img
 Assembler/bom.asm
 Assembler/bios(vram).asm
 Assembler/*.dbg
+
+#VSCode system file
+.vscode
