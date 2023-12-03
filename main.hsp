@@ -430,9 +430,9 @@
     vsave "dump_all.bin"
     bsave "dump_mem.bin", emu_vbin_Memory
     vsave_start
-    vsave_put vbin_CPUresistorG
-    vsave_put vbin_CPUresistorS
-    vsave_put vbin_CPUresistorE
+    vsave_put vbin_CPUregisterG
+    vsave_put vbin_CPUregisterS
+    vsave_put vbin_CPUregisterE
     vsave_end "dump_res.bin"
 
     vstr_temp = putstacltrace()
@@ -445,7 +445,7 @@
 
     vload "dump_all.bin"
 
-    vbin_CPUtmp.0 = fetchResistorWe(rFL)
+    vbin_CPUtmp.0 = fetchRegisterWe(rFL)
 
         vbin_CPUtmpS.0 = ""
         repeat 16
@@ -482,8 +482,8 @@
 
         loop
 
-        putmes_msglib "AX="+ strf("%04X", fetchResistorWg(rAX)) +" BX="+ strf("%04X", fetchResistorWg(rBX)) +" CX="+ strf("%04X", fetchResistorWg(rCX)) +" DX="+ strf("%04X", fetchResistorWg(rDX)) +" SI="+ strf("%04X", fetchResistorWg(rSI)) +" DI="+ strf("%04X", fetchResistorWg(rDI)) +" BP="+ strf("%04X", fetchResistorWg(rBP)) +" SP="+ strf("%04X", fetchResistorWg(rSP)) +"\n", SCREEN_DEBUGLOG_ID
-        putmes_msglib "CS="+ strf("%04X", fetchResistorWs(rCS)) +" DS="+ strf("%04X", fetchResistorWs(rDS)) +" ES="+ strf("%04X", fetchResistorWs(rES)) +" SS="+ strf("%04X", fetchResistorWs(rSS)) +" IP="+ strf("%04X", fetchResistorWe(rIP)) +" "+ vbin_CPUtmpS.0 +"\n", SCREEN_DEBUGLOG_ID
+        putmes_msglib "AX="+ strf("%04X", fetchRegisterWg(rAX)) +" BX="+ strf("%04X", fetchRegisterWg(rBX)) +" CX="+ strf("%04X", fetchRegisterWg(rCX)) +" DX="+ strf("%04X", fetchRegisterWg(rDX)) +" SI="+ strf("%04X", fetchRegisterWg(rSI)) +" DI="+ strf("%04X", fetchRegisterWg(rDI)) +" BP="+ strf("%04X", fetchRegisterWg(rBP)) +" SP="+ strf("%04X", fetchRegisterWg(rSP)) +"\n", SCREEN_DEBUGLOG_ID
+        putmes_msglib "CS="+ strf("%04X", fetchRegisterWs(rCS)) +" DS="+ strf("%04X", fetchRegisterWs(rDS)) +" ES="+ strf("%04X", fetchRegisterWs(rES)) +" SS="+ strf("%04X", fetchRegisterWs(rSS)) +" IP="+ strf("%04X", fetchRegisterWe(rIP)) +" "+ vbin_CPUtmpS.0 +"\n", SCREEN_DEBUGLOG_ID
         putmes_msglib "TIME="+ gettick(0) +" ms\n", SCREEN_DEBUGLOG_ID
         putmes_msglib "TICK="+ emu_vint_executedCmd +"\n\n", SCREEN_DEBUGLOG_ID
 

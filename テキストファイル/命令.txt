@@ -10,7 +10,7 @@ step 1: パラメータを読む
 
 	
 =オペランドタイプ
-Resistor	0x1
+Register	0x1
 Memory		0x2
 Pointer		0x3
 Value		0x4

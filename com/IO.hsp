@@ -10,7 +10,7 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.1 && 0xF0 ) == 0x00 ) : {
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.1 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.1 )
 
             }
         swbreak
@@ -29,7 +29,7 @@
 
         if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x03の場合（汎用BYTE_HIGHレジスタ）
 
-            writeResistorWg vint_CPUparam.0, vint_CPUio_Result
+            writeRegisterWg vint_CPUparam.0, vint_CPUio_Result
 
         }
         
@@ -49,7 +49,7 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : {
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
         swbreak
@@ -60,7 +60,7 @@
 
         if ( ( vint_CPUparam.1 && 0xF0 ) == 0x00 ) : {
 
-            vbin_CPUtmp.1 = fetchResistorWg ( vint_CPUparam.1 )
+            vbin_CPUtmp.1 = fetchRegisterWg ( vint_CPUparam.1 )
 
         }
 

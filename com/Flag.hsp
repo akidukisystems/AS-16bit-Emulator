@@ -60,7 +60,7 @@
     if ( vbin_CPUmeirei_Main == 0x87 ) : { // LAHF
 
         vbin_CPUtmp = %00000010
-        vbin_CPUtmp.1 = fetchResistorWe(rFL)
+        vbin_CPUtmp.1 = fetchRegisterWe(rFL)
 
         if ( vbin_CPUtmp.1 && fCF ) {
 
@@ -92,15 +92,15 @@
 
         }
 
-        writeResistorWg rAH, vbin_CPUtmp
+        writeRegisterWg rAH, vbin_CPUtmp
         return
 
     }
 
     if ( vbin_CPUmeirei_Main == 0x88 ) : { // SAHF
 
-        vbin_CPUtmp = fetchResistorWe(rFL)
-        vbin_CPUtmp.1 = fetchResistorWg(rAH)
+        vbin_CPUtmp = fetchRegisterWe(rFL)
+        vbin_CPUtmp.1 = fetchRegisterWg(rAH)
 
         if ( vbin_CPUtmp.1 && 1 ) {
 
@@ -152,7 +152,7 @@
 
         }
 
-        writeResistorWe rFL, vbin_CPUtmp
+        writeRegisterWe rFL, vbin_CPUtmp
         return
 
     }

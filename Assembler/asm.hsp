@@ -126,9 +126,9 @@
     vstr_loadline = ""
     vstr_fixedData = ""
 
-    vstr_resistorWordTable      = "AX", "BX", "CX", "DX", "SI", "DI", "BP", "SP", "CS", "DS", "ES", "SS", "IP", "FL"
-    vstr_resistorByteHighTable  = "AH", "BH", "CH", "DH"
-    vstr_resistorByteLowTable   = "AL", "BL", "CL", "DL"
+    vstr_registerWordTable      = "AX", "BX", "CX", "DX", "SI", "DI", "BP", "SP", "CS", "DS", "ES", "SS", "IP", "FL"
+    vstr_registerByteHighTable  = "AH", "BH", "CH", "DH"
+    vstr_registerByteLowTable   = "AL", "BL", "CL", "DL"
 
     vtable_com_wordTable = ""
     #addition "arch\\com\\wordtable.hsp"
@@ -867,16 +867,16 @@
 
         //pointer
 
-        foreach vstr_resistorWordTable
+        foreach vstr_registerWordTable
 
-            if ( vstr_code.2 == "["+ vstr_resistorWordTable.cnt +"]" ) {
+            if ( vstr_code.2 == "["+ vstr_registerWordTable.cnt +"]" ) {
 
                 vtable_type.0.vint_thisNoteIndex = SIZE_WORD
                 vtable_type.1.vint_thisNoteIndex = PRM_POINTER
 
             }
 
-            if ( vstr_code.3 == "["+ vstr_resistorWordTable.cnt +"]" ) {
+            if ( vstr_code.3 == "["+ vstr_registerWordTable.cnt +"]" ) {
 
                 vtable_type.0.vint_thisNoteIndex = SIZE_WORD
                 vtable_type.2.vint_thisNoteIndex = PRM_POINTER
@@ -885,16 +885,16 @@
 
         loop
 
-        foreach vstr_resistorByteHighTable
+        foreach vstr_registerByteHighTable
 
-            if ( vstr_code.2 == "["+ vstr_resistorByteHighTable.cnt +"]" ) {
+            if ( vstr_code.2 == "["+ vstr_registerByteHighTable.cnt +"]" ) {
 
                 if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
                 vtable_type.1.vint_thisNoteIndex = PRM_POINTER
 
             }
 
-            if ( vstr_code.3 == "["+ vstr_resistorByteHighTable.cnt +"]" ) {
+            if ( vstr_code.3 == "["+ vstr_registerByteHighTable.cnt +"]" ) {
 
                 if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
                 vtable_type.2.vint_thisNoteIndex = PRM_POINTER
@@ -904,16 +904,16 @@
 
         loop
 
-        foreach vstr_resistorByteLowTable
+        foreach vstr_registerByteLowTable
 
-            if ( vstr_code.2 == "["+ vstr_resistorByteLowTable.cnt +"]" ) {
+            if ( vstr_code.2 == "["+ vstr_registerByteLowTable.cnt +"]" ) {
 
                 if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
                 vtable_type.1.vint_thisNoteIndex = PRM_POINTER
 
             }
 
-            if ( vstr_code.3 == "["+ vstr_resistorByteLowTable.cnt +"]" ) {
+            if ( vstr_code.3 == "["+ vstr_registerByteLowTable.cnt +"]" ) {
 
                 if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
                 vtable_type.2.vint_thisNoteIndex = PRM_POINTER
@@ -924,18 +924,18 @@
 
         loop
 
-        //resistor
+        //register
 
-        foreach vstr_resistorWordTable
+        foreach vstr_registerWordTable
 
-            if ( vstr_code.2 == vstr_resistorWordTable.cnt ) {
+            if ( vstr_code.2 == vstr_registerWordTable.cnt ) {
 
                 vtable_type.0.vint_thisNoteIndex = SIZE_WORD
                 vtable_type.1.vint_thisNoteIndex = PRM_RESISTOR
 
             }
 
-            if ( vstr_code.3 == vstr_resistorWordTable.cnt ) {
+            if ( vstr_code.3 == vstr_registerWordTable.cnt ) {
 
                 vtable_type.0.vint_thisNoteIndex = SIZE_WORD
                 vtable_type.2.vint_thisNoteIndex = PRM_RESISTOR
@@ -944,16 +944,16 @@
 
         loop
 
-        foreach vstr_resistorByteHighTable
+        foreach vstr_registerByteHighTable
 
-            if ( vstr_code.2 == vstr_resistorByteHighTable.cnt ) {
+            if ( vstr_code.2 == vstr_registerByteHighTable.cnt ) {
 
                 if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
                 vtable_type.1.vint_thisNoteIndex = PRM_RESISTOR
 
             }
 
-            if ( vstr_code.3 == vstr_resistorByteHighTable.cnt ) {
+            if ( vstr_code.3 == vstr_registerByteHighTable.cnt ) {
 
                 if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
                 vtable_type.2.vint_thisNoteIndex = PRM_RESISTOR
@@ -963,16 +963,16 @@
 
         loop
 
-        foreach vstr_resistorByteLowTable
+        foreach vstr_registerByteLowTable
 
-            if ( vstr_code.2 == vstr_resistorByteLowTable.cnt ) {
+            if ( vstr_code.2 == vstr_registerByteLowTable.cnt ) {
 
                 if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
                 vtable_type.1.vint_thisNoteIndex = PRM_RESISTOR
 
             }
 
-            if ( vstr_code.3 == vstr_resistorByteLowTable.cnt ) {
+            if ( vstr_code.3 == vstr_registerByteLowTable.cnt ) {
 
                 if ( vtable_type.0.vint_thisNoteIndex != SIZE_WORD ) : vtable_type.0.vint_thisNoteIndex = SIZE_BYTE
                 vtable_type.2.vint_thisNoteIndex = PRM_RESISTOR

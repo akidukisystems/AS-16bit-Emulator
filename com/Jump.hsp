@@ -13,39 +13,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -65,39 +65,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -117,39 +117,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
         
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -169,39 +169,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -221,39 +221,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -273,39 +273,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -325,39 +325,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -377,39 +377,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -429,39 +429,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -481,39 +481,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -533,39 +533,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -585,39 +585,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -643,39 +643,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -701,39 +701,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -759,39 +759,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -817,39 +817,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -869,39 +869,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -921,39 +921,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -961,7 +961,7 @@
 
     if ( vbin_CPUmeirei_Main == 0xA2 ) : { // JCXZ  CX=zero
 
-        if ( fetchResistorWg(rCX) != 0 ) : {
+        if ( fetchRegisterWg(rCX) != 0 ) : {
 
             return
             
@@ -973,39 +973,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 4, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 4, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -1018,40 +1018,40 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rES), vbin_CPUtmp.0, 1, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rES), vbin_CPUtmp.0, 1, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWs rCS, fetchResistorWs(rES)
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWs rCS, fetchRegisterWs(rES)
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -1064,39 +1064,39 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 2, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 2, emu_vint_executedCmd, gettick(0)
 
-        writeResistorWe rIP, vbin_CPUtmp.0
+        writeRegisterWe rIP, vbin_CPUtmp.0
 
         return
 
@@ -1109,45 +1109,45 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        vbin_CPUtmp.1 = fetchResistorWg(rCX)
+        vbin_CPUtmp.1 = fetchRegisterWg(rCX)
         vbin_CPUtmp.1 --
         checkDataW vbin_CPUtmp.1
-        writeResistorWg rCX, vbin_CPUtmp.1
+        writeRegisterWg rCX, vbin_CPUtmp.1
 
         if ( vbin_CPUtmp.1 != 0 ) {
 
-            if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 5, emu_vint_executedCmd, gettick(0)
-            writeResistorWe rIP, vbin_CPUtmp.0
+            if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 5, emu_vint_executedCmd, gettick(0)
+            writeRegisterWe rIP, vbin_CPUtmp.0
 
         }
 
@@ -1162,46 +1162,46 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        vbin_CPUtmp.1 = fetchResistorWg(rCX)
+        vbin_CPUtmp.1 = fetchRegisterWg(rCX)
         vbin_CPUtmp.1 --
         checkDataW vbin_CPUtmp.1
-        writeResistorWg rCX, vbin_CPUtmp.1
+        writeRegisterWg rCX, vbin_CPUtmp.1
         checkFlagW vbin_CPUtmp.1, fZF
 
         if ( ( vbin_CPUtmp.1 ) != 0 and ( TestFlag( fZF ) == fZF ) ) {
 
-            if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 6, emu_vint_executedCmd, gettick(0)
-            writeResistorWe rIP, vbin_CPUtmp.0
+            if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 6, emu_vint_executedCmd, gettick(0)
+            writeRegisterWe rIP, vbin_CPUtmp.0
 
         }
 
@@ -1216,46 +1216,46 @@
         case 0x01 // レジスタ
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.0 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WORDセグメントレジスタ）
 
-                vbin_CPUtmp.0 = fetchResistorWs( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.0 = fetchRegisterWs( vint_CPUparam.0 -0x10 )
 
             }
         swbreak
         case 0x02 // メモリ
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vint_CPUparam.0 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vint_CPUparam.0 )
         swbreak
         case 0x03 // レジスタp
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x00 ) : { // パラメータ1の上位4bitが0x00の場合（汎用WORDレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 )
 
             }
             if ( ( vint_CPUparam.0 && 0xF0 ) == 0x10 ) : { // パラメータ1の上位4bitが0x01の場合（WOEDセグメントレジスタ）
 
-                vbin_CPUtmp.1 = fetchResistorWg( vint_CPUparam.0 -0x10 )
+                vbin_CPUtmp.1 = fetchRegisterWg( vint_CPUparam.0 -0x10 )
 
             }
-            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchResistorWs(rDS) *0x10 + vbin_CPUtmp.1 )
+            vbin_CPUtmp.0 = wpeek( emu_vbin_Memory, fetchRegisterWs(rDS) *0x10 + vbin_CPUtmp.1 )
         swbreak
         case 0x04 // 即値
             vbin_CPUtmp.0 = vint_CPUparam.0
         swbreak
         swend
 
-        vbin_CPUtmp.1 = fetchResistorWg(rCX)
+        vbin_CPUtmp.1 = fetchRegisterWg(rCX)
         vbin_CPUtmp.1 --
         checkDataW vbin_CPUtmp.1
-        writeResistorWg rCX, vbin_CPUtmp.1
+        writeRegisterWg rCX, vbin_CPUtmp.1
         checkFlagW vbin_CPUtmp.1, fZF
 
         if ( ( vbin_CPUtmp.1 ) != 0 and ( TestFlag( fZF ) != fZF ) ) {
 
-            if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchResistorWs(rCS), fetchResistorWe(rIP), fetchResistorWs(rCS), vbin_CPUtmp.0, 7, emu_vint_executedCmd, gettick(0)
-            writeResistorWe rIP, vbin_CPUtmp.0
+            if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 7, emu_vint_executedCmd, gettick(0)
+            writeRegisterWe rIP, vbin_CPUtmp.0
 
         }
 
