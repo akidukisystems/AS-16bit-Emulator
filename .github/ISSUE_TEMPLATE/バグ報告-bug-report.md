@@ -1,6 +1,6 @@
 ---
 name: バグ報告 Bug report
-about: Create a report to help us improve
+about: バグが発生しました！
 title: 'バグ報告 [簡潔な情報 例: TYPEコマンド実行時にフリーズします]'
 labels: bug
 assignees: ''
