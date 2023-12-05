@@ -1,5 +1,5 @@
 ---
-name: バグ報告 Bug report
+name: (A) バグ報告 Bug report
 about: バグが発生しました！
 title: 'バグ報告 [簡潔な情報 例: TYPEコマンド実行時にフリーズします]'
 labels: bug
