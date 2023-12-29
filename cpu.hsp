@@ -309,5 +309,33 @@
 
     }
 
+    if ( getwinstat( SCREEN_MONITOR_ID ) ) {
+
+        switch vint_conf_RefreshRate
+            case 0
+                gosub *l_refreshReg
+            swbreak
+            case 1
+                if ( ( vint_CPU_Timer_Count \ 2 ) == 0) : gosub *l_refreshReg
+            swbreak
+            case 2
+                if ( ( vint_CPU_Timer_Count \ 4 ) == 0) : gosub *l_refreshReg
+            swbreak
+            case 3
+                if ( ( vint_CPU_Timer_Count \ 8 ) == 0) : gosub *l_refreshReg
+            swbreak
+            case 4
+                if ( ( vint_CPU_Timer_Count \ 16 ) == 0) : gosub *l_refreshReg
+            swbreak
+            case 5
+                if ( ( vint_CPU_Timer_Count \ 32 ) == 0) : gosub *l_refreshReg
+            swbreak
+            case 6
+                if ( ( vint_CPU_Timer_Count \ 64 ) == 0) : gosub *l_refreshReg
+            swbreak
+        swend
+
+    }
+
     vint_CPU_Timer_Count ++
     return
