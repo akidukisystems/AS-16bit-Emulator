@@ -639,34 +639,34 @@
     redraw 0
 
     color 255, 255, 255 : boxf : color
-    pos 0, 40
+    pos 0, 60
 
     mes "System monitor"
     mes "-Register value"
 
-    pos 0, 80
+    pos 0, 100
     mes "AX "+ strf( "%04X", fetchRegisterWg(rAX) )
     mes "SI "+ strf( "%04X", fetchRegisterWg(rSI) )
     mes "CS "+ strf( "%04X", fetchRegisterWs(rCS) )
     mes "IP "+ strf( "%04X", fetchRegisterWe(rIP) )
 
-    pos 128, 60
+    pos 128, 100
     mes "BX "+ strf( "%04X", fetchRegisterWg(rBX) )
     mes "DI "+ strf( "%04X", fetchRegisterWg(rDI) )
     mes "DS "+ strf( "%04X", fetchRegisterWs(rDS) )
     mes "FLAGS "+ vbin_CPUtmpS.0
 
-    pos 256, 60
+    pos 256, 100
     mes "CX "+ strf( "%04X", fetchRegisterWg(rCX) )
     mes "BP "+ strf( "%04X", fetchRegisterWg(rBP) )
     mes "ES "+ strf( "%04X", fetchRegisterWs(rES) )
 
-    pos 384, 60
+    pos 384, 100
     mes "DX "+ strf( "%04X", fetchRegisterWg(rDX) )
     mes "SP "+ strf( "%04X", fetchRegisterWg(rSP) )
     mes "SS "+ strf( "%04X", fetchRegisterWs(rSS) )
 
-    pos 0, 140
+    pos 0, 180
     mes "TIME(ms) "+ gettick(0)
     mes "TICK "+ emu_vint_executedCmd
 
