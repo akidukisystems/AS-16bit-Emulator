@@ -355,6 +355,8 @@
     cfgAS_read "Processor.RefreshTime", CPU_PIN_REFRESH
     cfgAS_read "Graphic.RefreshTime", DISPLAY_REFRESH_TIME
 
+    vint_CPUspeed = CPU_CLOCK_CYCLE / CPU_CLOCK_WAIT * 1000
+
     color CLR_WHITE
     
     cfgAS_read "BIOS.MemoryTable.StartAddr.MainCodeArea", vint_Ram_BIOS_MainCode.StartAddr
@@ -475,7 +477,7 @@
         mes "\nProcessor"
         mes " -Name: "+ vstr_ProcessorName
         mes " -Vendor: "+ vstr_ProcessorVendor
-        mes " -Speed: 2600 I/s (MAX)"
+        mes " -Speed: "+ vint_CPUspeed +" Cycles/sec (MAX)"
         mes " -Architecture: "+ vstr_ProcessorArchName
 
         stop
