@@ -355,7 +355,7 @@
     cfgAS_read "Processor.RefreshTime", CPU_PIN_REFRESH
     cfgAS_read "Graphic.RefreshTime", DISPLAY_REFRESH_TIME
 
-    vint_CPUspeed = CPU_CLOCK_CYCLE / CPU_CLOCK_WAIT * 1000
+    vint_CPUspeed = CPU_CLOCK_CYCLE / ( CPU_CLOCK_WAIT / 2 ) * 1000
 
     color CLR_WHITE
     
