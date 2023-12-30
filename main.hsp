@@ -346,6 +346,7 @@
     vstr_ProcessorVendor = "(none)"
     vint_VRAM_Format = 1
     vstr_FontName = "Bm437 IBM VGA 8x16"
+    vint_DRAMSize = 1048576
     
     cfgAS_read "Processor.Name", vstr_ProcessorName
     cfgAS_read "Processor.ArchName", vstr_ProcessorArchName
@@ -359,6 +360,8 @@
     vint_CPUspeed = CPU_CLOCK_CYCLE / ( CPU_CLOCK_WAIT / 2 )
 
     color CLR_WHITE
+
+    cfgAS_read "Memory.Size", vint_DRAMSize
     
     cfgAS_read "BIOS.MemoryTable.StartAddr.MainCodeArea", vint_Ram_BIOS_MainCode.StartAddr
     cfgAS_read "BIOS.MemoryTable.EndAddr.MainCodeArea"  , vint_Ram_BIOS_MainCode.EndAddr
@@ -445,7 +448,7 @@
     initscr
 
     vint_CPU_Timer_isActive = false
-    sdim emu_vbin_Memory, 1048576
+    sdim emu_vbin_Memory, vint_DRAMSize
     memcpy emu_vbin_Memory, vbin_BIOS, varsize(vbin_BIOS), vint_Ram_BIOS_MainCode.StartAddr
     sdim emu_vbin_IO, 0xFFFF
     emu_vbin_PIN = 0
@@ -474,7 +477,7 @@
         color 0, 0, 192 : boxf
         color 192, 192, 192 : boxf 5, 5, 640-5, 480-5
         color 0, 0, 192 : boxf 10, 30, 640-10, 480-30
-        pos 10, 10 : mes "AkidukiSystems 16bit Emulator Setup Utility"
+        pos 10, 10 : mes "AkidukiSystems 16bit Emulator Infomation Viewer"
         pos 10, 480-25 : mes "Copyright (c) 2022-2023 AkidukiSystems CC BY-SA 4.0"
 
         color 192, 192, 192
@@ -487,6 +490,8 @@
         mes " -Vendor: "+ vstr_ProcessorVendor
         mes " -Speed: "+ vint_CPUspeed +"K Cycles/sec (MAX)"
         mes " -Architecture: "+ vstr_ProcessorArchName
+        mes "\nMemory"
+        mes " -Size: "+ vint_DRAMSize +" Bytes"
 
         stop
 
