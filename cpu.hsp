@@ -43,7 +43,7 @@
     onkey gosub *l_CPUio_KeyBuffer
 
     oncmd gosub *l_CPU_onTimer, WM_TIMER
-    SetTimer hwnd, 1, 5, 0
+    SetTimer hwnd, 1, 10, 0
     vint_CPU_Timer_isActive = 1
     vint_InterruptNumber = 0
     vint_fetchCmdOffset = 0
