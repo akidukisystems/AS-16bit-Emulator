@@ -1,8 +1,8 @@
-_FILEVERSION=0.13.0
-_PRODUCTVERSION=0.13.0
+_FILEVERSION=1.0.0
+_PRODUCTVERSION=1.0.0
 CompanyName=AkidukiSystems
 FileDescription=AS 16bit-Emulator
-FileVersion=0.13.0
+FileVersion=1.0.0
 OriginalFilename=emulator.exe
 ProductName=AS 16bit-Emulator
-ProductVersion=0.13.0
+ProductVersion=1.0.0
