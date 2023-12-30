@@ -124,7 +124,7 @@
     #enum SCREEN_DISPLAY_ID
     #enum SCREEN_CONTROL_ID
     #enum SCREEN_MONITOR_ID
-    #enum SCREEN_MONITOR_CONFIG_ID
+    #enum SCREEN_CONFIG_ID
     #enum SCREEN_SIZE_X = 640
     #enum SCREEN_SIZE_Y = 480
 
@@ -244,7 +244,7 @@
     screen SCREEN_DISPLAY_ID, SCREEN_SIZE_X, SCREEN_SIZE_Y, 4 +1
     screen SCREEN_CONTROL_ID, SCREEN_SIZE_Y /2, SCREEN_SIZE_X/2, 8+4
     screen SCREEN_MONITOR_ID, SCREEN_SIZE_X, SCREEN_SIZE_Y, 8+4
-    screen SCREEN_MONITOR_CONFIG_ID, SCREEN_SIZE_Y /2, SCREEN_SIZE_X/2, 8+4
+    screen SCREEN_CONFIG_ID, SCREEN_SIZE_X, SCREEN_SIZE_Y, 8+4
 
     vint_conf_RefreshRate = 1
 
@@ -268,26 +268,24 @@
 
 
     winsel SCREEN_DEBUGLOG_ID, SCRnone
-    title "AS 16bit Emulator - debug"
+    title "debug"
 
     winsel SCREEN_DISPLAY_ID, SCRnone
-    title "AS 16bit Emulator - screen"
+    title "screen"
     initscr
     font msgothic, 16
 
     winsel SCREEN_MONITOR_ID, SCRhide
-    title "AS 16bit Emulator - monitor"
+    title "monitor"
     
+    pos 640 -64, 480 -24
     button gosub "Close", *l_control_monitor_close
-    button gosub "Config", *l_control_monitor_config
 
-    winsel SCREEN_MONITOR_CONFIG_ID, SCRhide
-    title "AS 16bit Emulator - monitor - config"
+    winsel SCREEN_CONFIG_ID, SCRhide
+    title "config"
 
-    objsize 128, 20, 0
-    combox vint_conf_RefreshRate, 0, "RealTime\n2 Cycles\n4 Cycles\n8 Cycles\n16 Cycles\n32 Cycles"
-    objsize
-    button gosub "Close", *l_control_monitor_config_close
+    pos 0, 0
+    mes "Please wait..."
 
     winsel SCREEN_CONTROL_ID, SCRnone
     title "Controler"
@@ -297,6 +295,7 @@
     button gosub "DUMP", *l_control_dump
     button goto  "DEBUG", *l_control_debug
     button gosub "MONITOR", *l_control_monitor
+    button gosub "CONFIG", *l_control_config
     
     button gosub "CLEAR LOG", *l_control_clearLog
     button gosub "TOGGLE TRACE", *l_control_tglTrace
@@ -385,6 +384,31 @@
     cfgAS_read "StackTrace.putTrace.#UD2", vint_isEnablePutTraceError_UD2
 
     cfgAS_read "StackTrace.putTrace.HardwareInterrupt", vint_isEnablePutTrace_HardwareInterrupt
+
+    winsel SCREEN_CONFIG_ID, SCRnone
+
+    color 255, 255, 255 : boxf : color : pos 0, 0
+
+    objsize 128, 20, 0
+    mes "Monitor"
+    mes "-RefreshRate", 1
+    combox vint_conf_RefreshRate, 0, "RealTime\n2 Cycles\n4 Cycles\n8 Cycles\n16 Cycles\n32 Cycles" : pos 0, ginfo_cy
+
+    mes "System/CPU"
+    mes "-ClockCycle", 1
+    input CPU_CLOCK_CYCLE, 128, 20, 8 : pos 0, ginfo_cy
+    mes "-ClockPause", 1
+    input CPU_CLOCK_WAIT, 128, 20, 8 : pos 0, ginfo_cy
+    mes "-RefreshTime", 1
+    input CPU_PIN_REFRESH, 128, 20, 8 : pos 0, ginfo_cy
+
+    mes "System/Graphic"
+    mes "-RefreshTime", 1
+    input DISPLAY_REFRESH_TIME, 128, 20, 8 : pos 0, ginfo_cy
+
+    pos 640 -64, 480 -24
+    objsize
+    button gosub "Close", *l_control_config_close
 
     winsel SCREEN_DISPLAY_ID, SCRnone
     font vstr_FontName, 16
@@ -581,15 +605,15 @@
 
     return
 
-*l_control_monitor_config
+*l_control_config
 
-    winsel SCREEN_MONITOR_CONFIG_ID, SCRactive
+    winsel SCREEN_CONFIG_ID, SCRactive
 
     return
 
-*l_control_monitor_config_close
+*l_control_config_close
 
-    winsel SCREEN_MONITOR_CONFIG_ID, SCRhide
+    winsel SCREEN_CONFIG_ID, SCRhide
 
     return
 
@@ -639,34 +663,34 @@
     redraw 0
 
     color 255, 255, 255 : boxf : color
-    pos 0, 60
+    pos 0, 0
 
     mes "System monitor"
     mes "-Register value"
 
-    pos 0, 100
+    pos 0, 40
     mes "AX "+ strf( "%04X", fetchRegisterWg(rAX) )
     mes "SI "+ strf( "%04X", fetchRegisterWg(rSI) )
     mes "CS "+ strf( "%04X", fetchRegisterWs(rCS) )
     mes "IP "+ strf( "%04X", fetchRegisterWe(rIP) )
 
-    pos 128, 100
+    pos 128, 40
     mes "BX "+ strf( "%04X", fetchRegisterWg(rBX) )
     mes "DI "+ strf( "%04X", fetchRegisterWg(rDI) )
     mes "DS "+ strf( "%04X", fetchRegisterWs(rDS) )
     mes "FLAGS "+ vbin_CPUtmpS.0
 
-    pos 256, 100
+    pos 256, 40
     mes "CX "+ strf( "%04X", fetchRegisterWg(rCX) )
     mes "BP "+ strf( "%04X", fetchRegisterWg(rBP) )
     mes "ES "+ strf( "%04X", fetchRegisterWs(rES) )
 
-    pos 384, 100
+    pos 384, 40
     mes "DX "+ strf( "%04X", fetchRegisterWg(rDX) )
     mes "SP "+ strf( "%04X", fetchRegisterWg(rSP) )
     mes "SS "+ strf( "%04X", fetchRegisterWs(rSS) )
 
-    pos 0, 180
+    pos 0, 120
     mes "TIME(ms) "+ gettick(0)
     mes "TICK "+ emu_vint_executedCmd
 
