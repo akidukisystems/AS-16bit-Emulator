@@ -4,7 +4,7 @@ Processor.ArchName="AS16"
 Processor.Vendor="AkidukiSystems"
 Processor.ClockCycle=256
 Processor.ClockPause=12
-Processor.RefreshTime=4
+Processor.RefreshTime=1
 
 #Graphic Settings
 Graphic.Format=2

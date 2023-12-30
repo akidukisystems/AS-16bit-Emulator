@@ -301,11 +301,9 @@
 
     }
 
-    gosub *l_CPU_Display
-
     if ( ( vint_CPU_Timer_Count \ DISPLAY_REFRESH_TIME ) == 0 ) {
 
-        
+        gosub *l_CPU_Display
 
     }
 
