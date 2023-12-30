@@ -292,14 +292,15 @@
 
     objsize SCREEN_SIZE_Y /2, 32, 0
     button gosub "RESET", *l_control_RESET
-    button gosub "DUMP", *l_control_dump
-    button goto  "DEBUG", *l_control_debug
-    button gosub "MONITOR", *l_control_monitor
-    button gosub "CONFIG", *l_control_config
+    button gosub "config", *l_control_config
     
-    button gosub "CLEAR LOG", *l_control_clearLog
-    button gosub "TOGGLE TRACE", *l_control_tglTrace
-    button gosub "CLEAR TRACE", *l_control_clearTrace
+    mes "-Debug"
+    button gosub "Dump memory/reg", *l_control_dump
+    button goto  "Load dump file", *l_control_debug
+    ;button gosub "Monitor", *l_control_monitor
+    button gosub "Clear log", *l_control_clearLog
+    button gosub "Turn-ON Trace", *l_control_tglTrace
+    button gosub "Clear trace", *l_control_clearTrace
     
 
 
@@ -392,9 +393,9 @@
     color 255, 255, 255 : boxf : color : pos 0, 0
 
     objsize 128, 20, 0
-    mes "Monitor"
-    mes "-RefreshRate", 1
-    combox vint_conf_RefreshRate, 0, "RealTime\n2 Cycles\n4 Cycles\n8 Cycles\n16 Cycles\n32 Cycles" : pos 0, ginfo_cy
+    ;mes "Monitor"
+    ;mes "-RefreshRate", 1
+    ;combox vint_conf_RefreshRate, 0, "RealTime\n2 Cycles\n4 Cycles\n8 Cycles\n16 Cycles\n32 Cycles" : pos 0, ginfo_cy
 
     mes "System/CPU"
     mes "-ClockCycle", 1
@@ -451,7 +452,14 @@
     emu_vbin_needReboot = false
     sdim vstr_DisplayString, 4800
     initiation_stack
-    if ( vint_isEnableStacktrace ) : setTrace true
+    if ( vint_isEnableStacktrace ) {
+        
+        setTrace true
+
+        winsel SCREEN_CONTROL_ID, SCRnone
+        objprm 5, "Turn-OFF Trace"
+
+    }
 
     emu_vbin_Memory_Index = vint_Ram_BIOS_MainCode.StartAddr
 
@@ -472,7 +480,7 @@
         color 192, 192, 192
         pos 15, 40
         mes "Emulator"
-        mes " -Version: 0.11 Debug"
+        mes " -Version: 0.13 Debug"
         mes " -BIOS binary file: \""+ vstr_BIOSpath +"\""
         mes "\nProcessor"
         mes " -Name: "+ vstr_ProcessorName
@@ -581,9 +589,15 @@
 
         setTrace false
 
+        winsel SCREEN_CONTROL_ID, SCRnone
+        objprm 5, "Turn-ON Trace"
+
     } else {
 
         setTrace true
+
+        winsel SCREEN_CONTROL_ID, SCRnone
+        objprm 5, "Turn-OFF Trace"
 
     }
 
