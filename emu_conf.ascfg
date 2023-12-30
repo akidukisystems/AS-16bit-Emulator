@@ -6,10 +6,13 @@ Processor.ClockCycle=256
 Processor.ClockPause=12
 Processor.RefreshTime=1
 
+#Memory Settings
+Memory.Size=1048576
+
 #Graphic Settings
 Graphic.Format=2
 Graphic.Font="Bm437 PhoenixVGA 8x16"
-Graphic.RefreshTime=16
+Graphic.RefreshTime=1
 
 #BIOS Setup Settings
 BIOS.MemoryTable.StartAddr.MainCodeArea=$F0000
