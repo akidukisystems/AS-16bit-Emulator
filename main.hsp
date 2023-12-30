@@ -288,18 +288,18 @@
     mes "Please wait..."
 
     winsel SCREEN_CONTROL_ID, SCRnone
-    title "Controler"
+    title "controler"
 
     objsize SCREEN_SIZE_Y /2, 32, 0
     button gosub "RESET", *l_control_RESET
-    button gosub "config", *l_control_config
+    button gosub "Config", *l_control_config
     
     mes "-Debug"
     button gosub "Dump memory/reg", *l_control_dump
     button goto  "Load dump file", *l_control_debug
     ;button gosub "Monitor", *l_control_monitor
     button gosub "Clear log", *l_control_clearLog
-    button gosub "Turn-ON Trace", *l_control_tglTrace
+    button gosub "Turn-ON trace", *l_control_tglTrace
     button gosub "Clear trace", *l_control_clearTrace
     
 
@@ -457,7 +457,7 @@
         setTrace true
 
         winsel SCREEN_CONTROL_ID, SCRnone
-        objprm 5, "Turn-OFF Trace"
+        objprm 5, "Turn-OFF trace"
 
     }
 
@@ -480,7 +480,7 @@
         color 192, 192, 192
         pos 15, 40
         mes "Emulator"
-        mes " -Version: 1.0"
+        mes " -Version: 1.1"
         mes " -BIOS binary file: \""+ vstr_BIOSpath +"\""
         mes "\nProcessor"
         mes " -Name: "+ vstr_ProcessorName
@@ -590,14 +590,14 @@
         setTrace false
 
         winsel SCREEN_CONTROL_ID, SCRnone
-        objprm 5, "Turn-ON Trace"
+        objprm 5, "Turn-ON trace"
 
     } else {
 
         setTrace true
 
         winsel SCREEN_CONTROL_ID, SCRnone
-        objprm 5, "Turn-OFF Trace"
+        objprm 5, "Turn-OFF trace"
 
     }
 
