@@ -1,0 +1,169 @@
+
+    #packopt name "diskmake"
+    #packopt version "diskver.txt"
+    #include "user32.as"
+    #include "..\\msglib.as"
+
+    init_msglib 0, 0, 0
+
+    SECTOR_SIZE = 0     ; bytes     (size)
+    TRUCK_SIZE  = 0     ; sector    (size)
+    CYLS_SIZE   = 0     ; truck     (size)
+    HEAD_CNT    = 0     ;           (size)
+    CLST_SIZE   = 0     ; sector    (size)
+    FAT_CNT     = 0     ;           (size)
+    FAT_POS     = 1     ; clst      (number)
+    FAT_SIZE    = 0     ; clst      (size)
+    vint_cmdmode = 0
+
+    if ( dir_cmdline == "make" ) {
+
+        vint_cmdmode = 1
+
+    }
+
+    sysfont 11
+
+    vint_filecnt = 0
+    vint_Initiated = 0
+
+    vstr_createtable = ""
+    notesel vstr_createtable
+    noteload "create"
+    repeat notemax
+
+        vstr_createLine = ""
+        noteget vstr_createLine, cnt
+        vstr_filename = strmid( vstr_createLine, 1, strlen( vstr_createLine ) -1 )
+        switch strmid( vstr_createLine, 0, 1 )
+        case "?"
+            // initiation
+            sdim varr_str_tmp
+            split vstr_filename, "=", varr_str_tmp
+            if ( varr_str_tmp.0 == "sector" ) :     SECTOR_SIZE = int( varr_str_tmp.1 )
+            if ( varr_str_tmp.0 == "truck" ) :      TRUCK_SIZE  = int( varr_str_tmp.1 )
+            if ( varr_str_tmp.0 == "cyls" ) :       CYLS_SIZE   = int( varr_str_tmp.1 )
+            if ( varr_str_tmp.0 == "head" ) :       HEAD_CNT    = int( varr_str_tmp.1 )
+            if ( varr_str_tmp.0 == "clst" ) :       CLST_SIZE   = int( varr_str_tmp.1 )
+            if ( varr_str_tmp.0 == "fat-cnt" ) :    FAT_CNT     = int( varr_str_tmp.1 )
+            if ( varr_str_tmp.0 == "fat-pos" ) :    FAT_POS     = int( varr_str_tmp.1 )
+            if ( varr_str_tmp.0 == "fat-size" ) :   FAT_SIZE    = int( varr_str_tmp.1 )
+            if ( vstr_filename == "init" ) {
+                sdim vbin_saveBinaryData, HEAD_CNT*CYLS_SIZE*TRUCK_SIZE*SECTOR_SIZE
+                sdim vbin_FATdata, FAT_SIZE*CLST_SIZE*SECTOR_SIZE
+                vint_Initiated = 1
+            }
+        swbreak
+        case "!"
+            // MBR
+            if ( vint_Initiated == 0 ) : dialog "Not initiazed" : stop
+            exist vstr_filename
+            if ( strsize == -1 ) : dialog "File \""+ vstr_filename +"\" is not found" : stop
+            sdim vbin_LoadData, strsize
+            vint_filesize = strsize
+            if ( vint_filesize != SECTOR_SIZE ) : dialog "File \""+ vstr_filename +"\" is too small" : stop
+            bload vstr_filename, vbin_LoadData, vint_filesize
+            memcpy vbin_saveBinaryData, vbin_LoadData, SECTOR_SIZE, 0, 0
+            putmes_msglib "write MBR\n"
+        swbreak
+        case "+"
+            // FILE
+            if ( vint_Initiated == 0 ) : dialog "Not initiazed" : stop
+            // ファイル読み込み
+            exist vstr_filename
+            if ( strsize == -1 ) : dialog "File \""+ vstr_filename +"\" is not found" : stop
+            sdim vbin_LoadData, strsize
+            vint_filesize = strsize
+            bload vstr_filename, vbin_LoadData, vint_filesize
+            
+            // ファイル名が8.3形式に収まらないならエラー
+            if ( strlen( strtrim( vstr_filename, 3, '.' ) ) > 11 ) : dialog "Filename \""+ vstr_filename +"\" is too long" : stop
+
+            // 大文字にする
+            CharUpper varptr(vstr_filename)
+
+            // ファイル名と拡張子で分けて、スペース埋めする
+            vint_filenameDot = instr( vstr_filename, 0, "." )
+            vstr_filename_Name = strf( "%-8s", strmid( vstr_filename, 0, vint_filenameDot ) )
+            vstr_filename_Kaku = strf( "%3s", strmid( vstr_filename, vint_filenameDot +1, 3 ) )
+
+            // ファイルが占有するクラスタ数を算出
+            vint_filecluster = vint_filesize / (CLST_SIZE*SECTOR_SIZE)
+            if ( vint_filesize \ (CLST_SIZE*SECTOR_SIZE) ) : vint_filecluster++
+
+            // 作成日時を算出
+            // 作成時刻         hhhh hmmm mmms ssss
+            // sは実際には2で割られた値が入る
+            vbin_fileCreateTime = 0
+            vint_temp.0 = gettime(4)
+            vint_temp.0 = vint_temp.0 << 11
+            vint_temp.0 = vint_temp.0 || %0000011111111111
+            vint_temp.1 = vbin_fileCreateTime || %1111100000000000
+            vbin_fileCreateTime = vint_temp.0 && vint_temp.1
+            vint_temp.0 = gettime(5)
+            vint_temp.0 = vint_temp.0 << 5
+            vint_temp.0 = vint_temp.0 || %1111100000011111
+            vint_temp.1 = vbin_fileCreateTime || %0000011111100000
+            vbin_fileCreateTime = vint_temp.0 && vint_temp.1
+            vint_temp.0 = gettime(6)
+            vint_temp.0 /= 2
+            vint_temp.0 = vint_temp.0 || %1111111111100000
+            vint_temp.1 = vbin_fileCreateTime || %0000000000011111
+            vbin_fileCreateTime = vint_temp.0 && vint_temp.1
+
+            // 作成日           yyyy yyym mmmd dddd
+            // yは1980から起算した値
+            vbin_fileCreateDate = 0
+            vint_temp.0 = gettime(0)
+            vint_temp.0 -= 1980
+            vint_temp.0 = vint_temp.0 << 9
+            vint_temp.0 = vint_temp.0 || %0000000111111111
+            vint_temp.1 = vbin_fileCreateDate || %1111111000000000
+            vbin_fileCreateDate = vint_temp.0 && vint_temp.1
+            vint_temp.0 = gettime(1)
+            vint_temp.0 = vint_temp.0 << 5
+            vint_temp.0 = vint_temp.0 || %1111111000011111
+            vint_temp.1 = vbin_fileCreateDate || %0000000111100000
+            vbin_fileCreateDate = vint_temp.0 && vint_temp.1
+            vint_temp.0 = gettime(3)
+            vint_temp.0 = vint_temp.0 || %1111111111100000
+            vint_temp.1 = vbin_fileCreateDate || %0000000000011111
+            vbin_fileCreateDate = vint_temp.0 && vint_temp.1
+
+            // FAT情報書き込み
+            poke  vbin_FATdata, vint_filecnt *0x20 +0   , vstr_filename_Name+vstr_filename_Kaku
+            wpoke vbin_FATdata, vint_filecnt *0x20 +0x0C, vbin_fileCreateTime
+            wpoke vbin_FATdata, vint_filecnt *0x20 +0x0E, vbin_fileCreateDate
+            wpoke vbin_FATdata, vint_filecnt *0x20 +0x10, vbin_fileCreateDate
+            wpoke vbin_FATdata, vint_filecnt *0x20 +0x12, vbin_fileCreateTime
+            wpoke vbin_FATdata, vint_filecnt *0x20 +0x14, vbin_fileCreateDate
+            wpoke vbin_FATdata, vint_filecnt *0x20 +0x16, (FAT_POS + FAT_SIZE*FAT_CNT) + vint_nextFilePos
+            lpoke vbin_FATdata, vint_filecnt *0x20 +0x18, vint_filesize
+
+            // ファイルデータ書き込み
+            memcpy vbin_saveBinaryData, vbin_LoadData, vint_filesize, (FAT_POS + FAT_SIZE*FAT_CNT)*CLST_SIZE*SECTOR_SIZE + vint_nextFilePos*SECTOR_SIZE*CLST_SIZE, 0
+
+            putmes_msglib "write FILE:\""+ vstr_filename +"\" FatEntry:(b)"+ (FAT_POS*CLST_SIZE*SECTOR_SIZE + vint_filecnt *0x20) +" ClstEntry:(c)"+ (FAT_POS + vint_nextFilePos) +" FileSize:(b)"+ vint_filesize +"\n"
+            
+            vint_nextFilePos += vint_filecluster
+            vint_filecnt ++
+        swbreak
+        case "="
+            // Save
+            if ( vint_Initiated == 0 ) : dialog "Not initiazed" : stop
+            repeat FAT_CNT
+                memcpy vbin_saveBinaryData, vbin_FATdata, FAT_SIZE*CLST_SIZE*SECTOR_SIZE, (FAT_POS + FAT_SIZE*cnt)*CLST_SIZE*SECTOR_SIZE, 0
+            loop
+            bsave vstr_filename, vbin_saveBinaryData
+            putmes_msglib "Saved at \""+ vstr_filename +"\"\n"
+        swbreak
+        swend
+
+    loop
+
+    if ( vint_cmdmode ) {
+
+        end 0
+
+    }
+    

@@ -123,6 +123,8 @@
     #enum SCREEN_DEBUGLOG_ID = 0
     #enum SCREEN_DISPLAY_ID
     #enum SCREEN_CONTROL_ID
+    #enum SCREEN_MONITOR_ID
+    #enum SCREEN_CONFIG_ID
     #enum SCREEN_SIZE_X = 640
     #enum SCREEN_SIZE_Y = 480
 
@@ -136,9 +138,23 @@
         #enum global SCRnone = 0
         #enum global SCRactive = 1
 
+        #deffunc winselinit
+            dim windowstat, 256
+        return
+
         #deffunc winsel int winsel_winID, int winsel_prm
             gsel winsel_winID, winsel_prm
+            windowstat.winsel_winID = winsel_prm
         return
+
+        #defcfunc getwinstat int getwinstat_winID
+            switch windowstat.getwinstat_winID
+                case 1
+                return 1
+                case -1
+                return 0
+            swend
+        return -1
 
         #deffunc settick int tickID
             SetTick_int.tickID = GetTickCount()
@@ -221,32 +237,70 @@
 
     #endif
 
+    winselinit
+
 
     init_msglib SCREEN_DEBUGLOG_ID, 0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y
-    screen SCREEN_DISPLAY_ID, SCREEN_SIZE_X, SCREEN_SIZE_Y, 4 +1
+    screen SCREEN_DISPLAY_ID, SCREEN_SIZE_X, SCREEN_SIZE_Y, 4
     screen SCREEN_CONTROL_ID, SCREEN_SIZE_Y /2, SCREEN_SIZE_X/2, 8+4
+    screen SCREEN_MONITOR_ID, SCREEN_SIZE_X, SCREEN_SIZE_Y, 8+4
+    screen SCREEN_CONFIG_ID, SCREEN_SIZE_X, SCREEN_SIZE_Y, 8+4
+
+    vint_conf_RefreshRate = 1
+
+    vint_conf_DebugRegFormat_AX = 0
+    vint_conf_DebugRegFormat_BX = 0
+    vint_conf_DebugRegFormat_CX = 0
+    vint_conf_DebugRegFormat_DX = 0
+
+    vint_conf_DebugRegFormat_SI = 0
+    vint_conf_DebugRegFormat_DI = 0
+    vint_conf_DebugRegFormat_BP = 0
+    vint_conf_DebugRegFormat_SP = 0
+
+    vint_conf_DebugRegFormat_CS = 0
+    vint_conf_DebugRegFormat_DS = 0
+    vint_conf_DebugRegFormat_ES = 0
+    vint_conf_DebugRegFormat_SS = 0
+
+    vint_conf_DebugRegFormat_IP = 0
 
 
 
     winsel SCREEN_DEBUGLOG_ID, SCRnone
-    title "AS 16bit Emulator - debug"
+    title "debug"
 
     winsel SCREEN_DISPLAY_ID, SCRnone
-    title "AS 16bit Emulator - screen"
+    title "screen"
     initscr
     font msgothic, 16
 
+    winsel SCREEN_MONITOR_ID, SCRhide
+    title "monitor"
+    
+    pos 640 -64, 480 -24
+    button gosub "Close", *l_control_monitor_close
 
+    winsel SCREEN_CONFIG_ID, SCRhide
+    title "config"
+
+    pos 0, 0
+    mes "Please wait..."
 
     winsel SCREEN_CONTROL_ID, SCRnone
-    title "Controler"
+    title "controler"
+
     objsize SCREEN_SIZE_Y /2, 32, 0
     button gosub "RESET", *l_control_RESET
-    button gosub "DUMP", *l_control_dump
-    button goto  "DEBUG", *l_control_debug
-    button gosub "CLEAR LOG", *l_control_clearLog
-    button gosub "TOGGLE TRACE", *l_control_tglTrace
-    button gosub "CLEAR TRACE", *l_control_clearTrace
+    button gosub "Config", *l_control_config
+    
+    mes "-Debug"
+    button gosub "Dump memory/reg", *l_control_dump
+    button goto  "Load dump file", *l_control_debug
+    ;button gosub "Monitor", *l_control_monitor
+    button gosub "Clear log", *l_control_clearLog
+    button gosub "Turn-ON trace", *l_control_tglTrace
+    button gosub "Clear trace", *l_control_clearTrace
     
 
 
@@ -292,6 +346,7 @@
     vstr_ProcessorVendor = "(none)"
     vint_VRAM_Format = 1
     vstr_FontName = "Bm437 IBM VGA 8x16"
+    vint_DRAMSize = 1048576
     
     cfgAS_read "Processor.Name", vstr_ProcessorName
     cfgAS_read "Processor.ArchName", vstr_ProcessorArchName
@@ -302,7 +357,11 @@
     cfgAS_read "Processor.RefreshTime", CPU_PIN_REFRESH
     cfgAS_read "Graphic.RefreshTime", DISPLAY_REFRESH_TIME
 
+    vint_CPUspeed = CPU_CLOCK_CYCLE / ( CPU_CLOCK_WAIT / 2 )
+
     color CLR_WHITE
+
+    cfgAS_read "Memory.Size", vint_DRAMSize
     
     cfgAS_read "BIOS.MemoryTable.StartAddr.MainCodeArea", vint_Ram_BIOS_MainCode.StartAddr
     cfgAS_read "BIOS.MemoryTable.EndAddr.MainCodeArea"  , vint_Ram_BIOS_MainCode.EndAddr
@@ -331,6 +390,31 @@
     cfgAS_read "StackTrace.putTrace.#UD2", vint_isEnablePutTraceError_UD2
 
     cfgAS_read "StackTrace.putTrace.HardwareInterrupt", vint_isEnablePutTrace_HardwareInterrupt
+
+    winsel SCREEN_CONFIG_ID, SCRnone
+
+    color 255, 255, 255 : boxf : color : pos 0, 0
+
+    objsize 128, 20, 0
+    ;mes "Monitor"
+    ;mes "-RefreshRate", 1
+    ;combox vint_conf_RefreshRate, 0, "RealTime\n2 Cycles\n4 Cycles\n8 Cycles\n16 Cycles\n32 Cycles" : pos 0, ginfo_cy
+
+    mes "System/CPU"
+    mes "-ClockCycle", 1
+    input CPU_CLOCK_CYCLE, 128, 20, 8 : pos 0, ginfo_cy
+    mes "-ClockPause", 1
+    input CPU_CLOCK_WAIT, 128, 20, 8 : pos 0, ginfo_cy
+    mes "-RefreshTime", 1
+    input CPU_PIN_REFRESH, 128, 20, 8 : pos 0, ginfo_cy
+
+    mes "System/Graphic"
+    mes "-RefreshTime", 1
+    input DISPLAY_REFRESH_TIME, 128, 20, 8 : pos 0, ginfo_cy
+
+    pos 640 -64, 480 -24
+    objsize
+    button gosub "Close", *l_control_config_close
 
     winsel SCREEN_DISPLAY_ID, SCRnone
     font vstr_FontName, 16
@@ -364,14 +448,21 @@
     initscr
 
     vint_CPU_Timer_isActive = false
-    sdim emu_vbin_Memory, 1048576
+    sdim emu_vbin_Memory, vint_DRAMSize
     memcpy emu_vbin_Memory, vbin_BIOS, varsize(vbin_BIOS), vint_Ram_BIOS_MainCode.StartAddr
     sdim emu_vbin_IO, 0xFFFF
     emu_vbin_PIN = 0
     emu_vbin_needReboot = false
     sdim vstr_DisplayString, 4800
     initiation_stack
-    if ( vint_isEnableStacktrace ) : setTrace true
+    if ( vint_isEnableStacktrace ) {
+        
+        setTrace true
+
+        winsel SCREEN_CONTROL_ID, SCRnone
+        objprm 5, "Turn-OFF trace"
+
+    }
 
     emu_vbin_Memory_Index = vint_Ram_BIOS_MainCode.StartAddr
 
@@ -386,19 +477,21 @@
         color 0, 0, 192 : boxf
         color 192, 192, 192 : boxf 5, 5, 640-5, 480-5
         color 0, 0, 192 : boxf 10, 30, 640-10, 480-30
-        pos 10, 10 : mes "AkidukiSystems 16bit Emulator Setup Utility"
+        pos 10, 10 : mes "AkidukiSystems 16bit Emulator Infomation Viewer"
         pos 10, 480-25 : mes "Copyright (c) 2022-2023 AkidukiSystems CC BY-SA 4.0"
 
         color 192, 192, 192
         pos 15, 40
         mes "Emulator"
-        mes " -Version: 0.11 Debug"
+        mes " -Version: 1.1"
         mes " -BIOS binary file: \""+ vstr_BIOSpath +"\""
         mes "\nProcessor"
         mes " -Name: "+ vstr_ProcessorName
         mes " -Vendor: "+ vstr_ProcessorVendor
-        mes " -Speed: 2600 I/s (MAX)"
+        mes " -Speed: "+ vint_CPUspeed +"K Cycles/sec (MAX)"
         mes " -Architecture: "+ vstr_ProcessorArchName
+        mes "\nMemory"
+        mes " -Size: "+ vint_DRAMSize +" Bytes"
 
         stop
 
@@ -501,9 +594,15 @@
 
         setTrace false
 
+        winsel SCREEN_CONTROL_ID, SCRnone
+        objprm 5, "Turn-ON trace"
+
     } else {
 
         setTrace true
+
+        winsel SCREEN_CONTROL_ID, SCRnone
+        objprm 5, "Turn-OFF trace"
 
     }
 
@@ -512,6 +611,111 @@
 *l_control_clearTrace
 
     clearTrace
+
+    return
+
+*l_control_monitor
+
+    winsel SCREEN_MONITOR_ID, SCRactive
+
+    return
+
+*l_control_monitor_close
+
+    winsel SCREEN_MONITOR_ID, SCRhide
+
+    return
+
+*l_control_config
+
+    winsel SCREEN_CONFIG_ID, SCRactive
+
+    return
+
+*l_control_config_close
+
+    winsel SCREEN_CONFIG_ID, SCRhide
+
+    return
+
+*l_refreshReg
+
+    if ( getwinstat( SCREEN_MONITOR_ID ) == 0 ) : return
+
+    winsel SCREEN_MONITOR_ID, SCRnone
+
+    vbin_CPUtmp.0 = fetchRegisterWe(rFL)
+
+    vbin_CPUtmpS.0 = ""
+    repeat 16
+        
+        switch cnt
+        case 0
+            if ( vbin_CPUtmp && fCF ) : vbin_CPUtmpS.0 += "C" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 2
+            if ( vbin_CPUtmp && fPF ) : vbin_CPUtmpS.0 += "P" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 4
+            if ( vbin_CPUtmp && fAF ) : vbin_CPUtmpS.0 += "A" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 6
+            if ( vbin_CPUtmp && fZF ) : vbin_CPUtmpS.0 += "Z" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 7
+            if ( vbin_CPUtmp && fSF ) : vbin_CPUtmpS.0 += "S" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 8
+            if ( vbin_CPUtmp && fTF ) : vbin_CPUtmpS.0 += "T" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 9
+            if ( vbin_CPUtmp && fIF ) : vbin_CPUtmpS.0 += "I" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 10
+            if ( vbin_CPUtmp && fDF ) : vbin_CPUtmpS.0 += "D" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 11
+            if ( vbin_CPUtmp && fOF ) : vbin_CPUtmpS.0 += "O" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        swend
+
+    loop
+
+    redraw 0
+
+    color 255, 255, 255 : boxf : color
+    pos 0, 0
+
+    mes "System monitor"
+    mes "-Register value"
+
+    pos 0, 40
+    mes "AX "+ strf( "%04X", fetchRegisterWg(rAX) )
+    mes "SI "+ strf( "%04X", fetchRegisterWg(rSI) )
+    mes "CS "+ strf( "%04X", fetchRegisterWs(rCS) )
+    mes "IP "+ strf( "%04X", fetchRegisterWe(rIP) )
+
+    pos 128, 40
+    mes "BX "+ strf( "%04X", fetchRegisterWg(rBX) )
+    mes "DI "+ strf( "%04X", fetchRegisterWg(rDI) )
+    mes "DS "+ strf( "%04X", fetchRegisterWs(rDS) )
+    mes "FLAGS "+ vbin_CPUtmpS.0
+
+    pos 256, 40
+    mes "CX "+ strf( "%04X", fetchRegisterWg(rCX) )
+    mes "BP "+ strf( "%04X", fetchRegisterWg(rBP) )
+    mes "ES "+ strf( "%04X", fetchRegisterWs(rES) )
+
+    pos 384, 40
+    mes "DX "+ strf( "%04X", fetchRegisterWg(rDX) )
+    mes "SP "+ strf( "%04X", fetchRegisterWg(rSP) )
+    mes "SS "+ strf( "%04X", fetchRegisterWs(rSS) )
+
+    pos 0, 120
+    mes "TIME(ms) "+ gettick(0)
+    mes "TICK "+ emu_vint_executedCmd
+
+    redraw 1
 
     return
 
