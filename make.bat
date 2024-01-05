@@ -70,6 +70,7 @@
     asm.exe version.asm
     asm.exe type.asm
     asm.exe del.asm
+    asm.exe bench.asm
     cd ..\
     exit /b
 
