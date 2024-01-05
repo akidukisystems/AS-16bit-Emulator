@@ -144,7 +144,6 @@ backspace_not:
     JMP     keyloop:
 
 keyInterrupt:
-    DBG
     RET
 
 

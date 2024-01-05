@@ -139,11 +139,9 @@ umerukakutyo:
     JMP     owari:
 
 fileread.crlf:
-DBG
     MOV     SI, message1:
-    DBG
     MOV     AH, 10h
-    DBG
+
     INT     21h
     JMP     fileread.crlf_ret:
 
