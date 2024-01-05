@@ -297,7 +297,7 @@
     mes "-Debug"
     button gosub "Dump memory/reg", *l_control_dump
     button goto  "Load dump file", *l_control_debug
-    ;button gosub "Monitor", *l_control_monitor
+    button gosub "Monitor", *l_control_monitor
     button gosub "Clear log", *l_control_clearLog
     button gosub "Turn-ON trace", *l_control_tglTrace
     button gosub "Clear trace", *l_control_clearTrace
@@ -396,9 +396,9 @@
     color 255, 255, 255 : boxf : color : pos 0, 0
 
     objsize 128, 20, 0
-    ;mes "Monitor"
-    ;mes "-RefreshRate", 1
-    ;combox vint_conf_RefreshRate, 0, "RealTime\n2 Cycles\n4 Cycles\n8 Cycles\n16 Cycles\n32 Cycles" : pos 0, ginfo_cy
+    mes "Monitor"
+    mes "-RefreshRate", 1
+    combox vint_conf_RefreshRate, 0, "RealTime\n2 Cycles\n4 Cycles\n8 Cycles\n16 Cycles\n32 Cycles" : pos 0, ginfo_cy
 
     mes "System/CPU"
     mes "-ClockCycle", 1
@@ -460,7 +460,7 @@
         setTrace true
 
         winsel SCREEN_CONTROL_ID, SCRnone
-        objprm 5, "Turn-OFF trace"
+        objprm 6, "Turn-OFF trace"
 
     }
 
@@ -595,14 +595,14 @@
         setTrace false
 
         winsel SCREEN_CONTROL_ID, SCRnone
-        objprm 5, "Turn-ON trace"
+        objprm 6, "Turn-ON trace"
 
     } else {
 
         setTrace true
 
         winsel SCREEN_CONTROL_ID, SCRnone
-        objprm 5, "Turn-OFF trace"
+        objprm 6, "Turn-OFF trace"
 
     }
 
