@@ -580,7 +580,7 @@
 
     bsave "dump_generel.txt", vbin_CPUtmpS.1, strlen( vbin_CPUtmpS.1 )
 
-    vstr_temp = putstacltrace()
+    vstr_temp = putstacktrace()
     if ( vstr_temp == "" ) : return
 
     vbin_CPUtmpS.1 = "Emulator Stacktrace File\n"
@@ -589,7 +589,7 @@
 
     vbin_CPUtmpS.1 += vstr_temp
 
-    bsave "stacktrace.txt", vbin_CPUtmpS.1, strlen(vbin_CPUtmpS.1)
+    bsave "stacktrace.txt", vbin_CPUtmpS.1, strlen( vbin_CPUtmpS.1 )
 
     return
 

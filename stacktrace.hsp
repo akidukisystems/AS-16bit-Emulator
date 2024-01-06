@@ -149,7 +149,7 @@
 
     return
 
-    #defcfunc putstacltrace
+    #defcfunc putstacktrace
 
     return vstr_stackstring
 
