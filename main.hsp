@@ -454,13 +454,16 @@
     initscr
 
     vint_CPU_Timer_isActive = false
+
     sdim emu_vbin_Memory, vint_DRAMSize
     memcpy emu_vbin_Memory, vbin_BIOS, varsize(vbin_BIOS), vint_Ram_BIOS_MainCode.StartAddr
     sdim emu_vbin_IO, 0xFFFF
     emu_vbin_PIN = 0
     emu_vbin_needReboot = false
     sdim vstr_DisplayString, 4800
+
     initiation_stack
+
     if ( vint_isEnableStacktrace ) {
         
         setTrace true
@@ -584,9 +587,9 @@
     vbin_CPUtmpS.1 += "DateTime="+ getDateStr() +" "+ getTimeStr() +"\n"
     vbin_CPUtmpS.1 += "\n+Stacktrace Infomation\n"
 
-    vstr_temp += vbin_CPUtmpS.1
+    vbin_CPUtmpS.1 += vstr_temp
 
-    bsave "stacktrace.txt", vstr_temp, strlen(vstr_temp)
+    bsave "stacktrace.txt", vbin_CPUtmpS.1, strlen(vbin_CPUtmpS.1)
 
     return
 
