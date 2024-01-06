@@ -7,6 +7,7 @@ packfile
 #16bit Emulator
 error.txt
 dump_*.bin
+dump_*.txt
 github.css
 stacktrace.txt
 

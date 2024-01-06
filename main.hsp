@@ -98,6 +98,12 @@
             else : _p01 = p01
         return _p01
 
+        #defcfunc getDateStr
+        return ""+ gettime(0) + "/"+ strf( "%02d", gettime(1) ) + "/"+ strf( "%02d", gettime(3) )
+
+        #defcfunc getTimeStr
+        return ""+ strf( "%02d", gettime(4) ) + ":"+ strf( "%02d", gettime(5) ) + ":"+ strf( "%02d", gettime(6) )
+
     #global
 
     #include "cfg.as"
@@ -522,14 +528,64 @@
 
     vsave "dump_all.bin"
     bsave "dump_mem.bin", emu_vbin_Memory
-    vsave_start
-    vsave_put vbin_CPUregisterG
-    vsave_put vbin_CPUregisterS
-    vsave_put vbin_CPUregisterE
-    vsave_end "dump_res.bin"
+    
+    vbin_CPUtmp.0 = fetchRegisterWe(rFL)
+
+    vbin_CPUtmpS.0 = ""
+    vbin_CPUtmpS.1 = ""
+    repeat 16
+        
+        switch cnt
+        case 0
+            if ( vbin_CPUtmp && fCF ) : vbin_CPUtmpS.0 += "C" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 2
+            if ( vbin_CPUtmp && fPF ) : vbin_CPUtmpS.0 += "P" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 4
+            if ( vbin_CPUtmp && fAF ) : vbin_CPUtmpS.0 += "A" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 6
+            if ( vbin_CPUtmp && fZF ) : vbin_CPUtmpS.0 += "Z" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 7
+            if ( vbin_CPUtmp && fSF ) : vbin_CPUtmpS.0 += "S" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 8
+            if ( vbin_CPUtmp && fTF ) : vbin_CPUtmpS.0 += "T" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 9
+            if ( vbin_CPUtmp && fIF ) : vbin_CPUtmpS.0 += "I" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 10
+            if ( vbin_CPUtmp && fDF ) : vbin_CPUtmpS.0 += "D" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        case 11
+            if ( vbin_CPUtmp && fOF ) : vbin_CPUtmpS.0 += "O" : else : vbin_CPUtmpS.0 += "-"
+        swbreak
+        swend
+
+    loop
+
+    vbin_CPUtmpS.1 =  "Emulator System Dump File\n"
+    vbin_CPUtmpS.1 += "DateTime="+ getDateStr() +" "+ getTimeStr() +"\n"
+    vbin_CPUtmpS.1 += "\n+Register Infomation\n"
+    vbin_CPUtmpS.1 += "AX="+ strf("%04X", fetchRegisterWg(rAX)) +" BX="+ strf("%04X", fetchRegisterWg(rBX)) +" CX="+ strf("%04X", fetchRegisterWg(rCX)) +" DX="+ strf("%04X", fetchRegisterWg(rDX)) +" SI="+ strf("%04X", fetchRegisterWg(rSI)) +" DI="+ strf("%04X", fetchRegisterWg(rDI)) +" BP="+ strf("%04X", fetchRegisterWg(rBP)) +" SP="+ strf("%04X", fetchRegisterWg(rSP)) +"\n"
+    vbin_CPUtmpS.1 += "CS="+ strf("%04X", fetchRegisterWs(rCS)) +" DS="+ strf("%04X", fetchRegisterWs(rDS)) +" ES="+ strf("%04X", fetchRegisterWs(rES)) +" SS="+ strf("%04X", fetchRegisterWs(rSS)) +" IP="+ strf("%04X", fetchRegisterWe(rIP)) +" "+ vbin_CPUtmpS.0 +"\n"
+    vbin_CPUtmpS.1 += "TIME="+ gettick(0) +" ms\n"
+    vbin_CPUtmpS.1 += "TICK="+ emu_vint_executedCmd
+
+    bsave "dump_generel.txt", vbin_CPUtmpS.1, strlen( vbin_CPUtmpS.1 )
 
     vstr_temp = putstacltrace()
     if ( vstr_temp == "" ) : return
+
+    vbin_CPUtmpS.1 = "Emulator Stacktrace File\n"
+    vbin_CPUtmpS.1 += "DateTime="+ getDateStr() +" "+ getTimeStr() +"\n"
+    vbin_CPUtmpS.1 += "\n+Stacktrace Infomation\n"
+
+    vstr_temp += vbin_CPUtmpS.1
+
     bsave "stacktrace.txt", vstr_temp, strlen(vstr_temp)
 
     return
