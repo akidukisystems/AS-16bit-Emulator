@@ -3,89 +3,89 @@
 
 
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-�@�P�D������ĉ��H
+　１．これって何？
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
-���z�}�V���݂����Ȃ�ł��BIntel��IA-32�}�C�N���A�[�L�e�N�`���Ǝ��Ĕ�Ȃ���́B
-�R�[�h�̌݊����͂Ȃ��ł��B
-
-
-
-_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-�@�Q�D�Ɛӎ���
-_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-
-���̃\�t�g�E�F�A���g�p���A�����Ȃ鑹�Q���������Ă�����҂͈�ؐӔC�𕉂��܂���B
+仮想マシンみたいなやつです。IntelのIA-32マイクロアーキテクチャと似て非なるもの。
+コードの互換性はないです。
 
 
 
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-�@�R�D���ӎ���
+　２．免責事項
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
-���̃\�t�g�E�F�A�́A�N���G�C�e�B�u�E�R�����Y �\�� - �p�� 4.0 ���� ���C�Z���X �̉��ɒ񋟂���Ă��܂��B 
+このソフトウェアを使用し、いかなる損害が発生しても製作者は一切責任を負いません。
+
+
+
+_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+　３．注意事項
+_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+このソフトウェアは、クリエイティブ・コモンズ 表示 - 継承 4.0 国際 ライセンス の下に提供されています。 
 This software is licensed a CC BY-SA 4.0 .
 
 
 
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-�@�S�D�����
+　４．動作環境
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
-�J����
+開発環境
 OS      : Windows 11 Pro 22H2 (Build 22621.2861)
-��ĳ��  : Microsoft VS Code, knowbug, hspc.exe, hsp3.6
+ｿﾌﾄｳｪｱ  : Microsoft VS Code, knowbug, hspc.exe, hsp3.6
 CPU     : AMD Ryzen 5 4500
 Graphic : NVIDIA GeForce RTX 3060
 RAM     : DDR4-3200 PC4-25600 16GBx2
 
-�Œᓮ���
-OS      : AMD64�A�[�L�e�N�`���œ��삷��@Windows Vista �ȏ�� Windows NT�n OS
-CPU     : ���ɂȂ�
-Graphic : ���ɂȂ�
-Display : ���ɂȂ�
-RAM     : ���ɂȂ�
-�󂫗e�� : ���ɂȂ�
+最低動作環境
+OS      : AMD64アーキテクチャで動作する　Windows Vista 以上の Windows NT系 OS
+CPU     : 特になし
+Graphic : 特になし
+Display : 特になし
+RAM     : 特になし
+空き容量 : 特になし
 
 
 
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-�@�T�D�g����
+　５．使い方
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
-�C���X�g�[�����@
-	�W�J���āAhsp3�X�N���v�g�G�f�B�^�Ȃǂ�main.hsp���R���p�C�����Ď��s���Ă��������B
+インストール方法
+	展開して、hsp3スクリプトエディタなどでmain.hspをコンパイルして実行してください。
 
-�A���C���X�g�[�����@
-	�W�J�����t�@�C���S��S�č폜���Ă��������B
+アンインストール方法
+	展開したファイル郡を全て削除してください。
 
 
 
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
-�@�U�D���쌠
+　６．著作権
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
-���ɂ��� �l
+おにたま 様
 
-	�S�Ă� .dll �t�@�C��
+	全ての .dll ファイル
 
-	���쌠�\���́A������ HSPLicense.txt �ɂ���܂��B
+	著作権表示は、同封の HSPLicense.txt にあります。
 
-VileR �l
+VileR 様
 
-	�S�Ă� .fon �t�@�C��
+	全ての .fon ファイル
 
-	�N���G�C�e�B�u�E�R�����Y �\�� - �p�� 4.0 ���ۃ��C�Z���X    ���K������܂��B
-
-
-����ɋ��͂��Ă������������X�ɁA���̏���؂�Ă���\���グ�܂��B
+	クリエイティブ・コモンズ 表示 - 継承 4.0 国際ライセンス    が適応されます。
 
 
+製作に協力してくださった方々に、この場を借りてお礼申し上げます。
 
 
 
-����ҁF�H��
-�A����Fsupport@AkidukiSystems.com
-�z�[���y�[�W�Fhttps://akidukisystems.com
 
-�ŏI�X�V    : 2024/01/07
+
+製作者：秋月
+連絡先：support@AkidukiSystems.com
+ホームページ：https://akidukisystems.com
+
+最終更新    : 2024/01/07
