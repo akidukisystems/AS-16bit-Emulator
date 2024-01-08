@@ -75,42 +75,13 @@
     MOV     AH, 0Eh                     ; テレタイプモード
     INT     10h                         ; ビデオ割り込み
 
-keyloop:
     MOV     AH, 6                       ; キー入力をON
     MOV     AL, 1
     MOV     BH, 1
     INT     16h
     MOV     WORD[@addr_keyboardInterruptHandler], keyInterrupt:
 
-keyloop_fetch:
-    MOV     AH, 1                       ; キーが押されたか確認
-    INT     16h
-    JZ      keyloop_fetch:              ; 0（押されていない）ならループに戻る
-
-    XOR     AX, AX
-    INT     16h                         ; 押されたならキーコード取得
-
-    CMP     AH, 8                       ; BSキー押下
-    JE      backspace:
-
-    CMP     AH, 13                      ; Enterキー押下
-    JE      splitcommand:
-
-    MOV     DS, 07B0h                   ; 7B00hを基準にメモリ操作
-    MOV     BH, BYTE[0000h]             ; 入力された文字を7B02h以降に、文字数を7B00hに記録
-    ADD     BH, 0002h
-    MOV     [BH], AL
-    INC     BH
-    MOV     [BH], 0
-    SUB     BH, 0002h
-    MOV     BYTE[0000h], BH
-    XOR     BX, BX
-    MOV     DS, BX                      ; データセグメントをもどす
-
-    MOV     AH, 0Ah
-    INT     10h
-
-    JMP     keyloop_fetch:
+    JMP     halt:
 
 backspace:
     MOV     AH, 6                       ; キー入力をOFF
@@ -136,14 +107,68 @@ backspace:
     XOR     BX, BX
     MOV     DS, BX                      ; データセグメントをもどす
     
-    JMP     keyloop:
+    MOV     AH, 6                       ; キー入力をON
+    MOV     AL, 1
+    MOV     BH, 1
+    INT     16h
+    MOV     WORD[@addr_keyboardInterruptHandler], keyInterrupt:
+    
+    RET
 
 backspace_not:
     XOR     BX, BX
     MOV     DS, BX                      ; データセグメントをもどす
-    JMP     keyloop:
+
+    MOV     AH, 6                       ; キー入力をON
+    MOV     AL, 1
+    MOV     BH, 1
+    INT     16h
+    MOV     WORD[@addr_keyboardInterruptHandler], keyInterrupt:
+    
+    RET
+
 
 keyInterrupt:
+    MOV     AH, 6                       ; キー入力をOFF
+    MOV     AL, 1
+    MOV     BH, 0
+    INT     16h
+    MOV     WORD[@addr_keyboardInterruptHandler], 0
+
+    MOV     AH, 1                       ; キーが押されたか確認
+    INT     16h                         ; 0（押されていない）ならループに戻る
+    JZ      keyInterrupt_notanykeypushed:
+
+    XOR     AX, AX
+    INT     16h                         ; 押されたならキーコード取得
+
+    CMP     AH, 8                       ; BSキー押下
+    JE      backspace:
+
+    CMP     AH, 13                      ; Enterキー押下
+    JE      splitcommand:
+
+    MOV     DS, 07B0h                   ; 7B00hを基準にメモリ操作
+    MOV     BH, BYTE[0000h]             ; 入力された文字を7B02h以降に、文字数を7B00hに記録
+    ADD     BH, 0002h
+    MOV     [BH], AL
+    INC     BH
+    MOV     [BH], 0
+    SUB     BH, 0002h
+    MOV     BYTE[0000h], BH
+    XOR     BX, BX
+    MOV     DS, BX                      ; データセグメントをもどす
+
+    MOV     AH, 0Ah
+    INT     10h
+
+keyInterrupt_notanykeypushed:
+    MOV     AH, 6                       ; キー入力をON
+    MOV     AL, 1
+    MOV     BH, 1
+    INT     16h
+    MOV     WORD[@addr_keyboardInterruptHandler], keyInterrupt:
+    
     RET
 
 
@@ -215,7 +240,13 @@ splitcommand.end:
 
     MOV     BYTE[7B00h], 0
 
-    JMP     keyloop:
+    MOV     AH, 6                       ; キー入力をON
+    MOV     AL, 1
+    MOV     BH, 1
+    INT     16h
+    MOV     WORD[@addr_keyboardInterruptHandler], keyInterrupt:
+    
+    RET
     
 
 
@@ -232,7 +263,13 @@ doCommand_Fail.notfound:
 
     MOV     BYTE[7B00h], 0              ; 入力文字数リセット
 
-    JMP     keyloop:
+    MOV     AH, 6                       ; キー入力をON
+    MOV     AL, 1
+    MOV     BH, 1
+    INT     16h
+    MOV     WORD[@addr_keyboardInterruptHandler], keyInterrupt:
+    
+    RET
 
 doCommand_Fail.notexec:
     MOV     SI, messageCRLF:
@@ -247,7 +284,13 @@ doCommand_Fail.notexec:
 
     MOV     BYTE[7B00h], 0              ; 入力文字数リセット
 
-    JMP     keyloop:
+    MOV     AH, 6                       ; キー入力をON
+    MOV     AL, 1
+    MOV     BH, 1
+    INT     16h
+    MOV     WORD[@addr_keyboardInterruptHandler], keyInterrupt:
+    
+    RET
 
 checkExecutable:
     PUSHA
