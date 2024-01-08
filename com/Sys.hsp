@@ -33,7 +33,7 @@
         vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, vbin_CPUtmp.0 * 4 )         // オフセット
         vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, vbin_CPUtmp.0 * 4 +2 )      // セグメント
 
-        if ( vint_isEnablePutTrace_CALL ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 1, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_CALL ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 1, emu_vint_executedCmd, gettick(0), vbin_CPUtmp.0
 
         vbin_CPUtmp.3 = fetchRegisterWg(rSP) -2
         checkDataW(vbin_CPUtmp.3)
@@ -61,7 +61,7 @@
         vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, 3 * 4 )
         vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, 3 * 4 +2 )
 
-        if ( vint_isEnablePutTrace_CALL ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 2, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_CALL ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 2, emu_vint_executedCmd, gettick(0), -1
 
         vbin_CPUtmp.3 = fetchRegisterWg(rSP) -2
         checkDataW(vbin_CPUtmp.3)
@@ -95,7 +95,7 @@
         vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, 4 * 4 )
         vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, 4 * 4 +2 )
 
-        if ( vint_isEnablePutTrace_CALL ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_CALL ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 3, emu_vint_executedCmd, gettick(0), -1
 
         vbin_CPUtmp.3 = fetchRegisterWg(rSP) -2
         checkDataW(vbin_CPUtmp.3)
@@ -155,7 +155,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_CALL ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 4, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_CALL ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 4, emu_vint_executedCmd, gettick(0), -1
 
         vbin_CPUtmp.1 = fetchRegisterWg(rSP) -2
         checkDataW(vbin_CPUtmp.1)
@@ -219,7 +219,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_CALL ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), vbin_CPUtmp.0, 0, 5, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_CALL ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), vbin_CPUtmp.0, 0, 5, emu_vint_executedCmd, gettick(0), -1
 
         vbin_CPUtmp.1 = fetchRegisterWg(rSP) -2
         checkDataW(vbin_CPUtmp.1)
@@ -351,7 +351,7 @@
         vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, 6 * 4 )
         vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, 6 * 4 +2 )
 
-        if ( vint_isEnablePutTrace_UD2 ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 6, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace_UD2 ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 6, emu_vint_executedCmd, gettick(0), -1
 
         vbin_CPUtmp.3 = fetchRegisterWg(rSP) -2
         checkDataW(vbin_CPUtmp.3)
