@@ -519,7 +519,7 @@ message_BiosMenu:
     &DB "AkidukiSystems BIOS Setup Utility"
     &DW @CRLF
     &DW @CRLF
-    &DB "BIOS Version: 0.3"
+    &DB "BIOS Version: 0.4"
     &DW @CRLF
     &DB "BIOS Date: "
     &DW @_date.yy_upper
