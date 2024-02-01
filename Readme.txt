@@ -33,7 +33,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 開発環境
-OS      : Windows 11 Pro 22H2 (Build 22631.3007)
+OS      : Windows 11 Pro 23H2 (Build 22631.3007)
 ｿﾌﾄｳｪｱ  : Microsoft VS Code, knowbug, hspc.exe, hsp3.6
 CPU     : AMD Ryzen 7 5800X 8-Core Processor
 Graphic : NVIDIA GeForce RTX 3060
