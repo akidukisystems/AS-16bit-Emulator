@@ -4,30 +4,14 @@
     winsel SCREEN_DISPLAY_ID, SCRnone
     redraw false
 
-    if ( vint_VRAM_Format == 1 ) {
-
-        ; 256bit high-color teretype
-        
-        repeat 80*30
-
-            vint_CPUtmp = peek( emu_vbin_Memory, cnt *2 + $C5A80 )
-
-            if ( vint_CPUtmp == 0x00 ) : break
-
-            poke vstr_DisplayString, cnt, vint_CPUtmp
-
-        loop
-
-        softinitscr
-        mes vstr_DisplayString
-        
+    if ( vint_VRAM_Format == 0 ) {
     }
 
     if ( vint_VRAM_Format == 2 ) {
 
         ;2bit grayscale teretype
 
-        memcpy vstr_DisplayString, emu_vbin_Memory, 80*30, 0, $C6D40
+        memcpy vstr_DisplayString, emu_vbin_Memory, 80*30, 0, vint_Ram_Video.StartAddr
         memexpand vstr_DisplayString, strlen(vstr_DisplayString)
 
         vint_CPUtmp = gettick(0)
@@ -40,24 +24,19 @@
 
     }
 
-    if ( vint_VRAM_Format == 10 ) {
+    if ( vint_VRAM_Format == 4 ) {
 
-        ; VRAM direct addressing
+        ;2bit grayscale teretype
 
-        sdim vstr_DisplayString, 640*480
-        sdim vstr_DisplayString_fixed, 640*480
-        memcpy vstr_DisplayString, emu_vbin_Memory, 640*480, 0, $7D000
+        memcpy vstr_DisplayString, emu_vbin_Memory, 80*30, 0, vint_Ram_Video.StartAddr
+        memexpand vstr_DisplayString, strlen(vstr_DisplayString)
 
-        ; reverse y
+        vint_CPUtmp = gettick(0)
 
-        repeat 480
+        color : boxf
+        color 192, 192, 192 : pos 0, 0
+        mes vstr_DisplayString, 1
 
-            memcpy vstr_DisplayString_fixed, vstr_DisplayString, 640, (480-cnt-1)*640, cnt*640
-        
-        loop
-
-        poke emu_vbin_VRAM, 0, vstr_DisplayString
-        
     }
 
     redraw true

@@ -15,4 +15,18 @@
 
     swbreak
 
+    case 0x31
+
+        if ( vint_CPUioTypeIsIN ) {
+
+            vint_CPUio_Result = vint_VRAM_Format
+
+        } else {
+
+            vint_VRAM_Format = vint_CPUio_PortOutPut
+
+        }
+
+    swbreak
+
     swend

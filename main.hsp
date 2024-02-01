@@ -350,7 +350,7 @@
     vstr_ProcessorName = "(none)"
     vstr_ProcessorArchName = "(none)"
     vstr_ProcessorVendor = "(none)"
-    vint_VRAM_Format = 1
+    vint_VRAM_Format = 0
     vstr_FontName = "Bm437 IBM VGA 8x16"
     vint_DRAMSize = 1048576
     
@@ -361,6 +361,7 @@
     cfgAS_read "Processor.ClockCycle", CPU_CLOCK_CYCLE
     cfgAS_read "Processor.ClockPause", CPU_CLOCK_WAIT
     cfgAS_read "Processor.RefreshTime", CPU_PIN_REFRESH
+
     cfgAS_read "Graphic.RefreshTime", DISPLAY_REFRESH_TIME
 
     vint_CPUspeed = CPU_CLOCK_CYCLE / ( CPU_CLOCK_WAIT / 2 )
@@ -378,6 +379,8 @@
 
     cfgAS_read "Graphic.Format", vint_VRAM_Format
     cfgAS_read "Graphic.Font", vstr_FontName
+    cfgAS_read "Graphic.MemoryTable.StartAddr", vint_Ram_Video.StartAddr
+    cfgAS_read "Graphic.MemoryTable.EndAddr", vint_Ram_Video.EndAddr
 
     vint_isEnablePutTrace_CALL   = true
     vint_isEnablePutTrace_JUMP   = true

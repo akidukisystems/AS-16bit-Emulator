@@ -27,6 +27,10 @@
 
     STI
 
+    MOV     AH, 0
+    MOV     AL, 2
+    INT     10h
+
     MOV     AX, return_only:
     MOV     BX, 10h
     XOR     DX, DX

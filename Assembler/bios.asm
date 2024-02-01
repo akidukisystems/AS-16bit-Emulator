@@ -65,6 +65,10 @@
 
     STI
 
+    MOV     AH, 0
+    MOV     AL, 4
+    INT     10h
+
     MOV     DS, F000h                   ; 文字列のあるセグメント
     MOV     SI, message1:               ; 文字列のあるオフセット
     MOV     AH, 0Eh                     ; テレタイプモード
@@ -558,6 +562,8 @@ int_die:
     
 
 int_video:                              ; ビデオ割り込み (10h)
+    CMP     AH, 00h
+    JE      int_video_setmode:
     CMP     AH, 0Ah                     ; 文字書き込み
     JE      int_video_charput:
     CMP     AH, 0Eh                     ; テレタイプモード
@@ -568,6 +574,17 @@ int_video:                              ; ビデオ割り込み (10h)
     JE      int_video_setcursor:
     CMP     AH, 03h                     ; 画面クリア
     JE      int_video_getcursor:
+
+    IRET
+
+int_video_setmode:
+    PUSH    BX
+    XOR     BX, BX
+    MOV     BL, AL
+
+    OUT     31h, BX
+
+    POP     BX
 
     IRET
 

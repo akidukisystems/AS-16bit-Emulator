@@ -10,9 +10,11 @@ Processor.RefreshTime=1
 Memory.Size=1048576
 
 #Graphic Settings
-Graphic.Format=2
+Graphic.Format=0
 Graphic.Font="Bm437 PhoenixVGA 8x16"
 Graphic.RefreshTime=1
+Graphic.MemoryTable.StartAddr=$C6D40
+Graphic,MemoryTable.EndAddr=$C7FFF
 
 #BIOS Setup Settings
 BIOS.MemoryTable.StartAddr.MainCodeArea=$F0000
