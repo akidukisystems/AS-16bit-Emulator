@@ -33,11 +33,11 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 開発環境
-OS      : Windows 11 Pro 22H2 (Build 22621.2861)
+OS      : Windows 11 Pro 22H2 (Build 22631.3007)
 ｿﾌﾄｳｪｱ  : Microsoft VS Code, knowbug, hspc.exe, hsp3.6
-CPU     : AMD Ryzen 5 4500
+CPU     : AMD Ryzen 7 5800X 8-Core Processor
 Graphic : NVIDIA GeForce RTX 3060
-RAM     : DDR4-3200 PC4-25600 16GBx2
+RAM     : DDR4-3200 PC4-25600 32GBx4
 
 最低動作環境
 OS      : AMD64アーキテクチャで動作する　Windows Vista 以上の Windows NT系 OS
@@ -88,4 +88,4 @@ VileR 様
 連絡先：support@AkidukiSystems.com
 ホームページ：https://akidukisystems.com
 
-最終更新    : 2024/01/07
+最終更新    : 2024/02/01
