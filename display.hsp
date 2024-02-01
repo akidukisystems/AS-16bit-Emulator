@@ -30,9 +30,13 @@
         memcpy vstr_DisplayString, emu_vbin_Memory, 80*30, 0, $C6D40
         memexpand vstr_DisplayString, strlen(vstr_DisplayString)
 
+        vint_CPUtmp = gettick(0)
+
+        if ( ( ( vint_CPUtmp \ 500 ) >= 0 ) and ( ( vint_CPUtmp \ 500 ) <= 250 ) ) : vstr_DisplayString += "_"
+
         color : boxf
         color 192, 192, 192 : pos 0, 0
-        mes vstr_DisplayString
+        mes vstr_DisplayString, 1
 
     }
 
