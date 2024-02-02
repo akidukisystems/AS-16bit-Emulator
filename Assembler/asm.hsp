@@ -269,7 +269,7 @@
 
     // PreProcess
 
-    sdim vstr_code, 64, 8
+    sdim vstr_code, 64, 32
     vint_codeindex = 0
 
     sdim vtable_enum, 64, 2, 256
@@ -296,7 +296,7 @@
 
         noteget vstr_loadline, cnt
 
-        sdim vstr_code, 64, 8
+        sdim vstr_code, 64, 32
         splitExS vstr_loadline, vstr_code, ','
 
         if ( instr( vstr_code.1, 0, "#" ) == 0 ) {
@@ -505,7 +505,7 @@
         vint_thisNoteIndex = cnt
 
         noteget vstr_loadline, cnt
-        sdim vstr_code, 64, 8
+        sdim vstr_code, 64, 32
 
         splitExS vstr_loadline, vstr_code, ','
 
