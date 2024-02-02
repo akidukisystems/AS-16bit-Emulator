@@ -96,9 +96,16 @@
     del /s Assembler\packfile
     del /s Assembler\*.ax
     del /s Assembler\*.dbg
+    del /s Assembler\*.dbg
+    del /s Assembler\*.com
+    del /s Assembler\*.sys
+    del /s Assembler\*.bin
+    del /s Assembler\*.img
     del /s error.txt
     del /s dump_*.bin
+    del /s dump_*.txt
     del /s stacktrace.txt
+
     exit /b
 
 :cleanbin
