@@ -1,5 +1,5 @@
     
-    #config codesize    16384
+    #config codesize    4000h
     #config filename    "bios.bin"
     #origin addr        0000h
     #enum   @CRLF       0A0Dh
@@ -154,172 +154,7 @@ waitBiosMenu_timeout:
 
     JMP     fin:
 
-;   _/_/_/_/  Functions  _/_/_/_/
 
-editFlag:
-    CMP     AL, 0
-    JE      editFlag_Set:
-    CMP     AL, 1
-    JE      editFlag_del:
-    RET
-
-editFlag_Set:
-    PUSH    AX                          ; フラグ編集
-    PUSH    BX
-    MOV     AX, SP
-    ADD     AX, 10
-    MOV     BX, [AX]
-    OR      BX, DX
-    MOV     [AX], BX
-    POP     BX
-    POP     AX
-    RET
-
-editFlag_del:
-    PUSH    AX                          ; フラグ編集
-    PUSH    BX
-    MOV     AX, SP
-    ADD     AX, 10
-    MOV     BX, [AX]
-    NOT     DX
-    AND     BX, DX
-    MOV     [AX], BX
-    POP     BX
-    POP     AX
-    RET
-
-    ; AH...変換種類
-    ; BL...変換する値（raw）
-    ; BX...変換する値（asciiまたはbcd）
-    ; DL...変換された値（raw）
-    ; DX...変換された値（asciiまたはbcd）
-converts:
-    CMP     AH, 00h
-    JE      converts_hex2bcd:
-    CMP     AH, 01h
-    JE      converts_bcd2hex:
-    CMP     AH, 02h
-    JE      converts_bcd2ascii:
-    CMP     AH, 03h
-    JE      converts_ascii2bcd:
-
-    RET
-
-converts_hex2bcd:
-    XOR     CX, CX
-    MOV     CL, 0
-
-converts_hex2bcd.loop:
-    MOV     BH, 0Ah                     ; 10で割ると、余りがBCDの1桁に相当する
-    MOV     AX, BL
-    DIV     BH
-    MOV     CH, AH                      ; 余りをCHに移し、リピート時にpushする
-
-    PUSH    CX
-
-    CMP     AL, 0                       ; 商が0になったらおしまい
-    JE      converts_hex2bcd.done:
-
-    INC     CL                          ; CLは桁数 CHから戻すときに使う
-    MOV     BL, AL
-
-    JMP     converts_hex2bcd.loop:
-
-converts_hex2bcd.done:
-    XOR     DX, DX
-
-converts_hex2bcd.done.loop:
-    POP     CX
-    XOR     AX, AX
-    
-    PUSH    DX                          ; 何桁目か計算し、CLにかける
-    MOV     AH, CL
-    MOV     AL, 10h
-    CALL    pow:
-    MOV     BX, DX
-
-    XOR     DX, DX
-    XOR     AX, AX
-    MOV     AL, CH
-    MUL     BX
-    POP     DX
-    ADD     DX, AX                      ; かけたもの同士で加算していくと、BCDコードになる
-
-    CMP     CL, 0
-    JNE     converts_hex2bcd.done.loop:
-
-    RET
-
-    ; AH...乗数
-    ; AL...基数
-pow:
-    CMP     AH, 0
-    JE      pow_1:
-
-    PUSH    BX
-    PUSH    CX
-    XOR     BX, BX
-    MOV     BL, AH
-    MOV     AH, 0
-    MOV     DX, AX
-    MOV     CX, 1
-
-pow.loop:
-    CMP     CX, BX
-    JE      pow_fin:
-    MUL     DX
-    INC     CX
-    JMP     pow.loop:
-
-pow_1:
-    MOV     DX, 1
-    RET
-
-pow_fin:
-    POP     CX
-    POP     BX
-    MOV     DX, AX
-    RET
-
-
-
-
-
-converts_bcd2hex:
-converts_bcd2ascii:
-
-    MOV     AX, BX
-    AND     AL, 0Fh
-    ADD     AL, 30h
-    MOV     AH, 0
-    PUSH    AX
-
-    MOV     AX, BX
-    AND     AL, F0h
-    SHR     AL, 4
-    ADD     AL, 30h
-    MOV     AH, 0
-    PUSH    AX
-
-    MOV     AX, BX
-    AND     AH, 0Fh
-    ADD     AH, 30h
-
-    XOR     CX, CX
-    MOV     CL, AH
-
-    POP     AX
-    MOV     DH, AL
-
-    POP     AX
-    MOV     DL, AL
-
-    RET
-
-
-converts_ascii2bcd:
-
-    RET
 
 ;   _/_/_/_/  BIOS Menu  _/_/_/_/
 
@@ -500,6 +335,8 @@ fin:
     HLT                                 ; CPUを停止
     JMP     fin:
 
+
+
 ;   _/_/_/_/  Data  _/_/_/_/
 
 message1:
@@ -542,6 +379,175 @@ message_BiosMenu:
     &DW @CRLF
     &DB "Current DateTime: "
     &DB 0
+
+
+
+;   _/_/_/_/  Functions  _/_/_/_/
+
+editFlag:
+    CMP     AL, 0
+    JE      editFlag_Set:
+    CMP     AL, 1
+    JE      editFlag_del:
+    RET
+
+editFlag_Set:
+    PUSH    AX                          ; フラグ編集
+    PUSH    BX
+    MOV     AX, SP
+    ADD     AX, 10
+    MOV     BX, [AX]
+    OR      BX, DX
+    MOV     [AX], BX
+    POP     BX
+    POP     AX
+    RET
+
+editFlag_del:
+    PUSH    AX                          ; フラグ編集
+    PUSH    BX
+    MOV     AX, SP
+    ADD     AX, 10
+    MOV     BX, [AX]
+    NOT     DX
+    AND     BX, DX
+    MOV     [AX], BX
+    POP     BX
+    POP     AX
+    RET
+
+    ; AH...変換種類
+    ; BL...変換する値（raw）
+    ; BX...変換する値（asciiまたはbcd）
+    ; DL...変換された値（raw）
+    ; DX...変換された値（asciiまたはbcd）
+converts:
+    CMP     AH, 00h
+    JE      converts_hex2bcd:
+    CMP     AH, 01h
+    JE      converts_bcd2hex:
+    CMP     AH, 02h
+    JE      converts_bcd2ascii:
+    CMP     AH, 03h
+    JE      converts_ascii2bcd:
+
+    RET
+
+converts_hex2bcd:
+    XOR     CX, CX
+    MOV     CL, 0
+
+converts_hex2bcd.loop:
+    MOV     BH, 0Ah                     ; 10で割ると、余りがBCDの1桁に相当する
+    MOV     AX, BL
+    DIV     BH
+    MOV     CH, AH                      ; 余りをCHに移し、リピート時にpushする
+
+    PUSH    CX
+
+    CMP     AL, 0                       ; 商が0になったらおしまい
+    JE      converts_hex2bcd.done:
+
+    INC     CL                          ; CLは桁数 CHから戻すときに使う
+    MOV     BL, AL
+
+    JMP     converts_hex2bcd.loop:
+
+converts_hex2bcd.done:
+    XOR     DX, DX
+
+converts_hex2bcd.done.loop:
+    POP     CX
+    XOR     AX, AX
+    
+    PUSH    DX                          ; 何桁目か計算し、CLにかける
+    MOV     AH, CL
+    MOV     AL, 10h
+    CALL    pow:
+    MOV     BX, DX
+
+    XOR     DX, DX
+    XOR     AX, AX
+    MOV     AL, CH
+    MUL     BX
+    POP     DX
+    ADD     DX, AX                      ; かけたもの同士で加算していくと、BCDコードになる
+
+    CMP     CL, 0
+    JNE     converts_hex2bcd.done.loop:
+
+    RET
+
+    ; AH...乗数
+    ; AL...基数
+pow:
+    CMP     AH, 0
+    JE      pow_1:
+
+    PUSH    BX
+    PUSH    CX
+    XOR     BX, BX
+    MOV     BL, AH
+    MOV     AH, 0
+    MOV     DX, AX
+    MOV     CX, 1
+
+pow.loop:
+    CMP     CX, BX
+    JE      pow_fin:
+    MUL     DX
+    INC     CX
+    JMP     pow.loop:
+
+pow_1:
+    MOV     DX, 1
+    RET
+
+pow_fin:
+    POP     CX
+    POP     BX
+    MOV     DX, AX
+    RET
+
+
+
+converts_bcd2hex:
+converts_bcd2ascii:
+
+    MOV     AX, BX
+    AND     AL, 0Fh
+    ADD     AL, 30h
+    MOV     AH, 0
+    PUSH    AX
+
+    MOV     AX, BX
+    AND     AL, F0h
+    SHR     AL, 4
+    ADD     AL, 30h
+    MOV     AH, 0
+    PUSH    AX
+
+    MOV     AX, BX
+    AND     AH, 0Fh
+    ADD     AH, 30h
+
+    XOR     CX, CX
+    MOV     CL, AH
+
+    POP     AX
+    MOV     DH, AL
+
+    POP     AX
+    MOV     DL, AL
+
+    RET
+
+
+converts_ascii2bcd:
+
+    RET
+
+
 
 ;   _/_/_/_/  Interrupt Routine  _/_/_/_/
 
