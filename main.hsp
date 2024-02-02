@@ -377,7 +377,6 @@
     cfgAS_read "BIOS.MemoryTable.EndAddr.SubCodeArea"  , vint_Ram_BIOS_SubCode.EndAddr
     vint_Ram_BIOS_SubCode.SizeAddr = vint_Ram_BIOS_SubCode.EndAddr - vint_Ram_BIOS_SubCode.StartAddr +1
 
-    cfgAS_read "Graphic.Format", vint_VRAM_Format
     cfgAS_read "Graphic.Font", vstr_FontName
     cfgAS_read "Graphic.MemoryTable.StartAddr", vint_Ram_Video.StartAddr
     cfgAS_read "Graphic.MemoryTable.EndAddr", vint_Ram_Video.EndAddr
@@ -440,9 +439,6 @@
         
     }
 
-    sdim vbin_BIOS, strsize
-    bload vstr_BIOSpath, vbin_BIOS, strsize
-
     onkey gosub *l_bootKeyPush
     onexit *l_exit
 
@@ -453,10 +449,15 @@
 
 *l_emuEntry
 
+    cfgAS_read "Graphic.Format", vint_VRAM_Format
+
     winsel SCREEN_DISPLAY_ID, SCRnone
     initscr
 
     vint_CPU_Timer_isActive = false
+
+    sdim vbin_BIOS, strsize
+    bload vstr_BIOSpath, vbin_BIOS, strsize
 
     sdim emu_vbin_Memory, vint_DRAMSize
     memcpy emu_vbin_Memory, vbin_BIOS, varsize(vbin_BIOS), vint_Ram_BIOS_MainCode.StartAddr
@@ -490,7 +491,7 @@
         color 192, 192, 192 : boxf 5, 5, 640-5, 480-5
         color 0, 0, 192 : boxf 10, 30, 640-10, 480-30
         pos 10, 10 : mes "AkidukiSystems 16bit Emulator Infomation Viewer"
-        pos 10, 480-25 : mes "Copyright (c) 2022-2023 AkidukiSystems CC BY-SA 4.0"
+        pos 10, 480-25 : mes "Copyright (c) 2022-2024 AkidukiSystems CC BY-SA 4.0"
 
         color 192, 192, 192
         pos 15, 40

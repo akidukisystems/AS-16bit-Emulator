@@ -1,5 +1,5 @@
     
-    #config codesize    auto
+    #config codesize    16384
     #config filename    "bios.bin"
     #origin addr        0000h
     #enum   @CRLF       0A0Dh
@@ -27,6 +27,7 @@
     
     #enum   @addr_ramSegment                CA00h   ; 変数領域のセグメント
     #enum   @addr_int_video_VRAMlastWrite   0000h   ; WORD 最後にVRAMに書いたアドレス
+    #enum   @addr_int_EEPROM                1000h   ; BIOSの設定データが格納されるアドレス
 
 ;   _/_/_/_/  Main Routine  _/_/_/_/
     
@@ -502,7 +503,9 @@ fin:
 ;   _/_/_/_/  Data  _/_/_/_/
 
 message1:
-    &DB "AkidukiSystems 16bit Emulator  Version 0.11 Debug"
+    &DB "AkidukiSystems 16bit Emulator  Version 1.3"
+    &DW @CRLF
+    &DB "Copyright (c) 2022-2024 AkidukiSystems CC BY-SA 4.0"
     &DW @CRLF
     &DB "AkidukiSystems BIOS Version 0.3"
     &DW @CRLF
@@ -519,7 +522,7 @@ message_BiosMenu:
     &DB "AkidukiSystems BIOS Setup Utility"
     &DW @CRLF
     &DW @CRLF
-    &DB "BIOS Version: 0.4"
+    &DB "BIOS Version: 0.5"
     &DW @CRLF
     &DB "BIOS Date: "
     &DW @_date.yy_upper

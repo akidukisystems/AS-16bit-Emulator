@@ -1,0 +1,241 @@
+    
+    switch vint_CPUio_PortNumber
+
+        case 0x10
+
+            if ( vint_CPUioTypeIsIN == 1 ) {
+
+                vint_CPUio_Result = vint_CPUio_eeprom_Result
+
+            }
+
+            return
+
+        swbreak
+
+        case 0x11
+
+            if ( vint_CPUioTypeIsIN == 1 ) {
+
+                vint_CPUio_Result = vint_CPUio_eeprom_ErrorCode
+
+            }
+
+            return
+
+        swbreak
+
+        case 0x12
+
+            if ( vint_CPUioTypeIsIN == 0 ) {
+
+                vint_CPUio_eeprom_DataOffset = vint_CPUio_PortOutPut
+
+            }
+
+            return
+
+        swbreak
+
+        case 0x13
+
+            if ( vint_CPUioTypeIsIN == 0 ) {
+
+                vint_CPUio_eeprom_DataSegment = vint_CPUio_PortOutPut
+
+            }
+
+            return
+
+        swbreak
+
+        case 0x14
+
+            if ( vint_CPUioTypeIsIN == 0 ) {
+
+                vint_CPUio_eeprom_RWDataByte = vint_CPUio_PortOutPut
+
+            }
+
+            return
+
+        swbreak
+
+        
+        case 0x15
+
+            if ( vint_CPUioTypeIsIN == 0 ) {
+
+                vint_CPUio_eeprom_TargetROM = vint_CPUio_PortOutPut
+
+            }
+
+            return
+
+        swbreak
+
+        case 0x16
+
+            if ( vint_CPUioTypeIsIN == 1 ) : return
+
+            if ( vint_CPUio_PortOutPut == 0 ) {
+
+                vbin_CPUio_eeprom_buffer = ""
+                vint_CPUio_eeprom_buffersize = 0
+                
+                vint_CPUio_eeprom_Result = 0
+                vint_CPUio_eeprom_ErrorCode = 0
+                
+                vint_CPUio_eeprom_DataOffset = 0
+                vint_CPUio_eeprom_DataSegment = 0
+                vint_CPUio_eeprom_RWDataByte = 0
+                vint_CPUio_eeprom_TargetROM = 0
+
+                return
+
+            }
+
+            if ( vint_CPUio_PortOutPut == 1 ) {
+
+                sdim vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_buffersize
+
+                if ( vint_CPUio_eeprom_TargetROM == 0 ) {
+
+                    bsave vstr_BIOSpath, vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_buffersize
+
+                } else {
+
+                    bsave strf( "eeprom%d.img", vint_CPUio_eeprom_TargetROM ), vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_buffersize
+
+                }
+
+                vint_CPUio_eeprom_Result = 0x00
+                vint_CPUio_eeprom_ErrorCode = 0x00
+
+                return
+
+            }
+
+            if ( vint_CPUio_PortOutPut == 2 ) {
+
+                if ( vint_CPUio_eeprom_RWDataByte > vint_CPUio_eeprom_buffersize ) {
+
+                    vint_CPUio_eeprom_Result = 0x01
+                    vint_CPUio_eeprom_ErrorCode = 0x04
+
+                    return
+
+                }
+
+                poke emu_vbin_Memory, ( vint_CPUio_eeprom_DataSegment *0x10 + vint_CPUio_eeprom_DataOffset ), peek( vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_RWDataByte )
+
+                vint_CPUio_eeprom_Result = 0x00
+                vint_CPUio_eeprom_ErrorCode = 0x00
+
+                return
+
+            }
+
+            if ( vint_CPUio_PortOutPut == 3 ) {
+
+                if ( vint_CPUio_eeprom_RWDataByte > vint_CPUio_eeprom_buffersize ) {
+
+                    vint_CPUio_eeprom_Result = 0x01
+                    vint_CPUio_eeprom_ErrorCode = 0x04
+
+                    return
+
+                }
+
+                poke vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_RWDataByte, peek( emu_vbin_Memory, ( vint_CPUio_eeprom_DataSegment *0x10 + vint_CPUio_eeprom_DataOffset ) )
+
+                vint_CPUio_eeprom_Result = 0x00
+                vint_CPUio_eeprom_ErrorCode = 0x00
+
+                return
+
+            }
+
+            if ( vint_CPUio_PortOutPut == 4 ) {
+
+                if ( vint_CPUio_eeprom_TargetROM == 0 ) {
+
+                    exist vstr_BIOSpath
+
+                } else {
+
+                    exist strf( "eeprom%d.img", vint_CPUio_eeprom_TargetROM )
+
+                }
+
+                vint_CPUio_eeprom_buffersize = strsize
+                if ( vint_CPUio_eeprom_buffersize == -1 ) {
+
+                    vint_CPUio_eeprom_Result = 0x01
+                    vint_CPUio_eeprom_ErrorCode = 0xFF
+                    return
+
+                }
+
+                sdim vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_buffersize
+
+                if ( vint_CPUio_eeprom_TargetROM == 0 ) {
+
+                    bload vstr_BIOSpath, vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_buffersize
+
+                } else {
+
+                    bload strf( "eeprom%d.img", vint_CPUio_eeprom_TargetROM ), vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_buffersize
+
+                }
+
+                vint_CPUio_eeprom_Result = 0x00
+                vint_CPUio_eeprom_ErrorCode = 0x00
+                
+                return
+
+            }
+
+            if ( vint_CPUio_PortOutPut == 5 ) {
+
+                if ( vint_CPUio_eeprom_TargetROM == 0 ) {
+
+                    exist vstr_BIOSpath
+
+                } else {
+
+                    exist strf( "eeprom%d.img", vint_CPUio_eeprom_TargetROM )
+
+                }
+
+                vint_CPUio_eeprom_buffersize = strsize
+                if ( vint_CPUio_eeprom_buffersize == -1 ) {
+
+                    vint_CPUio_eeprom_Result = 0x01
+                    vint_CPUio_eeprom_ErrorCode = 0xFF
+                    return
+
+                }
+
+                if ( vint_CPUio_eeprom_TargetROM == 0 ) {
+
+                    bsave vstr_BIOSpath, vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_buffersize
+
+                } else {
+
+                    bsave strf( "eeprom%d.img", vint_CPUio_eeprom_TargetROM ), vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_buffersize
+
+                }
+
+                vint_CPUio_eeprom_Result = 0x00
+                vint_CPUio_eeprom_ErrorCode = 0x00
+
+                return
+
+            }
+
+            return
+
+        swbreak
+
+    swend
