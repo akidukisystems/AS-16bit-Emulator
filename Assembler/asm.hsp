@@ -311,6 +311,7 @@
 
                     } else {
 
+                        vint_savesize = intdh( vstr_code.3 )
                         sdim vbin_assembledData, intdh( vstr_code.3 )
                         putmes_msglib "Assembler: Codesize:"+ intdh( vstr_code.3 ) +" Bytes\n"
 
@@ -1721,7 +1722,9 @@
     // finish
     putmes_msglib "Assemble has competed. Saved binary file at \""+ vstr_filename +"\".\n"
 
-    bsave vstr_filename, vbin_assembledData, vint_currentaddress
+    if ( vint_isAutoSize ) : vint_savesize = vint_currentaddress
+
+    bsave vstr_filename, vbin_assembledData, vint_savesize
 
     vstr_debugtxt_output = ""
 
