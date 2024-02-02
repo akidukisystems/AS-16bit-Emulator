@@ -263,6 +263,8 @@
 
     loop
 
+    logmes vstr_fixedData
+
 
 
     // PreProcess
@@ -295,7 +297,7 @@
         noteget vstr_loadline, cnt
 
         sdim vstr_code, 64, 8
-        split vstr_loadline, ",", vstr_code
+        splitExS vstr_loadline, vstr_code, ','
 
         if ( instr( vstr_code.1, 0, "#" ) == 0 ) {
 
@@ -505,7 +507,7 @@
         noteget vstr_loadline, cnt
         sdim vstr_code, 64, 8
 
-        split vstr_loadline, ",", vstr_code
+        splitExS vstr_loadline, vstr_code, ','
 
         // prepocessor command
         if ( instr( vstr_code.1, 0, "#" ) == 0  ) {

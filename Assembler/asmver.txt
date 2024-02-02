@@ -1,8 +1,8 @@
-_FILEVERSION=0.3.3
-_PRODUCTVERSION=0.3.3
+_FILEVERSION=0.3.4
+_PRODUCTVERSION=0.3.4
 CompanyName=AkidukiSystems
 FileDescription=16bit-Assembler
-FileVersion=0.3.3
+FileVersion=0.3.4
 OriginalFilename=asm.exe
 ProductName=AS 16bit Assembler
-ProductVersion=0.3.3
+ProductVersion=0.3.4
