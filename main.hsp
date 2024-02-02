@@ -431,14 +431,6 @@
     vstr_BIOSpath = "bios.bin"
     cfgAS_read "BIOS.binaryPath", vstr_BIOSpath
 
-    exist vstr_BIOSpath
-    if ( strsize == -1 ) : {
-
-        mes "BIOS program data is not found!"
-        stop
-        
-    }
-
     onkey gosub *l_bootKeyPush
     onexit *l_exit
 
@@ -456,11 +448,20 @@
 
     vint_CPU_Timer_isActive = false
 
+    exist vstr_BIOSpath
+    if ( strsize == -1 ) : {
+
+        mes "BIOS program data is not found!"
+        stop
+        
+    }
+
     sdim vbin_BIOS, strsize
     bload vstr_BIOSpath, vbin_BIOS, strsize
 
     sdim emu_vbin_Memory, vint_DRAMSize
     memcpy emu_vbin_Memory, vbin_BIOS, varsize(vbin_BIOS), vint_Ram_BIOS_MainCode.StartAddr
+
     sdim emu_vbin_IO, 0xFFFF
     emu_vbin_PIN = 0
     emu_vbin_needReboot = false

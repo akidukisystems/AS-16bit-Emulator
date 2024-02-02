@@ -27,6 +27,7 @@
     
     #enum   @addr_ramSegment                CA00h   ; 変数領域のセグメント
     #enum   @addr_int_video_VRAMlastWrite   0000h   ; WORD 最後にVRAMに書いたアドレス
+    #enum   @addr_int_setup_BIOSStartupSec  1000h
     #enum   @addr_int_EEPROM                2000h   ; BIOSの設定データが格納されるアドレス
 
 ;   _/_/_/_/  Main Routine  _/_/_/_/
@@ -88,10 +89,34 @@
     MOV     BH, 1
     INT     16h
 
-    MOV     CX, 100                     ; 100*10ms待つ
+    MOV     AX, 0                       ; EEPROM IOを初期化
+    OUT     16h, AX
+
+    MOV     AX, @addr_int_setup_BIOSStartupSec  ; 読み込み先のメモリアドレス
+    OUT     12h, AX
+    MOV     AX, @addr_ramSegment
+    OUT     13h, AX
+
+    MOV     AX, 2000h                   ; 読み込み元アドレス
+    OUT     14h, AX
+
+    MOV     AX, 0                       ; EEPROM番号
+    OUT     15h, AX
+
+    MOV     AX, 4                       ; ROMを指定
+    OUT     16h, AX
+
+    MOV     AX, 2                       ; 読み込み実行
+    OUT     16h, AX
+
+    PUSH    DS
+    MOV     AX, @addr_ramSegment
+    MOV     DS, AX
+    MOV     CX, BYTE[@addr_int_setup_BIOSStartupSec]  ; 指定された値（デフォルト10h）*100ms待つ
+    POP     DS
 
 waitBiosMenu_wait:
-    MOV     AX, 10                      ; 10ms待つ
+    MOV     AX, 100                     ; 100ms待つ
     OUT     F0h, AX                     ; ウェイト
     DEC     CX                          ; カウンタをデクリメントして、0ならブート処理
     JZ      waitBiosMenu_timeout:
@@ -173,9 +198,6 @@ BiosMenu_Entry:
     INT     16h
 
 BiosMenu_Keywait:
-
-    MOV     AX, 100                     ; 100ms待つ
-    OUT     F0h, AX
 
     MOV     AX, 0                       ; 画面リフレッシュ無効
     OUT     30h, AX
@@ -306,15 +328,46 @@ BiosMenu_Keywait:
     MOV     AL, DL                      ; 2桁目を出力
     MOV     AH, 0Ah
     INT     10h
+
+    MOV     AH, 0Eh                     ; メッセージ表示
+    MOV     SI, message_BiosMenu_BIOSSetupSec:
+    INT     10h
+
+    PUSH    DS
+
+    MOV     AX, @addr_ramSegment
+    MOV     DS, AX
+
+    MOV     BL, BYTE[@addr_int_setup_BIOSStartupSec]
+
+    POP     DS
+
+    MOV     AH, 0
+    CALL    converts:
+
+    MOV     AH, 2
+    MOV     BX, DX
+    CALL    converts:
+
+    MOV     AH, 0Ah
+    MOV     AL, DH
+    INT     10h
+
+    MOV     AL, DL
+    INT     10h
+
                                         ; 画面更新時に同じ位置に日付時刻を表示するため、カーソル位置をもとに戻す
     MOV     AH, 03h                     ; カーソル位置を取得
     INT     10h
-    SUB     BX, 13h                     ; BXにカーソル位置が格納されるので、13hを引く（日付時刻の表示）
+    SUB     BX, 2Ah                     ; BXにカーソル位置が格納されるので、13hを引く（日付時刻の表示）
     MOV     AH, 02h                     ; カーソル位置を設定
     INT     10h
 
     MOV     AX, 1                       ; 画面更新を開始
     OUT     30h, AX
+
+    MOV     AX, 100                     ; 100ms待つ
+    OUT     F0h, AX
 
     IN      AX, 80h                     ; キーが押されたか確認
     CMP     AX, 0                       ; 0（押されていない）なら戻る
@@ -322,14 +375,92 @@ BiosMenu_Keywait:
     JE      BiosMenu_Keywait:
 
     IN      AX, 81h                     ; 押されたならキーコード取得
+
     PUSH    AX
+
     XOR     AX, AX
     OUT     8Fh, AX
+
     POP     AX
+
+    CMP     AX, 38                      ; 上矢印キー（38）なら
+    JE      BiosMenu_Key_Up:
+
+    CMP     AX, 40                      ; 下矢印キー（40）なら
+    JE      BiosMenu_Key_Down:
+
+    CMP     AX, 122                     ; F11キー（122）なら
+    JE      BiosMenu_Key_Save:
+
     CMP     AX, 27                      ; Escキー（27）ならリセット
     JNE     BiosMenu_Keywait:
+
     MOV     AX, 1                       
     OUT     FFh, AX
+
+    JMP     fin:
+
+BiosMenu_Key_Up:
+    PUSH    DS
+
+    MOV     AX, @addr_ramSegment
+    MOV     DS, AX
+
+    MOV     BL, BYTE[@addr_int_setup_BIOSStartupSec]
+    INC     BL
+
+    MOV     BYTE[@addr_int_setup_BIOSStartupSec], BL
+
+    POP     DS
+
+    JMP     BiosMenu_Keywait:
+
+BiosMenu_Key_Down:
+    PUSH    DS
+
+    MOV     AX, @addr_ramSegment
+    MOV     DS, AX
+
+    MOV     BL, BYTE[@addr_int_setup_BIOSStartupSec]
+    DEC     BL
+    MOV     BYTE[@addr_int_setup_BIOSStartupSec], BL
+
+    POP     DS
+
+    JMP     BiosMenu_Keywait:
+
+BiosMenu_Key_Save:
+    MOV     AX, 0
+    OUT     16h, AX
+    
+    MOV     AX, @addr_int_setup_BIOSStartupSec
+    OUT     12h, AX
+
+    MOV     AX, @addr_ramSegment
+    OUT     13h, AX
+
+    MOV     AX, 2000h
+    OUT     14h, AX
+
+    MOV     AX, 0
+    OUT     15h, AX
+    
+    MOV     AX, 4
+    OUT     16h, AX
+
+    MOV     AX, 6
+    OUT     16h, AX
+
+    MOV     AX, 3
+    OUT     16h, AX
+
+    MOV     AX, 6
+    OUT     16h, AX
+
+    MOV     AX, 5
+    OUT     16h, AX
+
+    JMP     BiosMenu_Keywait:
 
 fin:
     HLT                                 ; CPUを停止
@@ -358,6 +489,8 @@ message_osnotfound:
 message_BiosMenu:
     &DB "AkidukiSystems BIOS Setup Utility"
     &DW @CRLF
+    &DB "Press [Esc] to Exit, [F11] to Save change"
+    &DW @CRLF
     &DW @CRLF
     &DB "BIOS Version: 0.5"
     &DW @CRLF
@@ -379,6 +512,12 @@ message_BiosMenu:
     &DW @CRLF
     &DB "Current DateTime: "
     &DB 0
+
+message_BiosMenu_BIOSSetupSec:
+    &DW @CRLF
+    &DB "POST Waiting Time: "
+    &DB 0
+
 
 
 
@@ -1459,4 +1598,6 @@ int_none:
 
     &RESBSF 2000h
 
-    
+    ; ここからBIOS設定
+
+    &DB     10                          ; BIOS起動画面の待機時間
