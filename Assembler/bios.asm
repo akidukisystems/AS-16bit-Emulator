@@ -27,7 +27,7 @@
     
     #enum   @addr_ramSegment                CA00h   ; 変数領域のセグメント
     #enum   @addr_int_video_VRAMlastWrite   0000h   ; WORD 最後にVRAMに書いたアドレス
-    #enum   @addr_int_EEPROM                1000h   ; BIOSの設定データが格納されるアドレス
+    #enum   @addr_int_EEPROM                2000h   ; BIOSの設定データが格納されるアドレス
 
 ;   _/_/_/_/  Main Routine  _/_/_/_/
     
@@ -1450,3 +1450,7 @@ int_datetime_readDate.dc:
 
 int_none:
     IRET                                ; 割り込みだけど特に何もしない
+
+    &RESBSF 2000h
+
+    
