@@ -96,7 +96,6 @@
     del /s Assembler\packfile
     del /s Assembler\*.ax
     del /s Assembler\*.dbg
-    del /s Assembler\*.dbg
     del /s Assembler\*.com
     del /s Assembler\*.sys
     del /s Assembler\*.bin
