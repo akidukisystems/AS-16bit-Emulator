@@ -1,6 +1,4 @@
 
-    ;logmes ""+ strf("Executing - %02X", vbin_CPUmeirei_Main) +" "+ strf("CS:IP - %02X", fetchRegisterWs(rCS))+ ":"+ strf("%02X", fetchRegisterWe(rIP))
-    
     #addition "com/Data.hsp"    // done!
     #addition "com/Calc.hsp"    
     #addition "com/Logical.hsp" 

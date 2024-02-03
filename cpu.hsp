@@ -254,7 +254,6 @@
 
     vbin_CPUmeirei_Main     = vbin_CPUmeirei && 0x00FF
     vbin_CPUmeirei_Prm.0    = RBS ( vbin_CPUmeirei && 0xFF00, 8 )
-    ;logmes "cmd: "+ strf("0x%04X", vbin_CPUmeirei_Main ) +", prmType: "+ strf("0x%04X", vbin_CPUmeirei_Prm.0 ) +", prm0: "+ strf("0x%04X", vint_CPUparam.0 ) +", prm1: "+ strf("0x%04X", vint_CPUparam.1 )
     #addition "com.hsp"
 
     vint_CPUinvaildcmd = true

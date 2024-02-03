@@ -1,6 +1,4 @@
 
-    ;logmes strf("I/O port number equal 0x%04X", vint_CPUio_PortNumber)
-
     if ( ( vint_CPUio_PortNumber && 0xF0 ) == 0x10 ) : {
 
         #addition "io/eeprom.hsp"
@@ -55,8 +53,6 @@
     vint_CPUio_KeyBuffer_iparam = iparam
 
     vint_CPUio_KeyBuffer_LT = 1
-
-    logmes vint_CPUio_keyInterrupt
 
     setInterrupt vint_CPUio_keyInterrupt
 

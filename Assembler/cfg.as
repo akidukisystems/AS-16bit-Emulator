@@ -213,8 +213,6 @@ return 1
 
         splitEx Var_ThisConfigLine, Var_ThisConfigLineArray, '='
 
-        logmes Var_ThisConfigLine
-
         if ( Var_ThisConfigLineArray.0 == name ) : {
 
             var_int_notype = 0
@@ -290,8 +288,6 @@ return 1
         if ( Var_ThisConfigLine == "" ) : continue
 
         splitEx Var_ThisConfigLine, Var_ThisConfigLineArray, '='
-
-        logmes Var_ThisConfigLine
 
         if ( ( Var_ThisConfigLineArray.0 == name ) and isOverWrite ) : {
 
@@ -389,8 +385,6 @@ return 3
         if ( Var_ThisConfigLine == "" ) : continue
 
         splitEx Var_ThisConfigLine, Var_ThisConfigLineArray, '='
-
-        logmes Var_ThisConfigLine
 
         if ( Var_ThisConfigLineArray.0 == name ) : {
 

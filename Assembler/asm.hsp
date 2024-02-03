@@ -263,9 +263,6 @@
 
     loop
 
-    logmes vstr_fixedData
-
-
 
     // PreProcess
 

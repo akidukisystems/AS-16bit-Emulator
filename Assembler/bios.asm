@@ -81,11 +81,9 @@
 
     MOV     AH, 02h
     INT     1Ah
-    DBG
 
     MOV     AH, 04h
     INT     1Ah
-    DBG
 
     MOV     AH, 6                       ; キー入力をON
     MOV     AL, 1
@@ -726,7 +724,7 @@ message1:
     &DW @CRLF
     &DB "Copyright (c) 2022-2024 AkidukiSystems CC BY-SA 4.0"
     &DW @CRLF
-    &DB "AkidukiSystems BIOS Version 0.3"
+    &DB "AkidukiSystems BIOS Version 0.4"
     &DW @CRLF
     &DB "Press [F12] to Setup Utility"
     &DW @CRLF
@@ -748,7 +746,7 @@ message_BiosMenu:
     &DB "Press [Esc] to Exit, [F11] to Save change"
     &DW @CRLF
     &DW @CRLF
-    &DB "BIOS Version: 0.5"
+    &DB "BIOS Version: 0.4"
     &DW @CRLF
     &DB "BIOS Date: "
     &DW @_date.yy_upper
