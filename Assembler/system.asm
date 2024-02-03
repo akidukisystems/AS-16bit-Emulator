@@ -933,15 +933,12 @@ converts_ascii2bcd:
 
 keyboardInterrupt:
     CMP     WORD[@addr_keyboardInterruptHandler], 0
-    JE      keyboardInterrupt:
+    JE      keyboardInterrupt_Ret:
 
     CALL    WORD[@addr_keyboardInterruptHandler]
 
+keyboardInterrupt_Ret:
     IRET
-
-keyboardInterrupt:
-    IRET
-
 
 
 notfound_start.dat:
