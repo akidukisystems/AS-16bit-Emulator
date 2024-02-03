@@ -27,7 +27,10 @@
     
     #enum   @addr_ramSegment                CA00h   ; 変数領域のセグメント
     #enum   @addr_int_video_VRAMlastWrite   0000h   ; WORD 最後にVRAMに書いたアドレス
+    #enum   @addr_int_setup_currentCursor   1100h
+
     #enum   @addr_int_setup_BIOSStartupSec  1000h
+    #enum   @addr_int_setup_RetryBoot       1001h
     #enum   @addr_int_EEPROM                2000h   ; BIOSの設定データが格納されるアドレス
 
 ;   _/_/_/_/  Main Routine  _/_/_/_/
@@ -109,6 +112,15 @@
     MOV     AX, 2                       ; 読み込み実行
     OUT     16h, AX
 
+    MOV     AX, @addr_int_setup_RetryBoot
+    OUT     12h, AX
+    
+    MOV     AX, 2001h
+    OUT     14h, AX
+
+    MOV     AX, 2                       ; 読み込み実行
+    OUT     16h, AX
+
     PUSH    DS
     MOV     AX, @addr_ramSegment
     MOV     DS, AX
@@ -145,7 +157,7 @@ waitBiosMenu_timeout:
     MOV     AH, 0                       ; ディスク初期化
     INT     13h
 
-    JC      fin:                        ; エラーだったらおわり
+    JC      DiskError:                  ; エラーだったらおわり
 
     MOV     AH, 2                       ; セクタ読み込み
     MOV     AL, 1                       ; 読み込むセクタ数
@@ -158,13 +170,13 @@ waitBiosMenu_timeout:
     MOV     BX, 0                       ; 格納先アドレス(オフセット)
     INT     13h
 
-    JC      fin:                        ; エラーだったらおわり
+    JC      DiskError:                  ; エラーだったらおわり
 
     XOR     AX, AX
     MOV     DS, AX
     MOV     BX, WORD[7DFEh]             ; マジックコードを確認
     CMP     BX, AA55h
-    JNE     fin:                        ; ブータブルでなかったらおわり
+    JNE     NotBootable:                ; ブータブルでなかったらおわり
 
 
     XOR     AX, AX                      ; 0000:7C00 にジャンプ
@@ -172,12 +184,27 @@ waitBiosMenu_timeout:
 
     JF      7C00h
 
+DiskError:
     MOV     DS, F000h                   ; 文字列のあるセグメント
-    MOV     SI, message_osnotfound:     ; 文字列のあるオフセット
+    MOV     SI, message_DiskError:      ; 文字列のあるオフセット
     MOV     AH, 0Eh                     ; テレタイプモード
     INT     10h                         ; ビデオ割り込み
 
+    JMP     ResetSys:
+
+NotBootable:
+    MOV     DS, F000h                   ; 文字列のあるセグメント
+    MOV     SI, message_NotBootable:    ; 文字列のあるオフセット
+    MOV     AH, 0Eh                     ; テレタイプモード
+    INT     10h                         ; ビデオ割り込み
+
+ResetSys:
+    IN      AX, FFh
+    OR      AX, 1
+    OUT     FFh, AX
+
     JMP     fin:
+
 
 
 
@@ -191,6 +218,17 @@ BiosMenu_Entry:
     MOV     SI, message_BiosMenu:       ; 文字列のあるオフセット
     MOV     AH, 0Eh                     ; テレタイプモード
     INT     10h                         ; ビデオ割り込み
+
+    PUSH    DS
+
+    MOV     AX, @addr_ramSegment
+    MOV     DS, AX
+
+    XOR     AX, AX
+
+    MOV     BYTE[@addr_int_setup_currentCursor], AX
+
+    POP     DS
 
     MOV     AH, 6                       ; キー入力をON
     MOV     AL, 1
@@ -329,6 +367,24 @@ BiosMenu_Keywait:
     MOV     AH, 0Ah
     INT     10h
 
+    MOV     AH, 0Eh
+    MOV     SI, message_CRLF:
+    INT     10h
+    INT     10h
+
+    PUSH    DS
+
+    MOV     AX, @addr_ramSegment
+    MOV     DS, AX
+
+    MOV     AL, BYTE[@addr_int_setup_currentCursor]
+
+    POP     DS
+
+    CMP     AL, 0
+    JE      BiosMenu_Keywait_DrawCursor0:
+
+BiosMenu_Keywait_DrawCursor0_ret:
     MOV     AH, 0Eh                     ; メッセージ表示
     MOV     SI, message_BiosMenu_BIOSSetupSec:
     INT     10h
@@ -356,17 +412,64 @@ BiosMenu_Keywait:
     MOV     AL, DL
     INT     10h
 
+    MOV     AH, 0Eh
+    MOV     SI, message_CRLF:
+    INT     10h
+
+    PUSH    DS
+
+    MOV     AX, @addr_ramSegment
+    MOV     DS, AX
+
+    MOV     AL, BYTE[@addr_int_setup_currentCursor]
+
+    POP     DS
+
+    CMP     AL, 1
+    JE      BiosMenu_Keywait_DrawCursor1:
+
+BiosMenu_Keywait_DrawCursor1_ret:
+    MOV     AH, 0Eh                     ; メッセージ表示
+    MOV     SI, message_BiosMenu_SysBootretry:
+    INT     10h
+
+    PUSH    DS
+
+    MOV     AX, @addr_ramSegment
+    MOV     DS, AX
+
+    MOV     BL, BYTE[@addr_int_setup_RetryBoot]
+
+    POP     DS
+
+    CMP     BL, 0
+    JE      BiosMenu_Keywait_RetryBoot_Disable:
+
+    MOV     AH, 0Eh
+    MOV     SI, message_BiosMenu_Enable:
+    INT     10h
+
+    JMP     BiosMenu_Keywait_RetryBoot_Ret:
+
+BiosMenu_Keywait_RetryBoot_Disable:
+    MOV     AH, 0Eh
+    MOV     SI, message_BiosMenu_Disable:
+
+    INT     10h
+
+BiosMenu_Keywait_RetryBoot_Ret:
+
                                         ; 画面更新時に同じ位置に日付時刻を表示するため、カーソル位置をもとに戻す
     MOV     AH, 03h                     ; カーソル位置を取得
     INT     10h
-    SUB     BX, 2Ah                     ; BXにカーソル位置が格納されるので、13hを引く（日付時刻の表示）
+    SUB     BX, 74                      ; BXにカーソル位置が格納されるので、13hを引く（日付時刻の表示）
     MOV     AH, 02h                     ; カーソル位置を設定
     INT     10h
 
     MOV     AX, 1                       ; 画面更新を開始
     OUT     30h, AX
 
-    MOV     AX, 100                     ; 100ms待つ
+    MOV     AX, 50                      ; 50ms待つ
     OUT     F0h, AX
 
     IN      AX, 80h                     ; キーが押されたか確認
@@ -383,13 +486,19 @@ BiosMenu_Keywait:
 
     POP     AX
 
-    CMP     AX, 38                      ; 上矢印キー（38）なら
+    CMP     AX, 38                      ; 上矢印キー（38）ならカーソル上
     JE      BiosMenu_Key_Up:
 
-    CMP     AX, 40                      ; 下矢印キー（40）なら
+    CMP     AX, 40                      ; 下矢印キー（40）ならカーソル下
     JE      BiosMenu_Key_Down:
 
-    CMP     AX, 122                     ; F11キー（122）なら
+    CMP     AX, 37                      ; 左矢印キー（37）なら値をデクリメント
+    JE      BiosMenu_Key_Left:
+
+    CMP     AX, 39                      ; 右矢印キー（39）ならインクリメント
+    JE      BiosMenu_Key_Right:
+
+    CMP     AX, 122                     ; F11キー（122）なら保存
     JE      BiosMenu_Key_Save:
 
     CMP     AX, 27                      ; Escキー（27）ならリセット
@@ -406,11 +515,16 @@ BiosMenu_Key_Up:
     MOV     AX, @addr_ramSegment
     MOV     DS, AX
 
-    MOV     BL, BYTE[@addr_int_setup_BIOSStartupSec]
-    INC     BL
+    MOV     BL, BYTE[@addr_int_setup_currentCursor] ; カーソル位置取得
 
-    MOV     BYTE[@addr_int_setup_BIOSStartupSec], BL
+    CMP     BL, 0   ; カーソルが一番上なら戻る
+    JE      BiosMenu_Key_Up_Cancel:
 
+    DEC     BL      ; カーソルを上にする
+
+    MOV     BYTE[@addr_int_setup_currentCursor], BL
+
+BiosMenu_Key_Up_Cancel:
     POP     DS
 
     JMP     BiosMenu_Keywait:
@@ -421,46 +535,179 @@ BiosMenu_Key_Down:
     MOV     AX, @addr_ramSegment
     MOV     DS, AX
 
-    MOV     BL, BYTE[@addr_int_setup_BIOSStartupSec]
-    DEC     BL
-    MOV     BYTE[@addr_int_setup_BIOSStartupSec], BL
+    MOV     BL, 0
 
+    MOV     BL, BYTE[@addr_int_setup_currentCursor] ; カーソル位置取得
+
+    CMP     BL, 1   ; 一番下なら戻る
+    JE      BiosMenu_Key_Down_Cancel:
+
+    INC     BL      ; 下にする
+    
+    MOV     BYTE[@addr_int_setup_currentCursor], BL
+
+BiosMenu_Key_Down_Cancel:
     POP     DS
 
     JMP     BiosMenu_Keywait:
 
+
+
+BiosMenu_Key_Left:
+    PUSH    DS
+
+    MOV     AX, @addr_ramSegment
+    MOV     DS, AX
+
+    MOV     BH, BYTE[@addr_int_setup_currentCursor] ; カーソル位置取得
+
+    CMP     BH, 0           ; カーソル位置ごとに項目が違うので、それぞれに合った処理をする
+    JE      BiosMenu_key_Left_BIOSStartupSec:
+
+    CMP     BH, 1
+    JE      BiosMenu_key_Left_RetryBoot:
+
+    JMP     BiosMenu_Key_Left_Exit:
+
+BiosMenu_key_Left_BIOSStartupSec:
+    MOV     BL, BYTE[@addr_int_setup_BIOSStartupSec]
+
+    CMP     BL, 0           ; 最小値なら戻る
+    JE      BiosMenu_Key_Left_Exit:
+
+    DEC     BL              ; 項目の値をデクリメントする
+
+    MOV     BYTE[@addr_int_setup_BIOSStartupSec], BL
+
+    JMP     BiosMenu_Key_Left_Exit:
+
+BiosMenu_key_Left_RetryBoot:
+    MOV     BL, BYTE[@addr_int_setup_RetryBoot]
+
+    CMP     BL, 0           ; 最小値なら戻る
+    JE      BiosMenu_Key_Left_Exit:
+
+    DEC     BL              ; 項目の値をデクリメント
+
+    MOV     BYTE[@addr_int_setup_RetryBoot], BL
+
+    JMP     BiosMenu_Key_Left_Exit:
+
+BiosMenu_Key_Left_Exit:
+    POP     DS
+
+    JMP     BiosMenu_Keywait:
+
+BiosMenu_Key_Right:
+    PUSH    DS
+
+    MOV     AX, @addr_ramSegment
+    MOV     DS, AX
+
+    MOV     BH, BYTE[@addr_int_setup_currentCursor]
+
+    CMP     BH, 0       ; カーソル位置によって別々の処理をする
+    JE      BiosMenu_key_Right_BIOSStartupSec:
+
+    CMP     BH, 1
+    JE      BiosMenu_key_Right_RetryBoot:
+
+    JMP     BiosMenu_Key_Right_Exit:
+
+BiosMenu_key_Right_BIOSStartupSec:
+    MOV     BL, BYTE[@addr_int_setup_BIOSStartupSec]
+
+    CMP     BL, 99      ; 最大値なら戻る、そうでないならインクリメント
+    JE      BiosMenu_Key_Right_Exit:
+
+    INC     BL
+
+    MOV     BYTE[@addr_int_setup_BIOSStartupSec], BL
+
+    JMP     BiosMenu_Key_Right_Exit:
+
+BiosMenu_key_Right_RetryBoot:
+    MOV     BL, BYTE[@addr_int_setup_RetryBoot]
+
+    CMP     BL, 1       ; 最大値なら戻る、そうでないならインクリメント
+    JE      BiosMenu_Key_Right_Exit:
+
+    INC     BL
+
+    MOV     BYTE[@addr_int_setup_RetryBoot], BL
+
+    JMP     BiosMenu_Key_Right_Exit:
+
+BiosMenu_Key_Right_Exit:
+    POP     DS
+
+    JMP     BiosMenu_Keywait:
+
+
+
 BiosMenu_Key_Save:
-    MOV     AX, 0
+    MOV     AX, 0       ; 初期化
     OUT     16h, AX
     
-    MOV     AX, @addr_int_setup_BIOSStartupSec
+    MOV     AX, @addr_int_setup_BIOSStartupSec  ; 書き込み元のアドレス
     OUT     12h, AX
 
     MOV     AX, @addr_ramSegment
     OUT     13h, AX
 
-    MOV     AX, 2000h
+    MOV     AX, 2000h   ; 書き込み先のアドレス
     OUT     14h, AX
 
-    MOV     AX, 0
+    MOV     AX, 0       ; ROM番号
     OUT     15h, AX
     
-    MOV     AX, 4
+    MOV     AX, 4       ; ROM選択
     OUT     16h, AX
 
-    MOV     AX, 6
+    MOV     AX, 6       ; WREN実行
+    OUT     16h, AX
+
+    MOV     AX, 3       ; 書き込み
+    OUT     16h, AX
+
+    MOV     AX, @addr_int_setup_RetryBoot  ; 書き込み元のアドレス
+    OUT     12h, AX
+
+    MOV     AX, @addr_ramSegment
+    OUT     13h, AX
+
+    MOV     AX, 2001h
+    OUT     14h, AX
+
+    MOV     AX, 6       ; WREN
     OUT     16h, AX
 
     MOV     AX, 3
     OUT     16h, AX
 
-    MOV     AX, 6
+    MOV     AX, 6       ; WREN
     OUT     16h, AX
 
-    MOV     AX, 5
+    MOV     AX, 5       ; 書き込み確定
     OUT     16h, AX
 
     JMP     BiosMenu_Keywait:
+
+    ; カーソル描画
+BiosMenu_Keywait_DrawCursor0:
+    MOV     AH, 0Eh
+    MOV     SI, message_BiosMenu_Cursor:
+    INT     10h
+
+    JMP     BiosMenu_Keywait_DrawCursor0_ret:
+
+BiosMenu_Keywait_DrawCursor1:
+    MOV     AH, 0Eh
+    MOV     SI, message_BiosMenu_Cursor:
+    INT     10h
+
+    JMP     BiosMenu_Keywait_DrawCursor1_ret:
+
 
 fin:
     HLT                                 ; CPUを停止
@@ -469,6 +716,10 @@ fin:
 
 
 ;   _/_/_/_/  Data  _/_/_/_/
+
+message_CRLF:
+    &DW @CRLF
+    &DB 0
 
 message1:
     &DB "AkidukiSystems 16bit Emulator  Version 1.3"
@@ -481,7 +732,12 @@ message1:
     &DW @CRLF
     &DB 0
 
-message_osnotfound:
+message_DiskError:
+    &DB "Coudn't read Operation System from disk."
+    &DW @CRLF
+    &DB 0
+
+message_NotBootable:
     &DB "Operation System is not found."
     &DW @CRLF
     &DB 0
@@ -514,10 +770,24 @@ message_BiosMenu:
     &DB 0
 
 message_BiosMenu_BIOSSetupSec:
-    &DW @CRLF
     &DB "POST Waiting Time: "
     &DB 0
 
+message_BiosMenu_SysBootretry:
+    &DB "System Boot Retry: "
+    &DB 0
+
+message_BiosMenu_Enable:
+    &DB "Enable "
+    &DB 0
+
+message_BiosMenu_Disable:
+    &DB "Disable"
+    &DB 0
+
+message_BiosMenu_Cursor:
+    &DB "->"
+    &DB 0
 
 
 
@@ -1601,3 +1871,4 @@ int_none:
     ; ここからBIOS設定
 
     &DB     10                          ; BIOS起動画面の待機時間
+    &DB     0                           ; ブートを再試行するか
