@@ -385,19 +385,21 @@
     vint_isEnablePutTrace_JUMP   = true
     vint_isEnablePutTrace_RET    = true
     vint_isEnablePutTrace_CHANGE = true
-
     vint_isEnablePutTraceError_UD2 = true
-
     vint_isEnablePutTrace_HardwareInterrupt = true
 
     cfgAS_read "StackTrace.putTrace.CALL", vint_isEnablePutTrace_CALL
     cfgAS_read "StackTrace.putTrace.JUMP", vint_isEnablePutTrace_JUMP
     cfgAS_read "StackTrace.putTrace.RET", vint_isEnablePutTrace_RET
     cfgAS_read "StackTrace.putTrace.CHANGE", vint_isEnablePutTrace_CHANGE
-
     cfgAS_read "StackTrace.putTrace.#UD2", vint_isEnablePutTraceError_UD2
-
     cfgAS_read "StackTrace.putTrace.HardwareInterrupt", vint_isEnablePutTrace_HardwareInterrupt
+
+    vstr_FloppyImageFileNameFormat = "fdisk%d.img"
+    vstr_RomImageFileNameFormat = "eeprom%d.bin"
+
+    cfgAS_read "IO.Disk.FloppyImage.FileNameFormat", vstr_FloppyImageFileNameFormat
+    cfgAS_read "IO.EEPROM.RomImage.FileNameFormat", vstr_RomImageFileNameFormat
 
     winsel SCREEN_CONFIG_ID, SCRnone
 
@@ -497,7 +499,7 @@
         color 192, 192, 192
         pos 15, 40
         mes "Emulator"
-        mes " -Version: 1.2"
+        mes " -Version: 1.3"
         mes " -BIOS binary file: \""+ vstr_BIOSpath +"\""
         mes "\nProcessor"
         mes " -Name: "+ vstr_ProcessorName

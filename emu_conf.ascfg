@@ -24,7 +24,8 @@ BIOS.MemoryTable.EndAddr.SubCodeArea=$EFFFF
 BIOS.binaryPath=".\bios.bin"
 
 #IO Settings
-Disk.FloppyImage.FileNameFormat="fdisk%02d.img"
+IO.Disk.FloppyImage.FileNameFormat="fdisk%d.img"
+IO.EEPROM.RomImage.FileNameFormat="eeprom%d.bin"
 
 #StackTrace
 StackTrace.putTrace.CALL=1

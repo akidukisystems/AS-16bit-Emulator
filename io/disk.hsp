@@ -197,7 +197,7 @@
 
                 if ( vint_CPUio_PortOutPut == 0x05 ) {
 
-                    exist strf( "fdisk%d.img", vint_CPUio_disk_DiskNum )
+                    exist strf( vstr_FloppyImageFileNameFormat, vint_CPUio_disk_DiskNum )
                     vint_CPUio_disk_buffersize = strsize
                     if ( vint_CPUio_disk_buffersize == -1 ) {
 
@@ -208,7 +208,7 @@
                     }
 
                     sdim vbin_CPUio_disk_buffer, vint_CPUio_disk_buffersize
-                    bload strf( "fdisk%d.img", vint_CPUio_disk_DiskNum ), vbin_CPUio_disk_buffer, vint_CPUio_disk_buffersize
+                    bload strf( vstr_FloppyImageFileNameFormat, vint_CPUio_disk_DiskNum ), vbin_CPUio_disk_buffer, vint_CPUio_disk_buffersize
 
                     vint_CPUio_disk_DiskSectorSize = wpeek( vbin_CPUio_disk_buffer, 0x0E )
                     vint_CPUio_disk_DiskTruckSize = wpeek( vbin_CPUio_disk_buffer, 0x10 )
@@ -224,7 +224,7 @@
 
                 if ( vint_CPUio_PortOutPut == 0x08 ) {
 
-                    exist strf( "fdisk%d.img", vint_CPUio_disk_DiskNum )
+                    exist strf( vstr_FloppyImageFileNameFormat, vint_CPUio_disk_DiskNum )
                     vint_CPUio_disk_buffersize = strsize
                     if ( vint_CPUio_disk_buffersize == -1 ) {
 
@@ -234,7 +234,7 @@
 
                     }
 
-                    bsave strf( "fdisk%d.img", vint_CPUio_disk_DiskNum ), vbin_CPUio_disk_buffer, vint_CPUio_disk_buffersize
+                    bsave strf( vstr_FloppyImageFileNameFormat, vint_CPUio_disk_DiskNum ), vbin_CPUio_disk_buffer, vint_CPUio_disk_buffersize
 
                     vint_CPUio_disk_statval = 0x00
                     vint_CPUio_disk_errcode = 0x00

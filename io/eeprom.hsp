@@ -109,7 +109,7 @@
 
                 } else {
 
-                    bsave strf( "eeprom%d.img", vint_CPUio_eeprom_TargetROM ), vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_buffersize
+                    bsave strf( vstr_RomImageFileNameFormat, vint_CPUio_eeprom_TargetROM ), vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_buffersize
 
                 }
 
@@ -170,7 +170,7 @@
 
                 } else {
 
-                    exist strf( "eeprom%d.img", vint_CPUio_eeprom_TargetROM )
+                    exist strf( vstr_RomImageFileNameFormat, vint_CPUio_eeprom_TargetROM )
 
                 }
 
@@ -191,7 +191,7 @@
 
                 } else {
 
-                    bload strf( "eeprom%d.img", vint_CPUio_eeprom_TargetROM ), vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_buffersize
+                    bload strf( vstr_RomImageFileNameFormat, vint_CPUio_eeprom_TargetROM ), vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_buffersize
 
                 }
 
@@ -214,7 +214,7 @@
 
                 } else {
 
-                    exist strf( "eeprom%d.img", vint_CPUio_eeprom_TargetROM )
+                    exist strf( vstr_RomImageFileNameFormat, vint_CPUio_eeprom_TargetROM )
 
                 }
 
@@ -233,7 +233,7 @@
 
                 } else {
 
-                    bsave strf( "eeprom%d.img", vint_CPUio_eeprom_TargetROM ), vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_buffersize
+                    bsave strf( vstr_RomImageFileNameFormat, vint_CPUio_eeprom_TargetROM ), vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_buffersize
 
                 }
 
