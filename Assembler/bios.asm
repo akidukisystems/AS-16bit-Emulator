@@ -118,6 +118,85 @@
     MOV     AX, 2                       ; 読み込み実行
     OUT     16h, AX
 
+    MOV     AX, 09h                     ; 挿入されているディスク数を取得
+    OUT     28h, AX
+
+    IN      AX, 20h
+
+    PUSH    AX                          ; とりま退避
+
+    MOV     AH, 0                       ; バイナリ→BCD→ASCIIに変換
+    MOV     BL, AL
+
+    CALL    converts:
+
+    MOV     BX, DX
+    MOV     AH, 2
+
+    CALL    converts:
+
+    CMP     DH, 30h                     ; 0を表示しないよう処理
+    JE      skipZeroDraw:
+
+    MOV     AH, 0Ah
+    MOV     AL, DH
+    INT     10h
+
+skipZeroDraw:
+    MOV     AH, 0Ah
+    MOV     AL, DL
+    INT     10h
+
+    MOV     AH, 0Eh
+    MOV     SI, message_POST_detectFloppy:  ; メッセージ表示
+    INT     10h
+
+    POP     AX
+
+    XOR     CX, CX
+
+repeatDetectFloppy:
+    MOV     DX, CX                      ; 検出された順に場所を取得
+    OUT     27h, DX
+
+    MOV     DX, 0Ah
+    OUT     28h, DX
+
+    IN      DX, 20h
+
+    PUSH    AX
+
+    MOV     AH, 0Eh
+    MOV     SI, message_POST_detectFloppy_floppyname0:  ; メッセージ表示
+    INT     10h
+
+    MOV     AH, 0                       ; ASCIIに変換
+    MOV     BL, DL
+
+    CALL    converts:
+
+    MOV     BX, DX
+    MOV     AH, 2
+
+    CALL    converts:
+
+    MOV     AH, 0Ah                     ; 表示
+    MOV     AL, DH
+    INT     10h
+
+    MOV     AL, DL
+    INT     10h
+
+    MOV     AH, 0Eh
+    MOV     SI, message_POST_detectFloppy_floppyname1:
+    INT     10h
+
+    POP     AX
+
+    INC     CX                          ; 次のディスクに進める
+    CMP     CX, AX
+    JNE     repeatDetectFloppy:
+
     PUSH    DS
 
     MOV     AX, @addr_ramSegment
@@ -732,6 +811,20 @@ message1:
     &DW @CRLF
     &DB 0
 
+message_POST_detectFloppy:
+    &DB " Floppy disk drive has detected."
+    &DW @CRLF
+    &DB 0
+
+message_POST_detectFloppy_floppyname0:
+    &DB "Unnamed disk detected at ["
+    &DB 0
+
+message_POST_detectFloppy_floppyname1:
+    &DB "]"
+    &DW @CRLF
+    &DB 0
+
 message_DiskError:
     &DB "Coudn't read Operation System from disk."
     &DW @CRLF
@@ -831,6 +924,8 @@ editFlag_del:
     ; DL...変換された値（raw）
     ; DX...変換された値（asciiまたはbcd）
 converts:
+    PUSH    CX
+
     CMP     AH, 00h
     JE      converts_hex2bcd:
     CMP     AH, 01h
@@ -839,6 +934,8 @@ converts:
     JE      converts_bcd2ascii:
     CMP     AH, 03h
     JE      converts_ascii2bcd:
+
+    POP     CX
 
     RET
 
@@ -884,6 +981,8 @@ converts_hex2bcd.done.loop:
 
     CMP     CL, 0
     JNE     converts_hex2bcd.done.loop:
+    
+    POP     CX
 
     RET
 
@@ -921,6 +1020,10 @@ pow_fin:
 
 
 converts_bcd2hex:
+    POP     CX
+
+    RET
+
 converts_bcd2ascii:
 
     MOV     AX, BX
@@ -949,10 +1052,14 @@ converts_bcd2ascii:
     POP     AX
     MOV     DL, AL
 
+    POP     CX
+
     RET
 
 
 converts_ascii2bcd:
+
+    POP     CX
 
     RET
 

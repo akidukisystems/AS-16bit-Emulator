@@ -243,6 +243,55 @@
 
                 }
 
+                if ( vint_CPUio_PortOutPut == 0x09 ) {
+
+                    vint_CPUio_tmp = 0
+
+                    repeat 16
+
+                        exist strf( vstr_FloppyImageFileNameFormat, cnt )
+
+                        if ( strsize != -1 ) : vint_CPUio_tmp ++
+
+                    loop
+
+                    vint_CPUio_disk_statval = vint_CPUio_tmp
+                    vint_CPUio_disk_errcode = 0x00
+
+                    return
+
+                }
+
+                if ( vint_CPUio_PortOutPut == 0x0A ) {
+
+                    vint_CPUio_tmp = 0
+
+                    repeat 16
+
+                        exist strf( vstr_FloppyImageFileNameFormat, cnt )
+
+                        if ( strsize != -1 ) {
+
+                            if ( vint_CPUio_tmp == vint_CPUio_disk_DiskNum ) {
+                                
+                                vint_CPUio_disk_statval = cnt
+
+                                break
+
+                            }
+
+                            vint_CPUio_tmp ++
+
+                        }
+
+                    loop
+
+                    vint_CPUio_disk_errcode = 0x00
+
+                    return
+
+                }
+
             }
 
             return

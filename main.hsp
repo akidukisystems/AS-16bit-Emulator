@@ -490,29 +490,46 @@
 
     if ( wparam == 123 ) {
 
-        color 0, 0, 192 : boxf
-        color 192, 192, 192 : boxf 5, 5, 640-5, 480-5
-        color 0, 0, 192 : boxf 10, 30, 640-10, 480-30
-        pos 10, 10 : mes "AkidukiSystems 16bit Emulator Infomation Viewer"
-        pos 10, 480-25 : mes "Copyright (c) 2022-2024 AkidukiSystems CC BY-SA 4.0"
-
-        color 192, 192, 192
-        pos 15, 40
-        mes "Emulator"
-        mes " -Version: 1.3"
-        mes " -BIOS binary file: \""+ vstr_BIOSpath +"\""
-        mes "\nProcessor"
-        mes " -Name: "+ vstr_ProcessorName
-        mes " -Vendor: "+ vstr_ProcessorVendor
-        mes " -Speed: "+ vint_CPUspeed +"K Cycles/sec (MAX)"
-        mes " -Architecture: "+ vstr_ProcessorArchName
-        mes "\nMemory"
-        mes " -Size: "+ vint_DRAMSize +" Bytes"
-
-        stop
+        goto *l_InfoViewer
 
     }
 
+
+    return
+
+*l_InfoViewer
+
+    onkey gosub *l_InfoViewer_Exit
+
+    color 0, 0, 192 : boxf
+    color 192, 192, 192 : boxf 5, 5, 640-5, 480-5
+    color 0, 0, 192 : boxf 10, 30, 640-10, 480-30
+    pos 10, 10 : mes "AkidukiSystems 16bit Emulator Infomation Viewer"
+    pos 10, 480-25 : mes "Copyright (c) 2022-2024 AkidukiSystems CC BY-SA 4.0       Press [Esc] to Exit"
+
+    color 192, 192, 192
+    pos 15, 40
+    mes "Emulator"
+    mes " -Version: 1.3"
+    mes " -BIOS binary file: \""+ vstr_BIOSpath +"\""
+    mes "\nProcessor"
+    mes " -Name: "+ vstr_ProcessorName
+    mes " -Vendor: "+ vstr_ProcessorVendor
+    mes " -Speed: "+ vint_CPUspeed +"K Cycles/sec (MAX)"
+    mes " -Architecture: "+ vstr_ProcessorArchName
+    mes "\nMemory"
+    mes " -Size: "+ vint_DRAMSize +" Bytes"
+    mes "\nGraphic"
+    mes " -Font: \""+ vstr_FontName +"\""
+    mes "\nDisk I/O File name format"
+    mes " -Floppy: \""+ vstr_FloppyImageFileNameFormat +"\""
+    mes " -EEPROM: \""+ vstr_RomImageFileNameFormat +"\""
+
+    stop
+
+*l_InfoViewer_Exit
+
+    if ( wparam == 27 ) : goto *l_emuEntry
 
     return
 
