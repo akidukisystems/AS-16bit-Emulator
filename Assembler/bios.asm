@@ -25,13 +25,12 @@
     #enum   @_time.mm
     #enum   @_time.ss
     
-    #enum   @addr_ramSegment                CA00h   ; 変数領域のセグメント
-    #enum   @addr_int_video_VRAMlastWrite   0000h   ; WORD 最後にVRAMに書いたアドレス
-    #enum   @addr_int_setup_currentCursor   1100h
+    #enum   @addr_ramSegment                C800h   ; 変数領域のセグメント
+    #enum   @addr_int_video_VRAMlastWrite   0000h   ; WORD 最後にVRAMに書いたアドレス (WORD)
+    #enum   @addr_int_setup_currentCursor   0002h   ; BIOSセットアップ画面のカーソル (BYTE)
 
     #enum   @addr_int_setup_BIOSStartupSec  1000h
     #enum   @addr_int_setup_RetryBoot       1001h
-    #enum   @addr_int_EEPROM                2000h   ; BIOSの設定データが格納されるアドレス
 
 ;   _/_/_/_/  Main Routine  _/_/_/_/
     
@@ -98,7 +97,7 @@
     MOV     AX, @addr_ramSegment
     OUT     13h, AX
 
-    MOV     AX, 2000h                   ; 読み込み元アドレス
+    MOV     AX, config_BIOSStartupSec:                   ; 読み込み元アドレス
     OUT     14h, AX
 
     MOV     AX, 0                       ; EEPROM番号
@@ -113,22 +112,25 @@
     MOV     AX, @addr_int_setup_RetryBoot
     OUT     12h, AX
     
-    MOV     AX, 2001h
+    MOV     AX, config_SysBootRetry:
     OUT     14h, AX
 
     MOV     AX, 2                       ; 読み込み実行
     OUT     16h, AX
 
     PUSH    DS
+
     MOV     AX, @addr_ramSegment
     MOV     DS, AX
-    MOV     CX, BYTE[@addr_int_setup_BIOSStartupSec]  ; 指定された値（デフォルト10h）*100ms待つ
+
+    MOV     CL, BYTE[@addr_int_setup_BIOSStartupSec]  ; 指定された値（デフォルト10h）*100ms待つ
+
     POP     DS
 
 waitBiosMenu_wait:
     MOV     AX, 100                     ; 100ms待つ
     OUT     F0h, AX                     ; ウェイト
-    DEC     CX                          ; カウンタをデクリメントして、0ならブート処理
+    DEC     CL                          ; カウンタをデクリメントして、0ならブート処理
     JZ      waitBiosMenu_timeout:
 
     IN      AX, 80h                     ; キーが押されたか確認
@@ -1868,5 +1870,8 @@ int_none:
 
     ; ここからBIOS設定
 
+config_BIOSStartupSec:
     &DB     10                          ; BIOS起動画面の待機時間
+
+config_SysBootRetry:
     &DB     0                           ; ブートを再試行するか
