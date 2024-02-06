@@ -111,6 +111,15 @@
     #include "kernel32.as"
     #include "msglib.as"
     #include "stacktrace.hsp"
+    #include "dupProtect.as"
+
+    if ( checkDup ( "16bitvm" ) ) {
+
+        dialog "Virtual Machine is already running."
+
+        end
+
+    }
 
     #uselib "user32.dll"
     #func SetTimer  "SetTimer"  int, int, int, int
