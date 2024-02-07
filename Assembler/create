@@ -8,6 +8,7 @@
 ?fat-size=1
 ?init
 !boot.bin
++loader.sys
 +system.sys
 +jpnkey16.sys
 +start.dat
@@ -18,5 +19,4 @@
 +type.com
 +del.com
 +bench.com
-+loader.sys
 =fdisk0.img
