@@ -43,7 +43,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -95,7 +95,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -147,7 +147,7 @@
         swbreak
         swend
         
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -199,7 +199,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -251,7 +251,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -303,7 +303,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -355,7 +355,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -407,7 +407,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -459,7 +459,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -511,7 +511,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -563,7 +563,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -615,7 +615,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -673,7 +673,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -731,7 +731,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -789,7 +789,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -847,7 +847,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -899,7 +899,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -951,7 +951,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 3, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -1003,7 +1003,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 4, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 4, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -1048,7 +1048,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rES), vbin_CPUtmp.0, 1, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rES), vbin_CPUtmp.0, 1, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWs rCS, fetchRegisterWs(rES)
         writeRegisterWe rIP, vbin_CPUtmp.0
@@ -1094,7 +1094,7 @@
         swbreak
         swend
 
-        if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 2, emu_vint_executedCmd, gettick(0)
+        if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 2, emu_vint_executedCmd, gettick(0)
 
         writeRegisterWe rIP, vbin_CPUtmp.0
 
@@ -1146,7 +1146,7 @@
 
         if ( vbin_CPUtmp.1 != 0 ) {
 
-            if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 5, emu_vint_executedCmd, gettick(0)
+            if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 5, emu_vint_executedCmd, gettick(0)
             writeRegisterWe rIP, vbin_CPUtmp.0
 
         }
@@ -1200,7 +1200,7 @@
 
         if ( ( vbin_CPUtmp.1 ) != 0 and ( TestFlag( fZF ) == fZF ) ) {
 
-            if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 6, emu_vint_executedCmd, gettick(0)
+            if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 6, emu_vint_executedCmd, gettick(0)
             writeRegisterWe rIP, vbin_CPUtmp.0
 
         }
@@ -1254,7 +1254,7 @@
 
         if ( ( vbin_CPUtmp.1 ) != 0 and ( TestFlag( fZF ) != fZF ) ) {
 
-            if ( vint_isEnablePutTrace_JUMP ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 7, emu_vint_executedCmd, gettick(0)
+            if ( vint_isEnablePutTrace.1 ) : jumping  fetchRegisterWs(rCS), fetchRegisterWe(rIP), fetchRegisterWs(rCS), vbin_CPUtmp.0, 7, emu_vint_executedCmd, gettick(0)
             writeRegisterWe rIP, vbin_CPUtmp.0
 
         }

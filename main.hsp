@@ -263,23 +263,6 @@
 
     vint_conf_RefreshRate = 1
 
-    vint_conf_DebugRegFormat_AX = 0
-    vint_conf_DebugRegFormat_BX = 0
-    vint_conf_DebugRegFormat_CX = 0
-    vint_conf_DebugRegFormat_DX = 0
-
-    vint_conf_DebugRegFormat_SI = 0
-    vint_conf_DebugRegFormat_DI = 0
-    vint_conf_DebugRegFormat_BP = 0
-    vint_conf_DebugRegFormat_SP = 0
-
-    vint_conf_DebugRegFormat_CS = 0
-    vint_conf_DebugRegFormat_DS = 0
-    vint_conf_DebugRegFormat_ES = 0
-    vint_conf_DebugRegFormat_SS = 0
-
-    vint_conf_DebugRegFormat_IP = 0
-
 
 
     winsel SCREEN_DEBUGLOG_ID, SCRnone
@@ -390,25 +373,53 @@
     cfgAS_read "Graphic.MemoryTable.StartAddr", vint_Ram_Video.StartAddr
     cfgAS_read "Graphic.MemoryTable.EndAddr", vint_Ram_Video.EndAddr
 
-    vint_isEnablePutTrace_CALL   = true
-    vint_isEnablePutTrace_JUMP   = true
-    vint_isEnablePutTrace_RET    = true
-    vint_isEnablePutTrace_CHANGE = true
-    vint_isEnablePutTraceError_UD2 = true
-    vint_isEnablePutTrace_HardwareInterrupt = true
+    vint_isEnablePutTrace.0 = true ; call/fcall/int
+    vint_isEnablePutTrace.1 = true ; jmp
+    vint_isEnablePutTrace.2 = true ; ret
+    vint_isEnablePutTrace.3 = true ; ccs
+    vint_isEnablePutTrace.4 = true ; int
+    vint_isEnablePutTrace.5 = true ; hlt
+    vint_isEnablePutTrace.6 = true ; ud2
+    vint_isEnablePutTraceError.0 = true
+    
 
-    cfgAS_read "StackTrace.putTrace.CALL", vint_isEnablePutTrace_CALL
-    cfgAS_read "StackTrace.putTrace.JUMP", vint_isEnablePutTrace_JUMP
-    cfgAS_read "StackTrace.putTrace.RET", vint_isEnablePutTrace_RET
-    cfgAS_read "StackTrace.putTrace.CHANGE", vint_isEnablePutTrace_CHANGE
-    cfgAS_read "StackTrace.putTrace.#UD2", vint_isEnablePutTraceError_UD2
-    cfgAS_read "StackTrace.putTrace.HardwareInterrupt", vint_isEnablePutTrace_HardwareInterrupt
+    cfgAS_read "StackTrace.putTrace.CALL", vint_isEnablePutTrace.0
+    cfgAS_read "StackTrace.putTrace.JUMP", vint_isEnablePutTrace.1
+    cfgAS_read "StackTrace.putTrace.RET", vint_isEnablePutTrace.2
+    cfgAS_read "StackTrace.putTrace.CHANGE", vint_isEnablePutTrace.3
+    cfgAS_read "StackTrace.putTrace.#UD2", vint_isEnablePutTraceError.0
+    cfgAS_read "StackTrace.putTrace.HardwareInterrupt", vint_isEnablePutTrace.4
 
     vstr_FloppyImageFileNameFormat = "fdisk%d.img"
     vstr_RomImageFileNameFormat = "eeprom%d.bin"
+    vstr_FloppyBPBFormatFile = "afat16.ini"
 
     cfgAS_read "IO.Disk.FloppyImage.FileNameFormat", vstr_FloppyImageFileNameFormat
     cfgAS_read "IO.EEPROM.RomImage.FileNameFormat", vstr_RomImageFileNameFormat
+    cfgAS_read "IO.Disk.FloppyImage.BPBFormatFile", vstr_FloppyBPBFormatFile
+
+
+    cfgAS_init vstr_FloppyBPBFormatFile
+
+    vint_FloppyBPBFormat_sectorsize.0 = 0x0E
+    vint_FloppyBPBFormat_sectorsize.1 = 2
+    vint_FloppyBPBFormat_trucksize.0 = 0x10
+    vint_FloppyBPBFormat_trucksize.1 = 2
+    vint_FloppyBPBFormat_cilsize.0 = 0x12
+    vint_FloppyBPBFormat_cilsize.1 = 2
+    vint_FloppyBPBFormat_headcnt.0 = 0x14
+    vint_FloppyBPBFormat_headcnt.1 = 1
+
+    cfgAS_read "sectorsize.pos", vint_FloppyBPBFormat_sectorsize.0
+    cfgAS_read "sectorsize.length", vint_FloppyBPBFormat_sectorsize.1
+    cfgAS_read "trucksize.pos", vint_FloppyBPBFormat_trucksize.0
+    cfgAS_read "trucksize.length", vint_FloppyBPBFormat_trucksize.1
+    cfgAS_read "cilsize.pos", vint_FloppyBPBFormat_cilsize.0
+    cfgAS_read "cilsize.length", vint_FloppyBPBFormat_cilsize.1
+    cfgAS_read "headcnt.pos", vint_FloppyBPBFormat_headcnt.0
+    cfgAS_read "headcnt.length", vint_FloppyBPBFormat_headcnt.1
+
+    cfgAS_init vstr_configFileName
 
     winsel SCREEN_CONFIG_ID, SCRnone
 
@@ -437,7 +448,7 @@
 
     winsel SCREEN_DISPLAY_ID, SCRnone
     font vstr_FontName, 16
-    mref emu_vbin_VRAM, 66
+    ;mref emu_vbin_VRAM, 66
 
     vstr_BIOSpath = "bios.bin"
     cfgAS_read "BIOS.binaryPath", vstr_BIOSpath

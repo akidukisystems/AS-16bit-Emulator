@@ -153,7 +153,7 @@
                 vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, vint_InterruptNumber * 4 )         // オフセット
                 vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, vint_InterruptNumber * 4 +2 )      // セグメント
 
-                if ( vint_isEnablePutTrace_HardwareInterrupt ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 8, emu_vint_executedCmd, gettick(0), vint_InterruptNumber
+                if ( vint_isEnablePutTrace.4 ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 8, emu_vint_executedCmd, gettick(0), vint_InterruptNumber
 
                 vbin_CPUtmp.3 = fetchRegisterWg(rSP) -2
                 checkDataW(vbin_CPUtmp.3)
@@ -219,7 +219,7 @@
                 vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, vint_InterruptNumber * 4 )         // オフセット
                 vbin_CPUtmp.2 = wpeek( emu_vbin_Memory, vint_InterruptNumber * 4 +2 )      // セグメント
 
-                if ( vint_isEnablePutTrace_HardwareInterrupt ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 8, emu_vint_executedCmd, gettick(0), vint_InterruptNumber
+                if ( vint_isEnablePutTrace.4 ) : calling fetchRegisterWs(rCS), fetchRegisterWe(rIP), vbin_CPUtmp.2, vbin_CPUtmp.1, 8, emu_vint_executedCmd, gettick(0), vint_InterruptNumber
 
                 vbin_CPUtmp.3 = fetchRegisterWg(rSP) -2
                 checkDataW(vbin_CPUtmp.3)

@@ -26,6 +26,7 @@ BIOS.binaryPath=".\bios.bin"
 #IO Settings
 IO.Disk.FloppyImage.FileNameFormat="fdisk%d.img"
 IO.EEPROM.RomImage.FileNameFormat="eeprom%d.bin"
+IO.Disk.FloppyImage.BPBFormatFile="afat16.ini"
 
 #StackTrace
 StackTrace.putTrace.CALL=1

@@ -29,7 +29,7 @@
 
             if ( vint_CPUioTypeIsIN == 0 ) {
 
-                vint_CPUio_eeprom_DataOffset = vint_CPUio_PortOutPut
+                vint_CPUio_eeprom_ReadWriteAddress.0 = vint_CPUio_PortOutPut
 
             }
 
@@ -41,7 +41,7 @@
 
             if ( vint_CPUioTypeIsIN == 0 ) {
 
-                vint_CPUio_eeprom_DataSegment = vint_CPUio_PortOutPut
+                vint_CPUio_eeprom_ReadWriteAddress.1 = vint_CPUio_PortOutPut
 
             }
 
@@ -53,7 +53,7 @@
 
             if ( vint_CPUioTypeIsIN == 0 ) {
 
-                vint_CPUio_eeprom_RWDataByte = vint_CPUio_PortOutPut
+                vint_CPUio_eeprom_ReadWriteDataByte = vint_CPUio_PortOutPut
 
             }
 
@@ -86,9 +86,9 @@
                 vint_CPUio_eeprom_Result = 0
                 vint_CPUio_eeprom_ErrorCode = 0
                 
-                vint_CPUio_eeprom_DataOffset = 0
-                vint_CPUio_eeprom_DataSegment = 0
-                vint_CPUio_eeprom_RWDataByte = 0
+                vint_CPUio_eeprom_ReadWriteAddress.0 = 0 ; offset
+                vint_CPUio_eeprom_ReadWriteAddress.1 = 0 ; segment
+                vint_CPUio_eeprom_ReadWriteDataByte = 0
                 vint_CPUio_eeprom_TargetROM = 0
 
                 dim vint_CPUio_eeprom_isWritable, 16
@@ -122,7 +122,7 @@
 
             if ( vint_CPUio_PortOutPut == 2 ) {
 
-                if ( vint_CPUio_eeprom_RWDataByte > vint_CPUio_eeprom_buffersize ) {
+                if ( vint_CPUio_eeprom_ReadWriteDataByte > vint_CPUio_eeprom_buffersize ) {
 
                     vint_CPUio_eeprom_Result = 0x01
                     vint_CPUio_eeprom_ErrorCode = 0x04
@@ -131,7 +131,7 @@
 
                 }
 
-                poke emu_vbin_Memory, ( vint_CPUio_eeprom_DataSegment *0x10 + vint_CPUio_eeprom_DataOffset ), peek( vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_RWDataByte )
+                poke emu_vbin_Memory, ( vint_CPUio_eeprom_ReadWriteAddress.1 *0x10 + vint_CPUio_eeprom_ReadWriteAddress.0 ), peek( vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_ReadWriteDataByte )
 
                 vint_CPUio_eeprom_Result = 0x00
                 vint_CPUio_eeprom_ErrorCode = 0x00
@@ -144,7 +144,7 @@
 
                 if ( vint_CPUio_eeprom_isWritable.vint_CPUio_eeprom_TargetROM == 0 ) : return
 
-                if ( vint_CPUio_eeprom_RWDataByte > vint_CPUio_eeprom_buffersize ) {
+                if ( vint_CPUio_eeprom_ReadWriteDataByte > vint_CPUio_eeprom_buffersize ) {
 
                     vint_CPUio_eeprom_Result = 0x01
                     vint_CPUio_eeprom_ErrorCode = 0x04
@@ -153,7 +153,7 @@
 
                 }
 
-                poke vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_RWDataByte, peek( emu_vbin_Memory, ( vint_CPUio_eeprom_DataSegment *0x10 + vint_CPUio_eeprom_DataOffset ) )
+                poke vbin_CPUio_eeprom_buffer, vint_CPUio_eeprom_ReadWriteDataByte, peek( emu_vbin_Memory, ( vint_CPUio_eeprom_ReadWriteAddress.1 *0x10 + vint_CPUio_eeprom_ReadWriteAddress.0 ) )
 
                 vint_CPUio_eeprom_Result = 0x00
                 vint_CPUio_eeprom_ErrorCode = 0x00
