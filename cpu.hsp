@@ -101,7 +101,7 @@
 
         }
 
-        if ( ( cnt \ CPU_CLOCK_CYCLE  ) == 0 ) : await CPU_CLOCK_WAIT
+        if ( ( cnt \ CPU_CLOCK.0  ) == 0 ) : await CPU_CLOCK.1
 
         if ( emu_vbin_needReboot ) : break
 

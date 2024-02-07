@@ -130,8 +130,8 @@
     #define EndAddr     1
     #define SizeAddr    2
 
-    CPU_CLOCK_CYCLE = 256
-    CPU_CLOCK_WAIT = 1
+    CPU_CLOCK.0 = 256
+    CPU_CLOCK.1 = 1
     DISPLAY_REFRESH_TIME = 5
     CPU_PIN_REFRESH = 2
 
@@ -339,24 +339,23 @@
 
     cfgAS_init vstr_configFileName
 
-    vstr_ProcessorName = "(none)"
-    vstr_ProcessorArchName = "(none)"
-    vstr_ProcessorVendor = "(none)"
+    vstr_Processor.0 = "(none)" ; name
+    vstr_Processor.1 = "(none)" ; architecture
+    vstr_Processor.2 = "(none)" ; vendor
+
     vint_VRAM_Format = 0
     vstr_FontName = "Bm437 IBM VGA 8x16"
     vint_DRAMSize = 1048576
     
-    cfgAS_read "Processor.Name", vstr_ProcessorName
-    cfgAS_read "Processor.ArchName", vstr_ProcessorArchName
-    cfgAS_read "Processor.Vendor", vstr_ProcessorVendor
+    cfgAS_read "Processor.Name", vstr_Processor.0
+    cfgAS_read "Processor.ArchName", vstr_Processor.1
+    cfgAS_read "Processor.Vendor", vstr_Processor.2
 
-    cfgAS_read "Processor.ClockCycle", CPU_CLOCK_CYCLE
-    cfgAS_read "Processor.ClockPause", CPU_CLOCK_WAIT
+    cfgAS_read "Processor.ClockCycle", CPU_CLOCK.0 ; cycles
+    cfgAS_read "Processor.ClockPause", CPU_CLOCK.1 ; waitms
     cfgAS_read "Processor.RefreshTime", CPU_PIN_REFRESH
 
     cfgAS_read "Graphic.RefreshTime", DISPLAY_REFRESH_TIME
-
-    vint_CPUspeed = CPU_CLOCK_CYCLE / ( CPU_CLOCK_WAIT / 2 )
 
     color CLR_WHITE
 
@@ -432,9 +431,9 @@
 
     mes "System/CPU"
     mes "-ClockCycle", 1
-    input CPU_CLOCK_CYCLE, 128, 20, 8 : pos 0, ginfo_cy
+    input CPU_CLOCK.0, 128, 20, 8 : pos 0, ginfo_cy
     mes "-ClockPause", 1
-    input CPU_CLOCK_WAIT, 128, 20, 8 : pos 0, ginfo_cy
+    input CPU_CLOCK.1, 128, 20, 8 : pos 0, ginfo_cy
     mes "-RefreshTime", 1
     input CPU_PIN_REFRESH, 128, 20, 8 : pos 0, ginfo_cy
 
@@ -533,10 +532,10 @@
     mes " -Version: 1.3"
     mes " -BIOS binary file: \""+ vstr_BIOSpath +"\""
     mes "\nProcessor"
-    mes " -Name: "+ vstr_ProcessorName
-    mes " -Vendor: "+ vstr_ProcessorVendor
-    mes " -Speed: "+ vint_CPUspeed +"K Cycles/sec (MAX)"
-    mes " -Architecture: "+ vstr_ProcessorArchName
+    mes " -Name: "+ vstr_Processor.0
+    mes " -Vendor: "+ vstr_Processor.2
+    mes " -Speed: "+ CPU_CLOCK.0 / ( CPU_CLOCK.1 / 2 ) +"K Cycles/sec (MAX)"
+    mes " -Architecture: "+ vstr_Processor.1
     mes "\nMemory"
     mes " -Size: "+ vint_DRAMSize +" Bytes"
     mes "\nGraphic"

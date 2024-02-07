@@ -5,7 +5,7 @@
 
         repeat
 
-            if ( ( cnt \ CPU_CLOCK_CYCLE  ) == 0 ) : await CPU_CLOCK_WAIT
+            if ( ( cnt \ CPU_CLOCK.0  ) == 0 ) : await CPU_CLOCK.1
 
             if ( isSetInterrupt() and ( ( fetchRegisterWe(rFL) && fIF ) == fIF ) ) {
 
