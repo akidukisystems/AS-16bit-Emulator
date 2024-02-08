@@ -113,6 +113,8 @@
     #include "stacktrace.hsp"
     #include "dupProtect.as"
 
+    initDup
+
     if ( checkDup ( "16bitvm" ) ) {
 
         dialog "Virtual Machine is already running."
@@ -335,6 +337,8 @@
 	chdir "..\\"
 	noteunsel
 
+    color CLR_WHITE
+
     putmes_msglib "Applied fonts\n", SCREEN_DEBUGLOG_ID
 
     cfgAS_init vstr_configFileName
@@ -346,6 +350,9 @@
     vint_VRAM_Format = 0
     vstr_FontName = "Bm437 IBM VGA 8x16"
     vint_DRAMSize = 1048576
+
+    dim vint_Ram_BIOS_Binary, 3
+    dim vint_Ram_Video, 3
     
     cfgAS_read "Processor.Name", vstr_Processor.0
     cfgAS_read "Processor.ArchName", vstr_Processor.1
@@ -357,16 +364,11 @@
 
     cfgAS_read "Graphic.RefreshTime", DISPLAY_REFRESH_TIME
 
-    color CLR_WHITE
-
     cfgAS_read "Memory.Size", vint_DRAMSize
     
-    cfgAS_read "BIOS.MemoryTable.StartAddr.MainCodeArea", vint_Ram_BIOS_MainCode.StartAddr
-    cfgAS_read "BIOS.MemoryTable.EndAddr.MainCodeArea"  , vint_Ram_BIOS_MainCode.EndAddr
-    vint_Ram_BIOS_MainCode.SizeAddr = vint_Ram_BIOS_MainCode.EndAddr - vint_Ram_BIOS_MainCode.StartAddr +1
-    cfgAS_read "BIOS.MemoryTable.StartAddr.SubCodeArea", vint_Ram_BIOS_SubCode.StartAddr
-    cfgAS_read "BIOS.MemoryTable.EndAddr.SubCodeArea"  , vint_Ram_BIOS_SubCode.EndAddr
-    vint_Ram_BIOS_SubCode.SizeAddr = vint_Ram_BIOS_SubCode.EndAddr - vint_Ram_BIOS_SubCode.StartAddr +1
+    cfgAS_read "BIOS.MemoryTable.StartAddr.MainCodeArea", vint_Ram_BIOS_Binary.StartAddr
+    cfgAS_read "BIOS.MemoryTable.EndAddr.MainCodeArea"  , vint_Ram_BIOS_Binary.EndAddr
+    vint_Ram_BIOS_Binary.SizeAddr = vint_Ram_BIOS_Binary.EndAddr - vint_Ram_BIOS_Binary.StartAddr +1
 
     cfgAS_read "Graphic.Font", vstr_FontName
     cfgAS_read "Graphic.MemoryTable.StartAddr", vint_Ram_Video.StartAddr
@@ -469,6 +471,9 @@
 
     vint_CPU_Timer_isActive = false
 
+    emu_vint_executedCmd = 0
+    vint_CPU_Timer_Count = 0
+
     exist vstr_BIOSpath
     if ( strsize == -1 ) : {
 
@@ -481,7 +486,7 @@
     bload vstr_BIOSpath, vbin_BIOS, strsize
 
     sdim emu_vbin_Memory, vint_DRAMSize
-    memcpy emu_vbin_Memory, vbin_BIOS, varsize(vbin_BIOS), vint_Ram_BIOS_MainCode.StartAddr
+    memcpy emu_vbin_Memory, vbin_BIOS, varsize(vbin_BIOS), vint_Ram_BIOS_Binary.StartAddr
 
     sdim emu_vbin_IO, 0xFFFF
     emu_vbin_PIN = 0
@@ -499,7 +504,7 @@
 
     }
 
-    emu_vbin_Memory_Index = vint_Ram_BIOS_MainCode.StartAddr
+    emu_vbin_Memory_Index = vint_Ram_BIOS_Binary.StartAddr
 
     goto *l_CPUentry
 

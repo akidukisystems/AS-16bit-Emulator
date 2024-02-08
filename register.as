@@ -573,7 +573,7 @@
         poke vbin_CPUregisterG.registerBglIDw, 0x00, dataBglw
     return
 
-    #deffunc saveError str saverr_type
+    #deffunc saveError str saverr_type, int ticks
 
         vstr_temp = ""
         notesel vstr_temp
@@ -625,7 +625,7 @@
         noteadd ""
         noteadd "+Other infomation"
         noteadd "TIME="+ gettick(0) +" ms"
-        noteadd "TICK="+ emu_vint_executedCmd@ +""
+        noteadd "TICK="+ ticks +""
 
         notesave "error.txt"
         noteunsel

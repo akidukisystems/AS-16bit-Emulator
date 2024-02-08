@@ -7,6 +7,12 @@
 
 #define ERROR_ALREADY_EXISTS    183
 
+#deffunc initDup
+
+    hMutex = 0
+
+return
+
 #defcfunc checkDup str MUTEX_NAME
 
     if ( hMutex == 0 ) {

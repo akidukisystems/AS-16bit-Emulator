@@ -3,7 +3,7 @@
     #include "intcont.hsp"
 
     vint_CPUcurrentStep = 0
-    emu_vint_executedCmd = false
+    emu_vint_executedCmd = 0
     vint_CPUio_Display_isRefreshDisplay = true
     
 
@@ -74,7 +74,7 @@
 
         if ( vint_CPUinvaildcmd ) : {
 
-            saveError "#UD excption"
+            saveError "#UD excption", emu_vint_executedCmd
             vint_CPUinvaildcmd = false
 
             vbin_CPUtmp.1 = wpeek( emu_vbin_Memory, 6 * 4 )

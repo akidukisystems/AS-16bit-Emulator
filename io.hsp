@@ -1,4 +1,6 @@
 
+    vint_CPUio_Result = 0
+
     if ( ( vint_CPUio_PortNumber && 0xF0 ) == 0x10 ) : {
 
         #addition "io/eeprom.hsp"
