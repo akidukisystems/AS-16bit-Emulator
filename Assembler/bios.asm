@@ -27,7 +27,8 @@
     
     #enum   @addr_ramSegment                C800h   ; 変数領域のセグメント
     #enum   @addr_int_video_VRAMlastWrite   0000h   ; WORD 最後にVRAMに書いたアドレス (WORD)
-    #enum   @addr_int_setup_currentCursor   0002h   ; BIOSセットアップ画面のカーソル (BYTE)
+    #enum   @addr_int_setup_currentCursor   0002h   ; BIOSセットアップ画面のオブジェクトカーソル (BYTE)
+    #enum   @addr_int_bios_refreshCursorPos 0003h   ; BIOSセットアップ画面のディスプレイカーソル位置 (WORD)
 
     #enum   @addr_int_setup_BIOSStartupSec  1000h
     #enum   @addr_int_setup_RetryBoot       1001h
@@ -269,7 +270,19 @@ DiskError:
     MOV     AH, 0Eh                     ; テレタイプモード
     INT     10h                         ; ビデオ割り込み
 
-    JMP     ResetSys:
+    PUSH    DS
+
+    MOV     AX, @addr_ramSegment
+    MOV     DS, AX
+
+    MOV     BH, BYTE[@addr_int_setup_RetryBoot]
+
+    POP     DS
+
+    CMP     BH, 1
+    JE      ResetSys:
+
+    JMP     fin:
 
 NotBootable:
     MOV     DS, F000h                   ; 文字列のあるセグメント
@@ -277,9 +290,22 @@ NotBootable:
     MOV     AH, 0Eh                     ; テレタイプモード
     INT     10h                         ; ビデオ割り込み
 
+    PUSH    DS
+
+    MOV     AX, @addr_ramSegment
+    MOV     DS, AX
+
+    MOV     BH, BYTE[@addr_int_setup_RetryBoot]
+
+    POP     DS
+
+    CMP     BH, 1
+    JE      ResetSys:
+
+    JMP     fin:
+
 ResetSys:
-    IN      AX, FFh
-    OR      AX, 1
+    MOV     AX, 1
     OUT     FFh, AX
 
     JMP     fin:
@@ -318,6 +344,18 @@ BiosMenu_Keywait:
 
     MOV     AX, 0                       ; 画面リフレッシュ無効
     OUT     30h, AX
+
+    PUSH    DS
+
+    MOV     AX, @addr_ramSegment        ; あとで画面リフレッシュ時にカーソル位置を使うので、今のカーソル位置を控えておく
+    MOV     DS, AX
+
+    MOV     AH, 03h
+    INT     10h
+
+    MOV     WORD[@addr_int_bios_refreshCursorPos], BX
+
+    POP     DS
 
     MOV     AH, 04h                     ; 時刻取得
     INT     1Ah
@@ -463,6 +501,10 @@ BiosMenu_Keywait:
     CMP     AL, 0
     JE      BiosMenu_Keywait_DrawCursor0:
 
+    MOV     AH, 0Eh
+    MOV     SI, message_BiosMenu_CursorOFF:
+    INT     10h
+
 BiosMenu_Keywait_DrawCursor0_ret:
     MOV     AH, 0Eh                     ; メッセージ表示
     MOV     SI, message_BiosMenu_BIOSSetupSec:
@@ -507,6 +549,10 @@ BiosMenu_Keywait_DrawCursor0_ret:
     CMP     AL, 1
     JE      BiosMenu_Keywait_DrawCursor1:
 
+    MOV     AH, 0Eh
+    MOV     SI, message_BiosMenu_CursorOFF:
+    INT     10h
+
 BiosMenu_Keywait_DrawCursor1_ret:
     MOV     AH, 0Eh                     ; メッセージ表示
     MOV     SI, message_BiosMenu_SysBootretry:
@@ -539,9 +585,15 @@ BiosMenu_Keywait_RetryBoot_Disable:
 BiosMenu_Keywait_RetryBoot_Ret:
 
                                         ; 画面更新時に同じ位置に日付時刻を表示するため、カーソル位置をもとに戻す
-    MOV     AH, 03h                     ; カーソル位置を取得
-    INT     10h
-    SUB     BX, 74                      ; BXにカーソル位置が格納されるので、13hを引く（日付時刻の表示）
+    PUSH    DS                          ; メモリにカーソル位置をおいてあるので、それをつかう
+
+    MOV     AX, @addr_ramSegment
+    MOV     DS, AX
+
+    MOV     BX, WORD[@addr_int_bios_refreshCursorPos]   ; BXにカーソル位置を設定
+
+    POP     DS
+
     MOV     AH, 02h                     ; カーソル位置を設定
     INT     10h
 
@@ -775,14 +827,14 @@ BiosMenu_Key_Save:
     ; カーソル描画
 BiosMenu_Keywait_DrawCursor0:
     MOV     AH, 0Eh
-    MOV     SI, message_BiosMenu_Cursor:
+    MOV     SI, message_BiosMenu_CursorON:
     INT     10h
 
     JMP     BiosMenu_Keywait_DrawCursor0_ret:
 
 BiosMenu_Keywait_DrawCursor1:
     MOV     AH, 0Eh
-    MOV     SI, message_BiosMenu_Cursor:
+    MOV     SI, message_BiosMenu_CursorON:
     INT     10h
 
     JMP     BiosMenu_Keywait_DrawCursor1_ret:
@@ -863,11 +915,11 @@ message_BiosMenu:
     &DB 0
 
 message_BiosMenu_BIOSSetupSec:
-    &DB "POST Waiting Time: "
+    &DB "POST screen waiting time : "
     &DB 0
 
 message_BiosMenu_SysBootretry:
-    &DB "System Boot Retry: "
+    &DB "Retry boot disk error    : "
     &DB 0
 
 message_BiosMenu_Enable:
@@ -878,8 +930,12 @@ message_BiosMenu_Disable:
     &DB "Disable"
     &DB 0
 
-message_BiosMenu_Cursor:
+message_BiosMenu_CursorON:
     &DB "->"
+    &DB 0
+
+message_BiosMenu_CursorOFF:
+    &DB "  "
     &DB 0
 
 
@@ -1095,9 +1151,9 @@ int_video:                              ; ビデオ割り込み (10h)
     JE      int_video_teretype:
     CMP     AH, 20h                     ; 画面クリア
     JE      int_video_clear:
-    CMP     AH, 02h                     ; 画面クリア
+    CMP     AH, 02h                     ; カーソル設定
     JE      int_video_setcursor:
-    CMP     AH, 03h                     ; 画面クリア
+    CMP     AH, 03h                     ; カーソル位置取得
     JE      int_video_getcursor:
 
     IRET
