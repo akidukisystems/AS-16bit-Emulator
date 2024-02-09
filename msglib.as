@@ -1,5 +1,11 @@
+/*
 
-    #module
+    msglib.as
+        メッセージログ出力ライブラリ
+
+*/
+
+#module
 
     // msglibを初期化します（命令）
     // id=ウィンドウID
@@ -79,4 +85,4 @@
     #define global cls_msglib(%1=0) func_cls_msglib %1
 
 
-    #global
+#global

@@ -1,4 +1,9 @@
+/*
 
+    cfg.as
+        設定ファイル操作支援モジュール
+
+*/
 
 
 #module CFG_AS
@@ -174,6 +179,8 @@ return
 
 return
 
+; 設定ファイルを読み込み、モジュールを初期化します
+; file=設定ファイル名
 #deffunc cfgAS_init str file
 
     Var_ConfigLine = ""
@@ -195,7 +202,11 @@ return
 return 1
 
 
-
+; 設定ファイルにある項目を読み込みます
+; name=項目名
+; in=読み込み先の変数
+; isRepraceCRLF=改行コード変換オプション（デフォルト:0）
+; isRepraceCRLFに1をセットすると、項目の値に文字列"\n"があった場合、自動で改行コード(0x0D, 0x0A)に変換します。
 #define global cfgAS_read(%1, %2, %3=0) cfgAS_read_l@cfg_AS %1, %2, %3
 
 #deffunc local cfgAS_read_l str name, var in, int isRepraceCRLF
@@ -271,7 +282,12 @@ return 1
 
 
 
-
+; 設定ファイルにある項目へ書き込みます
+; name=項目名
+; in=書き込み元の変数
+; isOverWrite=上書きオプション（デフォルト:0）
+; isOverWriteに1をセットすると、同じ項目があった場合、その項目の値に上書きします。
+; 0をセットするか、省略した場合は、同じ項目があった場合には何もしません。
 #define global cfgAS_write(%1, %2, %3=0) cfgAS_write_l@cfg_AS %1, %2, %3
 
 #deffunc local cfgAS_write_l str name, var in, int isOverWrite
@@ -370,7 +386,8 @@ return 3
 
 
 
-
+; 設定ファイルから項目を削除します
+; name=項目名
 #deffunc cfgAS_remove str name
 
     if ( Var_isLoad == 0 ) : return 1
@@ -408,7 +425,8 @@ return 3
 
 
 
-
+; 設定ファイルの変更を保存します
+; file=設定ファイル名
 #deffunc cfgAS_save str file
 
     if ( Var_isLoad == 0 ) : return 1
@@ -421,6 +439,7 @@ return 0
 
 
 
+; モジュールをリセットします
 #deffunc cfgAS_reset
 
     if ( Var_isLoad == 0 ) : return 1
