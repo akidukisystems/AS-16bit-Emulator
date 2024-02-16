@@ -4,8 +4,9 @@
 
     vint_CPUcurrentStep = 0
     emu_vint_executedCmd = 0
+
     vint_CPUio_Display_isRefreshDisplay = true
-    
+    vint_CPUio_KeyBuffer_LT = 0
 
     // パラメータなし
     varr_CPUparamList_0(0) = 0x62, 0x63, 0x64, 0x65
