@@ -124,6 +124,9 @@
 
     IN      AX, 20h
 
+    TEST    AX, FFFFh
+    JZ      diskhasnodetect:            ; ディスクなんてない場合
+
     PUSH    AX                          ; とりま退避
 
     MOV     AH, 0                       ; バイナリ→BCD→ASCIIに変換
@@ -198,6 +201,7 @@ repeatDetectFloppy:
     CMP     CX, AX
     JNE     repeatDetectFloppy:
 
+diskhasnodetect:
     PUSH    DS
 
     MOV     AX, @addr_ramSegment
