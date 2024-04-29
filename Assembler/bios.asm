@@ -861,7 +861,7 @@ message1:
     &DW @CRLF
     &DB "Copyright (c) 2022-2024 AkidukiSystems CC BY-SA 4.0"
     &DW @CRLF
-    &DB "AkidukiSystems BIOS Version 0.4"
+    &DB "AkidukiSystems BIOS Version 0.5"
     &DW @CRLF
     &DB "Press [F12] to Setup Utility"
     &DW @CRLF
@@ -882,12 +882,14 @@ message_POST_detectFloppy_floppyname1:
     &DB 0
 
 message_DiskError:
-    &DB "Coudn't read Operation System from disk."
+    &DB "Couldn't read Operation System from disk."
     &DW @CRLF
     &DB 0
 
 message_NotBootable:
-    &DB "Operation System is not found."
+    &DB "No bootable disk found."
+    &DW @CRLF
+    &DB "Please insert disk and reboot."
     &DW @CRLF
     &DB 0
 
