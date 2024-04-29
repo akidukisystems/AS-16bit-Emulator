@@ -477,7 +477,7 @@
     exist vstr_BIOSpath
     if ( strsize == -1 ) : {
 
-        mes "BIOS program data is not found!"
+        mes "BIOS program data is not found"
         stop
         
     }
@@ -486,6 +486,13 @@
     bload vstr_BIOSpath, vbin_BIOS, strsize
 
     sdim emu_vbin_Memory, vint_DRAMSize
+
+    if ( vint_DRAMSize < ( vint_Ram_BIOS_Binary.StartAddr + varsize(vbin_BIOS) ) ) {
+
+        mes "BIOS program data is out of memory"
+        stop
+
+    }
     memcpy emu_vbin_Memory, vbin_BIOS, varsize(vbin_BIOS), vint_Ram_BIOS_Binary.StartAddr
 
     sdim emu_vbin_IO, 0xFFFF
@@ -534,7 +541,7 @@
     color 192, 192, 192
     pos 15, 40
     mes "Emulator"
-    mes " -Version: 1.3"
+    mes " -Version: 1.4"
     mes " -BIOS binary file: \""+ vstr_BIOSpath +"\""
     mes "\nProcessor"
     mes " -Name: "+ vstr_Processor.0
